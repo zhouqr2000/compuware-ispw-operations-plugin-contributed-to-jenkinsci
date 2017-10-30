@@ -48,8 +48,9 @@ THE SOFTWARE.
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jenkins.version>1.609.3</jenkins.version>
+		<jenkins.version>2.60.3</jenkins.version>
 		<workflow.version>1.10</workflow.version>
+		<maven.test.skip>true</maven.test.skip>
 	</properties>
 
 	<repositories>
@@ -124,6 +125,7 @@ THE SOFTWARE.
 		</dependency>
 
 		<!-- Test framework -->
+		<!-- 
 		<dependency>
 			<groupId>org.jenkins-ci.plugins.workflow</groupId>
 			<artifactId>workflow-step-api</artifactId>
@@ -137,21 +139,23 @@ THE SOFTWARE.
 			<version>${workflow.version}</version>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-servlets</artifactId>
 			<version>9.2.21.v20170120</version>
 			<scope>test</scope>
 		</dependency>
+		-->
 	</dependencies>
 
+<!-- 
 	<scm>
 		<connection>scm:git:ssh://github.com/jenkinsci/compuware-ispw-restapi-request-plugin.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com/jenkinsci/compuware-ispw-restapi-request-plugin.git</developerConnection>
 		<url>https://github.com/jenkinsci/compuware-ispw-restapi-request-plugin</url>
 		<tag>HEAD</tag>
 	</scm>
+	 -->
 	<developers>
 		<developer>
 			<id>janario</id>
