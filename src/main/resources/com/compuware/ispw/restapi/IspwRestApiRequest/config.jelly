@@ -1,0 +1,19 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+
+    <f:entry field="url" title="URL" help="/plugin/http_request/help-url.html">
+        <f:textbox />
+    </f:entry>
+    <f:entry field="httpMode" title="HTTP mode" help="/plugin/http_request/help-httpMode.html">
+        <f:select />
+    </f:entry>
+    <f:entry field="token" title="Token">
+        <f:textbox />
+    </f:entry>
+    <f:entry field="requestBody" title="Request body" help="/plugin/http_request/help-requestBody.html">
+        <f:textarea />
+    </f:entry>
+    <f:entry field="consoleLogResponseBody" title="Response body in console?" help="/plugin/http_request/help-consoleLogResponseBody.html">
+        <f:booleanRadio />
+    </f:entry>
+ </j:jelly>
