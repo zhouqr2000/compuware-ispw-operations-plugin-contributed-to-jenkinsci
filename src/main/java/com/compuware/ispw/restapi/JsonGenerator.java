@@ -57,7 +57,7 @@ public class JsonGenerator {
 	 * return json; }
 	 */
 
-	public String generate(boolean includeRoot, Object object) {
+	public String generate(Object object) {
 		String json = "{}";
 
 		try {
@@ -109,7 +109,7 @@ public class JsonGenerator {
 			auth.setPassword("library");
 			event.setCredentials(auth);
 
-			String json = generate(true, setInfo);
+			String json = generate(setInfo);
 			logger.info("setInfo json=" + json);
 		} catch (Exception x) {
 			logger.error(x.getMessage(), x);
