@@ -11,6 +11,7 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import org.apache.log4j.Logger;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -35,12 +36,12 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.model.Item;
 import hudson.model.Items;
 import hudson.model.TaskListener;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
@@ -53,6 +54,8 @@ import hudson.util.ListBoxModel.Option;
  */
 public class IspwRestApiRequest extends Builder {
 
+	private static Logger logger = Logger.getLogger(IspwRestApiRequest.class);
+	
     private @Nonnull String url;
 	private Boolean ignoreSslErrors = DescriptorImpl.ignoreSslErrors;
 	private HttpMode httpMode                 = DescriptorImpl.httpMode;
@@ -333,9 +336,16 @@ public class IspwRestApiRequest extends Builder {
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener)
     throws InterruptedException, IOException
     {
+    	/**
+    	 * Test code
+    	 */
+    	JsonGenerator gen = new JsonGenerator();
+    	gen.test();
+    	
 		EnvVars envVars = build.getEnvironment(listener);
 		for (Map.Entry<String, String> e : build.getBuildVariables().entrySet()) {
 			envVars.put(e.getKey(), e.getValue());
+			logger.info("EnvVars: "+e.getKey()+"="+e.getValue());
 		}
 
 		HttpRequestExecution exec = HttpRequestExecution.from(this, envVars, build,
