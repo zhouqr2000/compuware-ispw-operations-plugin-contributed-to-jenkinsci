@@ -3,6 +3,7 @@ package com.compuware.ispw.restapi;
 import java.util.HashMap;
 
 public class WebhookTokenManager {
+	
 	private static WebhookTokenManager instance;
 
 	private HashMap<String, WebhookToken> tagToToken;
