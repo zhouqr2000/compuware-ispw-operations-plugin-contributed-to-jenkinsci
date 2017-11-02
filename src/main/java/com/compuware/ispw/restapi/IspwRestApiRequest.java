@@ -143,13 +143,6 @@ public class IspwRestApiRequest extends Builder {
 	@DataBoundSetter
 	public void setIspwRequestBody(String ispwRequestBody) {
 		this.ispwRequestBody = ispwRequestBody;
-		
-		IspwRequestBean ispwRequestBean = GenerateAction.getIspwRequestBean("cw09", ispwRequestBody);
-		logger.info("ispwRequestBean="+ispwRequestBean);
-		
-		this.url = "http://localhost:48080"+ispwRequestBean.getContextPath();
-		this.requestBody = ispwRequestBean.getJsonRequest();
-		this.token = "4bc92bf0-e445-4d22-a5c5-45b3a83ea93d";
 	}
 	
 	public String getToken() {
@@ -385,8 +378,21 @@ public class IspwRestApiRequest extends Builder {
     @Override
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener)
     throws InterruptedException, IOException
-    {    	
+    {
 		EnvVars envVars = build.getEnvironment(listener);
+		
+		String buildTag = envVars.get("BUILD_TAG");
+		WebhookToken webhookToken = WebhookTokenManager.getInstance().get(buildTag);
+		logger.info("...getting buildTag="+buildTag+", webhookToken="+webhookToken.toString());
+		
+		IspwRequestBean ispwRequestBean = GenerateAction.getIspwRequestBean("cw09", ispwRequestBody, webhookToken);
+		logger.info("ispwRequestBean="+ispwRequestBean);
+		
+		this.url = "http://localhost:48080"+ispwRequestBean.getContextPath(); //CES URL
+		this.requestBody = ispwRequestBean.getJsonRequest();
+		this.token = "4bc92bf0-e445-4d22-a5c5-45b3a83ea93d"; //CES TOKEN
+
+		
 		for (Map.Entry<String, String> e : build.getBuildVariables().entrySet()) {
 			envVars.put(e.getKey(), e.getValue());
 			logger.info("EnvVars: "+e.getKey()+"="+e.getValue());
@@ -445,6 +451,7 @@ public class IspwRestApiRequest extends Builder {
             return HttpMode.getFillItems();
         }
         
+        // ISPW
         public ListBoxModel doFillIspwActionItems() {
         	return IspwAction.getFillItems();
         }

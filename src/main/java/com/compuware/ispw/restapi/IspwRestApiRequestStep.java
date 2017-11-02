@@ -8,6 +8,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
+import org.apache.log4j.Logger;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepDescriptorImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractSynchronousNonBlockingStepExecution;
@@ -17,14 +18,16 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
+import com.compuware.ispw.restapi.action.GenerateAction;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
 
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Item;
-import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.model.Run;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
@@ -33,24 +36,31 @@ import hudson.util.ListBoxModel;
  */
 public final class IspwRestApiRequestStep extends AbstractStepImpl {
 
-    private @Nonnull String url;
+	private static Logger logger = Logger.getLogger(IspwRestApiRequestStep.class);
+	
+	private @Nonnull String url;
 	private boolean ignoreSslErrors = DescriptorImpl.ignoreSslErrors;
-	private HttpMode httpMode                 = DescriptorImpl.httpMode;
-    private String httpProxy                  = DescriptorImpl.httpProxy;
-    private String validResponseCodes         = DescriptorImpl.validResponseCodes;
-    private String validResponseContent       = DescriptorImpl.validResponseContent;
-    private MimeType acceptType               = DescriptorImpl.acceptType;
-    private MimeType contentType              = DescriptorImpl.contentType;
-    private Integer timeout                   = DescriptorImpl.timeout;
-    private Boolean consoleLogResponseBody    = DescriptorImpl.consoleLogResponseBody;
-    private Boolean quiet                     = DescriptorImpl.quiet;
-    private String authentication             = DescriptorImpl.authentication;
-    private String requestBody                = DescriptorImpl.requestBody;
-    private List<HttpRequestNameValuePair> customHeaders = DescriptorImpl.customHeaders;
+	private HttpMode httpMode = DescriptorImpl.httpMode;
+	private String httpProxy = DescriptorImpl.httpProxy;
+	private String validResponseCodes = DescriptorImpl.validResponseCodes;
+	private String validResponseContent = DescriptorImpl.validResponseContent;
+	private MimeType acceptType = DescriptorImpl.acceptType;
+	private MimeType contentType = DescriptorImpl.contentType;
+	private Integer timeout = DescriptorImpl.timeout;
+	private Boolean quiet = DescriptorImpl.quiet;
+	private String authentication = DescriptorImpl.authentication;
+	private String requestBody = DescriptorImpl.requestBody;
+	private List<HttpRequestNameValuePair> customHeaders = DescriptorImpl.customHeaders;
 	private String outputFile = DescriptorImpl.outputFile;
 	private ResponseHandle responseHandle = DescriptorImpl.responseHandle;
-	private String token = DescriptorImpl.token; //modified by pmisvz0
+	private String token = DescriptorImpl.token; // modified by pmisvz0
 
+	// ISPW
+	private String ispwHost = DescriptorImpl.ispwHost;
+	private String ispwAction = DescriptorImpl.ispwAction;
+	private String ispwRequestBody = DescriptorImpl.ispwRequestBody;
+	private Boolean consoleLogResponseBody = DescriptorImpl.consoleLogResponseBody;
+	
     @DataBoundConstructor
     public IspwRestApiRequestStep(String url) {
         this.url = url;
@@ -78,6 +88,44 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
         return httpMode;
     }
 
+    // ispw begin
+	public String getIspwAction() {
+		return ispwAction;
+	}
+
+	@DataBoundSetter
+	public void setIspwAction(String ispwAction) {
+		this.ispwAction = ispwAction;
+
+		if (IspwAction.CreateAssignment.equals(ispwAction)
+				|| IspwAction.GenerateTasksInAssignment.equals(ispwAction)) {
+			httpMode = HttpMode.POST;
+		} else if (IspwAction.GetAssignmentInfo.equals(ispwAction)
+				|| IspwAction.GetAssignmentTaskList.equals(ispwAction)) {
+			httpMode = HttpMode.GET;
+		}
+
+		logger.info("ispwAction=" + ispwAction + ", httpMode=" + httpMode);
+	}
+	
+	public String getIspwHost() {
+		return ispwHost;
+	}
+
+	@DataBoundSetter
+	public void setIspwHost(String ispwHost) {
+		this.ispwHost = ispwHost;
+	}
+	
+	public String getIspwRequestBody() {
+		return ispwRequestBody;
+	}
+
+	@DataBoundSetter
+	public void setIspwRequestBody(String ispwRequestBody) {
+		this.ispwRequestBody = ispwRequestBody;
+	}
+    
 	public String getToken() {
 		return token;
 	}
@@ -219,6 +267,7 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 //			headers.add(new HttpRequestNameValuePair("Content-type", contentType.getContentType().toString()));
 //		}
 		
+		// ISPW
 		headers.add(new HttpRequestNameValuePair("Content-type", MimeType.APPLICATION_JSON.toString()));
 		headers.add(new HttpRequestNameValuePair("Authorization", getToken()));
 		
@@ -238,23 +287,35 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 
 	@Extension
     public static final class DescriptorImpl extends AbstractStepDescriptorImpl {
-        public static final boolean ignoreSslErrors = IspwRestApiRequest.DescriptorImpl.ignoreSslErrors;
-        public static final HttpMode httpMode                  = IspwRestApiRequest.DescriptorImpl.httpMode;
-        public static final String   httpProxy                 = IspwRestApiRequest.DescriptorImpl.httpProxy;
-        public static final String   validResponseCodes        = IspwRestApiRequest.DescriptorImpl.validResponseCodes;
-        public static final String   validResponseContent      = IspwRestApiRequest.DescriptorImpl.validResponseContent;
-        public static final MimeType acceptType                = IspwRestApiRequest.DescriptorImpl.acceptType;
-        public static final MimeType contentType               = IspwRestApiRequest.DescriptorImpl.contentType;
-        public static final int      timeout                   = IspwRestApiRequest.DescriptorImpl.timeout;
-        public static final Boolean  consoleLogResponseBody    = IspwRestApiRequest.DescriptorImpl.consoleLogResponseBody;
-        public static final Boolean  quiet                     = IspwRestApiRequest.DescriptorImpl.quiet;
-        public static final String   authentication            = IspwRestApiRequest.DescriptorImpl.authentication;
-        public static final String   requestBody               = IspwRestApiRequest.DescriptorImpl.requestBody;
-        public static final String   token                     = IspwRestApiRequest.DescriptorImpl.token;
-        public static final List <HttpRequestNameValuePair> customHeaders = Collections.<HttpRequestNameValuePair>emptyList();
-        public static final String outputFile = "";
+		public static final boolean ignoreSslErrors =
+				IspwRestApiRequest.DescriptorImpl.ignoreSslErrors;
+		public static final HttpMode httpMode = IspwRestApiRequest.DescriptorImpl.httpMode;
+		public static final String httpProxy = IspwRestApiRequest.DescriptorImpl.httpProxy;
+		public static final String validResponseCodes =
+				IspwRestApiRequest.DescriptorImpl.validResponseCodes;
+		public static final String validResponseContent =
+				IspwRestApiRequest.DescriptorImpl.validResponseContent;
+		public static final MimeType acceptType = IspwRestApiRequest.DescriptorImpl.acceptType;
+		public static final MimeType contentType = IspwRestApiRequest.DescriptorImpl.contentType;
+		public static final int timeout = IspwRestApiRequest.DescriptorImpl.timeout;
+		public static final Boolean quiet = IspwRestApiRequest.DescriptorImpl.quiet;
+		public static final String authentication =
+				IspwRestApiRequest.DescriptorImpl.authentication;
+		public static final String requestBody = IspwRestApiRequest.DescriptorImpl.requestBody;
+		public static final String token = IspwRestApiRequest.DescriptorImpl.token;
+		public static final List<HttpRequestNameValuePair> customHeaders = Collections
+				.<HttpRequestNameValuePair> emptyList();
+		public static final String outputFile = "";
 		public static final ResponseHandle responseHandle = ResponseHandle.STRING;
 
+		// ISPW related
+		public static final String ispwHost = IspwRestApiRequest.DescriptorImpl.ispwHost;
+		public static final String ispwAction = IspwRestApiRequest.DescriptorImpl.ispwAction;
+		public static final String ispwRequestBody =
+				IspwRestApiRequest.DescriptorImpl.ispwRequestBody;
+		public static final Boolean consoleLogResponseBody =
+				IspwRestApiRequest.DescriptorImpl.consoleLogResponseBody;
+		
         public DescriptorImpl() {
             super(Execution.class);
         }
@@ -273,6 +334,21 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
             return HttpMode.getFillItems();
         }
 
+        // ISPW
+        public ListBoxModel doFillIspwActionItems() {
+        	return IspwAction.getFillItems();
+        }
+
+        public ListBoxModel doFillIspwHostItems() {
+        	//TODO
+        	//These values should come from Global Configuration areas
+        	ListBoxModel items = new ListBoxModel();
+        	items.add("CW09:47623");
+        	items.add("CW09:27623");
+        	
+        	return items;
+        }
+        
         public ListBoxModel doFillAcceptTypeItems() {
             return MimeType.getContentTypeFillItems();
         }
@@ -312,6 +388,20 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 
 		@Override
 		protected ResponseContentSupplier run() throws Exception {
+			
+			EnvVars envVars = getContext().get(hudson.EnvVars.class);
+			
+			String buildTag = envVars.get("BUILD_TAG");
+			WebhookToken webhookToken = WebhookTokenManager.getInstance().get(buildTag);
+			logger.info("...getting buildTag="+buildTag+", webhookToken="+webhookToken.toString());
+			
+			IspwRequestBean ispwRequestBean = GenerateAction.getIspwRequestBean("cw09", step.ispwRequestBody, webhookToken);
+			logger.info("ispwRequestBean="+ispwRequestBean);
+			
+			step.url = "http://localhost:48080"+ispwRequestBean.getContextPath(); //CES URL
+			step.requestBody = ispwRequestBean.getJsonRequest();
+			step.token = "4bc92bf0-e445-4d22-a5c5-45b3a83ea93d"; //CES TOKEN
+			
 			HttpRequestExecution exec = HttpRequestExecution.from(step,
 					step.getQuiet() ? TaskListener.NULL : listener,
 					this);

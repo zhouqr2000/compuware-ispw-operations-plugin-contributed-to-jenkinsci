@@ -11,6 +11,7 @@ import com.compuware.ispw.model.rest.SetInfo;
 import com.compuware.ispw.restapi.Constants;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.JsonGenerator;
+import com.compuware.ispw.restapi.WebhookToken;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
 public class GenerateAction {
@@ -39,7 +40,8 @@ public class GenerateAction {
 		return RestApiUtils.join(Constants.LINE_SEPARATOR, defaultProps, true);
 	}
 
-	public static IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody) {
+	public static IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody,
+			WebhookToken webhookToken) {
 		IspwRequestBean bean = new IspwRequestBean();
 
 		String path = contextPath.replace("{srid}", srid);
@@ -82,9 +84,6 @@ public class GenerateAction {
 						}
 					} else if (name.equalsIgnoreCase(eventsName)) {
 						event.setName(value);
-					} else if (name.equalsIgnoreCase(eventsUrl)) {
-						hasEvent = true; // callback must has a callback URL
-						event.setUrl(value);
 					} else if (name.equalsIgnoreCase(eventsMethod)) {
 						event.setMethod(value);
 					} else if (name.equalsIgnoreCase(eventsBody)) {
@@ -100,11 +99,13 @@ public class GenerateAction {
 							event.setCredentials(auth);
 						}
 					}
+
 				}
 			}
 		}
 
-		if (hasEvent) {
+		if (webhookToken != null) {
+			event.setUrl(webhookToken.getURL());
 			setInfo.setEventCallbacks(events);
 		}
 
