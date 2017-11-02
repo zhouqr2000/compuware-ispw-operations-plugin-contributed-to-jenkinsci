@@ -1,0 +1,31 @@
+<div>
+
+    <p>Available parameters for ISPW generate action:</p>
+	<p>
+	<pre>
+assignmentId - The Assignment for which you intend to generate tasks.
+level - All tasks in the release at this level will be generated.
+
+runtimeConfiguration - Optional, see ISPW administrator for valid values.
+autoDeploy - Optional, promotes can be set up to automatically Deploy as well by an option set up by the ISPW. The default is to not use Auto Deploy.
+httpHeaders - Optional, global custom headers used for all, colon and semicolon separated. For example, n1:v1;n2:v2;n3:v3.
+credentials - Optional, global credentials used for all call backs. User name and password are colon separated.
+events.name - Optional, event name
+events.url - Optional, callback URI
+events.method - Optional, defaults to POST
+events.body - Optional, body for callback
+events.httpHeaders=Optional, custom headers - override global headers
+events.credentials=Optional, used if 3rd party requires basic authentication - overrides global credentials
+	</pre>
+	</p>
+	<p>Example:</p>
+	<pre>
+assignmentId=PLAY000313
+level=DEV2
+runtimeConfiguration=TPZP
+events.name=complete
+events.url=http://localhost:8080/jenkins/ispw-webhook-step/wait
+events.httpHeaders=Jenkins-Crumb:6f22d77069d8fc646f52eb9c9f81701b
+events.credentials=admin:library
+	</pre>
+</div>

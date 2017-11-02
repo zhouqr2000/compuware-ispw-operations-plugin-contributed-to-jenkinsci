@@ -22,6 +22,7 @@ import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
+import com.compuware.ispw.restapi.action.GenerateAction;
 import com.compuware.ispw.restapi.auth.BasicDigestAuthentication;
 import com.compuware.ispw.restapi.auth.FormAuthentication;
 import com.compuware.ispw.restapi.util.HttpClientUtil;
@@ -55,25 +56,30 @@ import hudson.util.ListBoxModel.Option;
 public class IspwRestApiRequest extends Builder {
 
 	private static Logger logger = Logger.getLogger(IspwRestApiRequest.class);
-	
-    private @Nonnull String url;
-	private Boolean ignoreSslErrors = DescriptorImpl.ignoreSslErrors;
-	private HttpMode httpMode                 = DescriptorImpl.httpMode;
-	private String httpProxy                  = DescriptorImpl.httpProxy;
-    private Boolean passBuildParameters       = DescriptorImpl.passBuildParameters;
-    private String validResponseCodes         = DescriptorImpl.validResponseCodes;
-    private String validResponseContent       = DescriptorImpl.validResponseContent;
-    private MimeType acceptType               = DescriptorImpl.acceptType;
-    private MimeType contentType              = DescriptorImpl.contentType;
-    private String outputFile                 = DescriptorImpl.outputFile;
-    private Integer timeout                   = DescriptorImpl.timeout;
-    private Boolean consoleLogResponseBody    = DescriptorImpl.consoleLogResponseBody;
-    private Boolean quiet                     = DescriptorImpl.quiet;
-    private String authentication             = DescriptorImpl.authentication;
-    private String requestBody                = DescriptorImpl.requestBody;
-	private String token                      = DescriptorImpl.token;
-    private List<HttpRequestNameValuePair> customHeaders = DescriptorImpl.customHeaders;
 
+	private @Nonnull String url;
+	private Boolean ignoreSslErrors = DescriptorImpl.ignoreSslErrors;
+	private HttpMode httpMode = DescriptorImpl.httpMode;
+	private String httpProxy = DescriptorImpl.httpProxy;
+	private Boolean passBuildParameters = DescriptorImpl.passBuildParameters;
+	private String validResponseCodes = DescriptorImpl.validResponseCodes;
+	private String validResponseContent = DescriptorImpl.validResponseContent;
+	private MimeType acceptType = DescriptorImpl.acceptType;
+	private MimeType contentType = DescriptorImpl.contentType;
+	private String outputFile = DescriptorImpl.outputFile;
+	private Integer timeout = DescriptorImpl.timeout;
+	private Boolean quiet = DescriptorImpl.quiet;
+	private String requestBody = DescriptorImpl.requestBody;
+	private String authentication = DescriptorImpl.authentication;
+	private String token = DescriptorImpl.token;
+	private List<HttpRequestNameValuePair> customHeaders = DescriptorImpl.customHeaders;
+
+	// ISPW
+	private String ispwHost = DescriptorImpl.ispwHost;
+	private String ispwAction = DescriptorImpl.ispwAction;
+	private String ispwRequestBody = DescriptorImpl.ispwRequestBody;
+	private Boolean consoleLogResponseBody = DescriptorImpl.consoleLogResponseBody;
+    
 	@DataBoundConstructor
 	public IspwRestApiRequest(@Nonnull String url) {
 		this.url = url;
@@ -102,6 +108,50 @@ public class IspwRestApiRequest extends Builder {
 		this.httpMode = httpMode;
 	}
 
+	public String getIspwAction() {
+		return ispwAction;
+	}
+
+	@DataBoundSetter
+	public void setIspwAction(String ispwAction) {
+		this.ispwAction = ispwAction;
+
+		if (IspwAction.CreateAssignment.equals(ispwAction)
+				|| IspwAction.GenerateTasksInAssignment.equals(ispwAction)) {
+			httpMode = HttpMode.POST;
+		} else if (IspwAction.GetAssignmentInfo.equals(ispwAction)
+				|| IspwAction.GetAssignmentTaskList.equals(ispwAction)) {
+			httpMode = HttpMode.GET;
+		}
+
+		logger.info("ispwAction=" + ispwAction + ", httpMode=" + httpMode);
+	}
+	
+	public String getIspwHost() {
+		return ispwHost;
+	}
+
+	@DataBoundSetter
+	public void setIspwHost(String ispwHost) {
+		this.ispwHost = ispwHost;
+	}
+	
+	public String getIspwRequestBody() {
+		return ispwRequestBody;
+	}
+
+	@DataBoundSetter
+	public void setIspwRequestBody(String ispwRequestBody) {
+		this.ispwRequestBody = ispwRequestBody;
+		
+		IspwRequestBean ispwRequestBean = GenerateAction.getIspwRequestBean("cw09", ispwRequestBody);
+		logger.info("ispwRequestBean="+ispwRequestBean);
+		
+		this.url = "http://localhost:48080"+ispwRequestBean.getContextPath();
+		this.requestBody = ispwRequestBean.getJsonRequest();
+		this.token = "4bc92bf0-e445-4d22-a5c5-45b3a83ea93d";
+	}
+	
 	public String getToken() {
 		return token;
 	}
@@ -331,17 +381,11 @@ public class IspwRestApiRequest extends Builder {
 		}
 		return workspace.child(filePath);
 	}
-
+	
     @Override
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener)
     throws InterruptedException, IOException
-    {
-    	/**
-    	 * Test code
-    	 */
-    	JsonGenerator gen = new JsonGenerator();
-    	gen.test();
-    	
+    {    	
 		EnvVars envVars = build.getEnvironment(listener);
 		for (Map.Entry<String, String> e : build.getBuildVariables().entrySet()) {
 			envVars.put(e.getKey(), e.getValue());
@@ -358,21 +402,28 @@ public class IspwRestApiRequest extends Builder {
 	@Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 		public static final boolean ignoreSslErrors = false;
-		public static final HttpMode httpMode                  = HttpMode.GET;
-		public static final String   httpProxy                 = "";
-        public static final Boolean  passBuildParameters       = false;
-        public static final String   validResponseCodes        = "100:399";
-        public static final String   validResponseContent      = "";
-        public static final MimeType acceptType                = MimeType.NOT_SET;
-        public static final MimeType contentType               = MimeType.NOT_SET;
-        public static final String   outputFile                = "";
-        public static final int      timeout                   = 0;
-        public static final Boolean  consoleLogResponseBody    = false;
-        public static final Boolean  quiet                     = false;
-        public static final String   authentication            = "";
-        public static final String   requestBody               = "";
-        public static final String   token                     = "";
-        public static final List <HttpRequestNameValuePair> customHeaders = Collections.<HttpRequestNameValuePair>emptyList();
+		public static final HttpMode httpMode = HttpMode.POST;
+		public static final String httpProxy = "";
+		public static final Boolean passBuildParameters = false;
+		public static final String validResponseCodes = "100:399";
+		public static final String validResponseContent = "";
+		public static final MimeType acceptType = MimeType.NOT_SET;
+		public static final MimeType contentType = MimeType.NOT_SET;
+		public static final String outputFile = "";
+		public static final int timeout = 0;
+		public static final Boolean quiet = false;
+		public static final String authentication = "";
+		public static final String requestBody = "";
+		public static final String token = "";
+
+		// ISPW related
+		public static final String ispwHost = "CW09:47623";
+		public static final String ispwAction = IspwAction.GenerateTasksInAssignment;
+		public static final String ispwRequestBody = GenerateAction.getDefaultProps();
+		public static final Boolean consoleLogResponseBody = false;
+
+		public static final List<HttpRequestNameValuePair> customHeaders = Collections
+				.<HttpRequestNameValuePair> emptyList();
 
         public DescriptorImpl() {
             load();
@@ -393,7 +444,21 @@ public class IspwRestApiRequest extends Builder {
         public ListBoxModel doFillHttpModeItems() {
             return HttpMode.getFillItems();
         }
+        
+        public ListBoxModel doFillIspwActionItems() {
+        	return IspwAction.getFillItems();
+        }
 
+        public ListBoxModel doFillIspwHostItems() {
+        	//TODO
+        	//These values should come from Global Configuration areas
+        	ListBoxModel items = new ListBoxModel();
+        	items.add("CW09:47623");
+        	items.add("CW09:27623");
+        	
+        	return items;
+        }
+        
         public ListBoxModel doFillAcceptTypeItems() {
             return MimeType.getContentTypeFillItems();
         }
