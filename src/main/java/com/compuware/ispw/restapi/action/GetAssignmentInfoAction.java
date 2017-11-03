@@ -6,10 +6,10 @@ import java.util.List;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
 
-public class GetAssignmentTaskListAction extends AbstractAction {
+public class GetAssignmentInfoAction extends AbstractAction {
 
-	public static String[] defaultProps = new String[] { assignmentId, level };
-	public static String contextPath = "/ispw/{srid}/assignments/{assignmentId}/tasks?level={level}";
+	public static String[] defaultProps = new String[] { assignmentId };
+	public static String contextPath = "/ispw/{srid}/assignments/{assignmentId}";
 
 	@Override
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody,

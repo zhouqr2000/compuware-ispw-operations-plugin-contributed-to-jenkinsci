@@ -1,8 +1,8 @@
-package com.compuware.ispw.restapi;
+package com.compuware.ispw.restapi.action;
 
 import hudson.util.ListBoxModel;
 
-public class IspwAction {
+public class IspwCommand {
 	public static String CreateAssignment = "CreateAssignment"; // POST
 	public static String GetAssignmentInfo = "GetAssignmentInfo"; // GET
 	public static String GetAssignmentTaskList = "GetAssignmentTaskList"; // GET

@@ -14,10 +14,7 @@ import com.compuware.ispw.restapi.JsonGenerator;
 import com.compuware.ispw.restapi.WebhookToken;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
-public class GenerateTasksInAssignmentAction implements IAction{
-
-	public static String assignmentId = "assignmentId";
-	public static String level = "level";
+public class GenerateTasksInAssignmentAction implements IAction {
 
 	public static String runtimeConfiguration = "runtimeConfiguration";
 	public static String autoDeploy = "autoDeploy";
@@ -65,40 +62,40 @@ public class GenerateTasksInAssignmentAction implements IAction{
 
 				if (StringUtils.isNotBlank(value)) {
 
-					if (name.equalsIgnoreCase(assignmentId)) {
+					if (name.equals(assignmentId)) {
 						path = path.replace("{assignmentId}", value);
-					} else if (name.equalsIgnoreCase(level)) {
+					} else if (name.equals(level)) {
 						path = path.replace("{level}", value);
-					} else if (name.equalsIgnoreCase(runtimeConfiguration)) {
+					} else if (name.equals(runtimeConfiguration)) {
 						setInfo.setRuntimeConfig(value);
-					} else if (name.equalsIgnoreCase(autoDeploy)) {
+					} else if (name.equals(autoDeploy)) {
 						setInfo.setAutoDeploy(autoDeploy);
-					} else if (name.equalsIgnoreCase(httpHeaders)) {
+					} else if (name.equals(httpHeaders)) {
 						ArrayList<HttpHeader> httpHeaders = RestApiUtils.toHttpHeaders(value);
 						if (!httpHeaders.isEmpty()) {
 							setInfo.setHttpHeaders(httpHeaders);
 						}
-					} else if (name.equalsIgnoreCase(credentials)) {
+					} else if (name.equals(credentials)) {
 						BasicAuthentication auth = RestApiUtils.toBasicAuthentication(value);
 						if (auth != null) {
 							setInfo.setCredentials(auth);
 						}
-					} else if (name.equalsIgnoreCase(eventsName)) {
+					} else if (name.equals(eventsName)) {
 						hasEvent = true;
 						event.setName(value);
-					} else if (name.equalsIgnoreCase(eventsMethod)) {
+					} else if (name.equals(eventsMethod)) {
 						hasEvent = true;
 						event.setMethod(value);
-					} else if (name.equalsIgnoreCase(eventsBody)) {
+					} else if (name.equals(eventsBody)) {
 						hasEvent = true;
 						event.setBody(value);
-					} else if (name.equalsIgnoreCase(eventsHttpHeaders)) {
+					} else if (name.equals(eventsHttpHeaders)) {
 						ArrayList<HttpHeader> httpHeaders = RestApiUtils.toHttpHeaders(value);
 						if (!httpHeaders.isEmpty()) {
 							hasEvent = true;
 							event.setHttpHeaders(httpHeaders);
 						}
-					} else if (name.equalsIgnoreCase(eventsCredentials)) {
+					} else if (name.equals(eventsCredentials)) {
 						BasicAuthentication auth = RestApiUtils.toBasicAuthentication(value);
 						if (auth != null) {
 							hasEvent = true;

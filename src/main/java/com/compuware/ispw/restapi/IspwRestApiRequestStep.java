@@ -21,6 +21,7 @@ import org.kohsuke.stapler.QueryParameter;
 import com.compuware.ispw.restapi.action.GenerateTasksInAssignmentAction;
 import com.compuware.ispw.restapi.action.GetAssignmentTaskListAction;
 import com.compuware.ispw.restapi.action.IAction;
+import com.compuware.ispw.restapi.action.IspwCommand;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
 
 import hudson.EnvVars;
@@ -103,11 +104,11 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 	public void setIspwAction(String ispwAction) {
 		this.ispwAction = ispwAction;
 
-		if (IspwAction.CreateAssignment.equals(ispwAction)
-				|| IspwAction.GenerateTasksInAssignment.equals(ispwAction)) {
+		if (IspwCommand.CreateAssignment.equals(ispwAction)
+				|| IspwCommand.GenerateTasksInAssignment.equals(ispwAction)) {
 			httpMode = HttpMode.POST;
-		} else if (IspwAction.GetAssignmentInfo.equals(ispwAction)
-				|| IspwAction.GetAssignmentTaskList.equals(ispwAction)) {
+		} else if (IspwCommand.GetAssignmentInfo.equals(ispwAction)
+				|| IspwCommand.GetAssignmentTaskList.equals(ispwAction)) {
 			httpMode = HttpMode.GET;
 		}
 
@@ -405,15 +406,19 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			logger.info("...ispwAction=" + step.ispwAction);
 
 			IAction action = null;
-			if (IspwAction.GenerateTasksInAssignment.equals(step.ispwAction)) {
+			if (IspwCommand.GenerateTasksInAssignment.equals(step.ispwAction)) {
 				action = new GenerateTasksInAssignmentAction();
-			} else if (IspwAction.GetAssignmentTaskList.equals(step.ispwAction)) {
+			} else if (IspwCommand.GetAssignmentTaskList.equals(step.ispwAction)) {
 				action = new GetAssignmentTaskListAction();
 			}
 
 			if (action == null) {
-				logger.info("Action:" + step.ispwAction + " is not implemented yet");
-				throw new IllegalStateException(new Exception());
+				String errorMsg =
+						"Action:"
+								+ step.ispwAction
+								+ " is not implemented. Please make sure you have the correct action name.";
+				logger.info(errorMsg);
+				throw new IllegalStateException(new Exception(errorMsg));
 			}
 
 			IspwRequestBean ispwRequestBean =
@@ -423,6 +428,11 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			step.url = "http://localhost:48080" + ispwRequestBean.getContextPath(); // CES URL
 			step.requestBody = ispwRequestBean.getJsonRequest();
 			step.token = "4bc92bf0-e445-4d22-a5c5-45b3a83ea93d"; // CES TOKEN
+
+			logger.info("...url=" + step.url);
+			logger.info("...requestBody=" + step.requestBody);
+			logger.info("...token=" + step.token);
+			logger.info("...httpMode=" + step.httpMode);
 			
 			HttpRequestExecution exec = HttpRequestExecution.from(step,
 					step.getQuiet() ? TaskListener.NULL : listener,

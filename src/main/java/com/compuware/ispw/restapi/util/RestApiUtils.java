@@ -1,6 +1,7 @@
 package com.compuware.ispw.restapi.util;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -69,5 +70,14 @@ public class RestApiUtils {
 		}
 
 		return auth;
+	}
+
+	public static boolean containsIgnoreCase(List<String> tokens, String anotherToken) {
+		for (String token : tokens) {
+			if (token.equalsIgnoreCase(anotherToken))
+				return true;
+		}
+
+		return false;
 	}
 }

@@ -23,8 +23,10 @@ import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
 import com.compuware.ispw.restapi.action.GenerateTasksInAssignmentAction;
+import com.compuware.ispw.restapi.action.GetAssignmentInfoAction;
 import com.compuware.ispw.restapi.action.GetAssignmentTaskListAction;
 import com.compuware.ispw.restapi.action.IAction;
+import com.compuware.ispw.restapi.action.IspwCommand;
 import com.compuware.ispw.restapi.auth.BasicDigestAuthentication;
 import com.compuware.ispw.restapi.auth.FormAuthentication;
 import com.compuware.ispw.restapi.util.HttpClientUtil;
@@ -122,11 +124,11 @@ public class IspwRestApiRequest extends Builder {
 	public void setIspwAction(String ispwAction) {
 		this.ispwAction = ispwAction;
 
-		if (IspwAction.CreateAssignment.equals(ispwAction)
-				|| IspwAction.GenerateTasksInAssignment.equals(ispwAction)) {
+		if (IspwCommand.CreateAssignment.equals(ispwAction)
+				|| IspwCommand.GenerateTasksInAssignment.equals(ispwAction)) {
 			httpMode = HttpMode.POST;
-		} else if (IspwAction.GetAssignmentInfo.equals(ispwAction)
-				|| IspwAction.GetAssignmentTaskList.equals(ispwAction)) {
+		} else if (IspwCommand.GetAssignmentInfo.equals(ispwAction)
+				|| IspwCommand.GetAssignmentTaskList.equals(ispwAction)) {
 			httpMode = HttpMode.GET;
 		}
 
@@ -393,25 +395,32 @@ public class IspwRestApiRequest extends Builder {
 		logger.info("...ispwAction="+ispwAction);
 		
     	IAction action = null;
-		if (IspwAction.GenerateTasksInAssignment.equals(ispwAction)) {
+		if (IspwCommand.GenerateTasksInAssignment.equals(ispwAction)) {
 			action = new GenerateTasksInAssignmentAction();
-		} else if (IspwAction.GetAssignmentTaskList.equals(ispwAction)) {
+		} else if (IspwCommand.GetAssignmentTaskList.equals(ispwAction)) {
 			action = new GetAssignmentTaskListAction();
+		} else if(IspwCommand.GetAssignmentInfo.equals(ispwAction)) {
+			action = new GetAssignmentInfoAction();
 		}
     	
-		if(action == null)
-		{
-			logger.info("Action:"+ispwAction+" is not implemented yet");
+		if (action == null) {
+			logger.info("Action:" + ispwAction
+					+ " is not implemented, please make sure you have the correct action name");
 			return false;
 		}
 		
 		IspwRequestBean ispwRequestBean = action.getIspwRequestBean("cw09", ispwRequestBody, webhookToken);
 		logger.info("ispwRequestBean="+ispwRequestBean);
 		
-		this.url = "http://localhost:48080"+ispwRequestBean.getContextPath(); //CES URL
+		this.url = "http://localhost:48080" + ispwRequestBean.getContextPath(); // CES URL
 		this.requestBody = ispwRequestBean.getJsonRequest();
-		this.token = "4bc92bf0-e445-4d22-a5c5-45b3a83ea93d"; //CES TOKEN
-		
+		this.token = "4bc92bf0-e445-4d22-a5c5-45b3a83ea93d"; // CES TOKEN
+
+		logger.info("...url=" + url);
+		logger.info("...requestBody=" + requestBody);
+		logger.info("...token=" + token);
+		logger.info("...httpMode=" + httpMode);
+	
 		for (Map.Entry<String, String> e : build.getBuildVariables().entrySet()) {
 			envVars.put(e.getKey(), e.getValue());
 			logger.info("EnvVars: "+e.getKey()+"="+e.getValue());
@@ -443,7 +452,7 @@ public class IspwRestApiRequest extends Builder {
 
 		// ISPW related
 		public static final String ispwHost = "CW09:47623";
-		public static final String ispwAction = IspwAction.GenerateTasksInAssignment;
+		public static final String ispwAction = IspwCommand.GenerateTasksInAssignment;
 		public static final String ispwRequestBody = GenerateTasksInAssignmentAction.getDefaultProps();
 		public static final Boolean consoleLogResponseBody = false;
 
@@ -472,7 +481,7 @@ public class IspwRestApiRequest extends Builder {
         
         // ISPW
         public ListBoxModel doFillIspwActionItems() {
-        	return IspwAction.getFillItems();
+        	return IspwCommand.getFillItems();
         }
 
         public ListBoxModel doFillIspwHostItems() {
