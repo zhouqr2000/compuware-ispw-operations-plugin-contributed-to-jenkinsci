@@ -16,10 +16,10 @@
     </f:entry>
     -->
     <f:entry field="ispwHost" title="Host" help="/plugin/compuware-ispw-restapi-request-plugin/help-ispwHost.html">
-        <f:select default="${descriptor.ispwHost}"/>
+        <f:textbox default="cw09"/>
     </f:entry>
     <f:entry field="ispwAction" title="Action" help="/plugin/compuware-ispw-restapi-request-plugin/help-ispwAction.html">
-        <f:select default="${descriptor.ispwAction}"/>
+        <f:textbox default="GenerateTasksInAssignment"/>
     </f:entry>
     <f:entry field="ispwRequestBody" title="Request" help="/plugin/compuware-ispw-restapi-request-plugin/help-ispwRequestBody.html">
         <f:textarea default="${descriptor.ispwRequestBody}"/>

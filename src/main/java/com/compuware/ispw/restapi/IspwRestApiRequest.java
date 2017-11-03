@@ -81,15 +81,19 @@ public class IspwRestApiRequest extends Builder {
 	private Boolean consoleLogResponseBody = DescriptorImpl.consoleLogResponseBody;
     
 	@DataBoundConstructor
-	public IspwRestApiRequest(@Nonnull String url) {
-		this.url = url;
+	public IspwRestApiRequest() {
 	}
-
+	
 	@Nonnull
 	public String getUrl() {
 		return url;
 	}
 
+	@DataBoundSetter
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	
 	public Boolean getIgnoreSslErrors() {
 		return ignoreSslErrors;
 	}
@@ -383,7 +387,7 @@ public class IspwRestApiRequest extends Builder {
 		
 		String buildTag = envVars.get("BUILD_TAG");
 		WebhookToken webhookToken = WebhookTokenManager.getInstance().get(buildTag);
-		logger.info("...getting buildTag="+buildTag+", webhookToken="+webhookToken.toString());
+		logger.info("...getting buildTag="+buildTag+", webhookToken="+webhookToken);
 		
 		IspwRequestBean ispwRequestBean = GenerateAction.getIspwRequestBean("cw09", ispwRequestBody, webhookToken);
 		logger.info("ispwRequestBean="+ispwRequestBean);
