@@ -56,20 +56,24 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 	private String token = DescriptorImpl.token; // modified by pmisvz0
 
 	// ISPW
-	private String ispwHost = DescriptorImpl.ispwHost;
-	private String ispwAction = DescriptorImpl.ispwAction;
+	private String ispwHost; // = DescriptorImpl.ispwHost;
+	private String ispwAction; // = DescriptorImpl.ispwAction;
 	private String ispwRequestBody = DescriptorImpl.ispwRequestBody;
 	private Boolean consoleLogResponseBody = DescriptorImpl.consoleLogResponseBody;
 	
     @DataBoundConstructor
-    public IspwRestApiRequestStep(String url) {
-        this.url = url;
+    public IspwRestApiRequestStep() {
     }
 
     public String getUrl() {
         return url;
     }
 
+	@DataBoundSetter
+	public void setUrl(String url) {
+		this.url = url;
+	}
+    
 	public boolean isIgnoreSslErrors() {
 		return ignoreSslErrors;
 	}
@@ -335,6 +339,7 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
         }
 
         // ISPW
+        /*
         public ListBoxModel doFillIspwActionItems() {
         	return IspwAction.getFillItems();
         }
@@ -343,12 +348,13 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
         	//TODO
         	//These values should come from Global Configuration areas
         	ListBoxModel items = new ListBoxModel();
-        	items.add("CW09:47623");
-        	items.add("CW09:27623");
+        	items.add("cw09");
+        	items.add("cwcc");
         	
         	return items;
         }
-        
+        */
+ 
         public ListBoxModel doFillAcceptTypeItems() {
             return MimeType.getContentTypeFillItems();
         }
@@ -393,7 +399,7 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			
 			String buildTag = envVars.get("BUILD_TAG");
 			WebhookToken webhookToken = WebhookTokenManager.getInstance().get(buildTag);
-			logger.info("...getting buildTag="+buildTag+", webhookToken="+webhookToken.toString());
+			logger.info("...getting buildTag="+buildTag+", webhookToken="+webhookToken);
 			
 			IspwRequestBean ispwRequestBean = GenerateAction.getIspwRequestBean("cw09", step.ispwRequestBody, webhookToken);
 			logger.info("ispwRequestBean="+ispwRequestBean);
