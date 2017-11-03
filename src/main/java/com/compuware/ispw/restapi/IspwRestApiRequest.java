@@ -22,7 +22,9 @@ import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
-import com.compuware.ispw.restapi.action.GenerateAction;
+import com.compuware.ispw.restapi.action.GenerateTasksInAssignmentAction;
+import com.compuware.ispw.restapi.action.GetAssignmentTaskListAction;
+import com.compuware.ispw.restapi.action.IAction;
 import com.compuware.ispw.restapi.auth.BasicDigestAuthentication;
 import com.compuware.ispw.restapi.auth.FormAuthentication;
 import com.compuware.ispw.restapi.util.HttpClientUtil;
@@ -388,14 +390,27 @@ public class IspwRestApiRequest extends Builder {
 		String buildTag = envVars.get("BUILD_TAG");
 		WebhookToken webhookToken = WebhookTokenManager.getInstance().get(buildTag);
 		logger.info("...getting buildTag="+buildTag+", webhookToken="+webhookToken);
+		logger.info("...ispwAction="+ispwAction);
 		
-		IspwRequestBean ispwRequestBean = GenerateAction.getIspwRequestBean("cw09", ispwRequestBody, webhookToken);
+    	IAction action = null;
+		if (IspwAction.GenerateTasksInAssignment.equals(ispwAction)) {
+			action = new GenerateTasksInAssignmentAction();
+		} else if (IspwAction.GetAssignmentTaskList.equals(ispwAction)) {
+			action = new GetAssignmentTaskListAction();
+		}
+    	
+		if(action == null)
+		{
+			logger.info("Action:"+ispwAction+" is not implemented yet");
+			return false;
+		}
+		
+		IspwRequestBean ispwRequestBean = action.getIspwRequestBean("cw09", ispwRequestBody, webhookToken);
 		logger.info("ispwRequestBean="+ispwRequestBean);
 		
 		this.url = "http://localhost:48080"+ispwRequestBean.getContextPath(); //CES URL
 		this.requestBody = ispwRequestBean.getJsonRequest();
 		this.token = "4bc92bf0-e445-4d22-a5c5-45b3a83ea93d"; //CES TOKEN
-
 		
 		for (Map.Entry<String, String> e : build.getBuildVariables().entrySet()) {
 			envVars.put(e.getKey(), e.getValue());
@@ -429,7 +444,7 @@ public class IspwRestApiRequest extends Builder {
 		// ISPW related
 		public static final String ispwHost = "CW09:47623";
 		public static final String ispwAction = IspwAction.GenerateTasksInAssignment;
-		public static final String ispwRequestBody = GenerateAction.getDefaultProps();
+		public static final String ispwRequestBody = GenerateTasksInAssignmentAction.getDefaultProps();
 		public static final Boolean consoleLogResponseBody = false;
 
 		public static final List<HttpRequestNameValuePair> customHeaders = Collections

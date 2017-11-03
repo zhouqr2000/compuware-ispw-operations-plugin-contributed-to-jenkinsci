@@ -18,7 +18,9 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
-import com.compuware.ispw.restapi.action.GenerateAction;
+import com.compuware.ispw.restapi.action.GenerateTasksInAssignmentAction;
+import com.compuware.ispw.restapi.action.GetAssignmentTaskListAction;
+import com.compuware.ispw.restapi.action.IAction;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
 
 import hudson.EnvVars;
@@ -396,17 +398,31 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 		protected ResponseContentSupplier run() throws Exception {
 			
 			EnvVars envVars = getContext().get(hudson.EnvVars.class);
-			
+
 			String buildTag = envVars.get("BUILD_TAG");
 			WebhookToken webhookToken = WebhookTokenManager.getInstance().get(buildTag);
-			logger.info("...getting buildTag="+buildTag+", webhookToken="+webhookToken);
-			
-			IspwRequestBean ispwRequestBean = GenerateAction.getIspwRequestBean("cw09", step.ispwRequestBody, webhookToken);
-			logger.info("ispwRequestBean="+ispwRequestBean);
-			
-			step.url = "http://localhost:48080"+ispwRequestBean.getContextPath(); //CES URL
+			logger.info("...getting buildTag=" + buildTag + ", webhookToken=" + webhookToken);
+			logger.info("...ispwAction=" + step.ispwAction);
+
+			IAction action = null;
+			if (IspwAction.GenerateTasksInAssignment.equals(step.ispwAction)) {
+				action = new GenerateTasksInAssignmentAction();
+			} else if (IspwAction.GetAssignmentTaskList.equals(step.ispwAction)) {
+				action = new GetAssignmentTaskListAction();
+			}
+
+			if (action == null) {
+				logger.info("Action:" + step.ispwAction + " is not implemented yet");
+				throw new IllegalStateException(new Exception());
+			}
+
+			IspwRequestBean ispwRequestBean =
+					action.getIspwRequestBean("cw09", step.ispwRequestBody, webhookToken);
+			logger.info("ispwRequestBean=" + ispwRequestBean);
+
+			step.url = "http://localhost:48080" + ispwRequestBean.getContextPath(); // CES URL
 			step.requestBody = ispwRequestBean.getJsonRequest();
-			step.token = "4bc92bf0-e445-4d22-a5c5-45b3a83ea93d"; //CES TOKEN
+			step.token = "4bc92bf0-e445-4d22-a5c5-45b3a83ea93d"; // CES TOKEN
 			
 			HttpRequestExecution exec = HttpRequestExecution.from(step,
 					step.getQuiet() ? TaskListener.NULL : listener,

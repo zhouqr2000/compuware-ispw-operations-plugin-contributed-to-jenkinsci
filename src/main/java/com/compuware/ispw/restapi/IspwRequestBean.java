@@ -1,12 +1,13 @@
 package com.compuware.ispw.restapi;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
 public class IspwRequestBean {
-	private String contextPath;
-	private String jsonRequest;
-	
+	private String contextPath = StringUtils.EMPTY;
+	private String jsonRequest = "{}"; //empty JSON
+
 	public String getContextPath() {
 		return contextPath;
 	}

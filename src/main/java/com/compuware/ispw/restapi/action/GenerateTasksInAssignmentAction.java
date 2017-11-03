@@ -14,7 +14,7 @@ import com.compuware.ispw.restapi.JsonGenerator;
 import com.compuware.ispw.restapi.WebhookToken;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
-public class GenerateAction {
+public class GenerateTasksInAssignmentAction implements IAction{
 
 	public static String assignmentId = "assignmentId";
 	public static String level = "level";
@@ -40,7 +40,8 @@ public class GenerateAction {
 		return RestApiUtils.join(Constants.LINE_SEPARATOR, defaultProps, true);
 	}
 
-	public static IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody,
+	@Override
+	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody,
 			WebhookToken webhookToken) {
 		IspwRequestBean bean = new IspwRequestBean();
 
@@ -83,19 +84,24 @@ public class GenerateAction {
 							setInfo.setCredentials(auth);
 						}
 					} else if (name.equalsIgnoreCase(eventsName)) {
+						hasEvent = true;
 						event.setName(value);
 					} else if (name.equalsIgnoreCase(eventsMethod)) {
+						hasEvent = true;
 						event.setMethod(value);
 					} else if (name.equalsIgnoreCase(eventsBody)) {
+						hasEvent = true;
 						event.setBody(value);
 					} else if (name.equalsIgnoreCase(eventsHttpHeaders)) {
 						ArrayList<HttpHeader> httpHeaders = RestApiUtils.toHttpHeaders(value);
 						if (!httpHeaders.isEmpty()) {
+							hasEvent = true;
 							event.setHttpHeaders(httpHeaders);
 						}
 					} else if (name.equalsIgnoreCase(eventsCredentials)) {
 						BasicAuthentication auth = RestApiUtils.toBasicAuthentication(value);
 						if (auth != null) {
+							hasEvent = true;
 							event.setCredentials(auth);
 						}
 					}
@@ -104,7 +110,7 @@ public class GenerateAction {
 			}
 		}
 
-		if (webhookToken != null) {
+		if (webhookToken != null && hasEvent) {
 			event.setUrl(webhookToken.getURL());
 			setInfo.setEventCallbacks(events);
 		}
