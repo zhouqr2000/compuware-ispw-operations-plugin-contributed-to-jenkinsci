@@ -22,6 +22,7 @@ import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
+import com.compuware.ispw.restapi.action.CreateAssignmentAction;
 import com.compuware.ispw.restapi.action.GenerateTasksInAssignmentAction;
 import com.compuware.ispw.restapi.action.GetAssignmentInfoAction;
 import com.compuware.ispw.restapi.action.GetAssignmentTaskListAction;
@@ -31,6 +32,7 @@ import com.compuware.ispw.restapi.auth.BasicDigestAuthentication;
 import com.compuware.ispw.restapi.auth.FormAuthentication;
 import com.compuware.ispw.restapi.util.HttpClientUtil;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
+import com.compuware.ispw.restapi.util.RestApiUtils;
 import com.google.common.base.Strings;
 import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
@@ -401,6 +403,8 @@ public class IspwRestApiRequest extends Builder {
 			action = new GetAssignmentTaskListAction();
 		} else if(IspwCommand.GetAssignmentInfo.equals(ispwAction)) {
 			action = new GetAssignmentInfoAction();
+		} else if(IspwCommand.CreateAssignment.equals(ispwAction)) {
+			action = new CreateAssignmentAction();
 		}
     	
 		if (action == null) {
@@ -409,12 +413,18 @@ public class IspwRestApiRequest extends Builder {
 			return false;
 		}
 		
-		IspwRequestBean ispwRequestBean = action.getIspwRequestBean("cw09", ispwRequestBody, webhookToken);
+		//TODO, the following CES(url, ispw host, ispw token) will fetched from Global settings in future
+		String cesUrl = RestApiUtils.getCesUrl();
+		String cesIspwHost = RestApiUtils.getCesIspwHost();
+		String cesIspwToken = RestApiUtils.getCesIspwToken();
+		logger.info("...ces.url="+cesUrl+", ces.ispw.host="+cesIspwHost+", ces.ispw.token="+cesIspwToken);
+		
+		IspwRequestBean ispwRequestBean = action.getIspwRequestBean(cesIspwHost, ispwRequestBody, webhookToken);
 		logger.info("ispwRequestBean="+ispwRequestBean);
 		
-		this.url = "http://localhost:48080" + ispwRequestBean.getContextPath(); // CES URL
+		this.url = cesUrl + ispwRequestBean.getContextPath(); // CES URL
 		this.requestBody = ispwRequestBean.getJsonRequest();
-		this.token = "4bc92bf0-e445-4d22-a5c5-45b3a83ea93d"; // CES TOKEN
+		this.token = cesIspwToken; // CES TOKEN
 
 		logger.info("...url=" + url);
 		logger.info("...requestBody=" + requestBody);
@@ -488,8 +498,8 @@ public class IspwRestApiRequest extends Builder {
         	//TODO
         	//These values should come from Global Configuration areas
         	ListBoxModel items = new ListBoxModel();
-        	items.add("CW09:47623");
-        	items.add("CW09:27623");
+        	items.add("CES [http://localhost:48080], ISPW [cw09-47623]");
+        	items.add("CES [http://localhost:48080], ISPW [cw09-27623]");
         	
         	return items;
         }

@@ -18,11 +18,14 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
+import com.compuware.ispw.restapi.action.CreateAssignmentAction;
 import com.compuware.ispw.restapi.action.GenerateTasksInAssignmentAction;
+import com.compuware.ispw.restapi.action.GetAssignmentInfoAction;
 import com.compuware.ispw.restapi.action.GetAssignmentTaskListAction;
 import com.compuware.ispw.restapi.action.IAction;
 import com.compuware.ispw.restapi.action.IspwCommand;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
+import com.compuware.ispw.restapi.util.RestApiUtils;
 
 import hudson.EnvVars;
 import hudson.Extension;
@@ -410,6 +413,10 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 				action = new GenerateTasksInAssignmentAction();
 			} else if (IspwCommand.GetAssignmentTaskList.equals(step.ispwAction)) {
 				action = new GetAssignmentTaskListAction();
+			} else if(IspwCommand.GetAssignmentInfo.equals(step.ispwAction)) {
+				action = new GetAssignmentInfoAction();
+			} else if(IspwCommand.CreateAssignment.equals(step.ispwAction)) {
+				action = new CreateAssignmentAction();
 			}
 
 			if (action == null) {
@@ -421,13 +428,19 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 				throw new IllegalStateException(new Exception(errorMsg));
 			}
 
+			//TODO, the following CES(url, ispw host, ispw token) will fetched from Global settings in future
+			String cesUrl = RestApiUtils.getCesUrl();
+			String cesIspwHost = RestApiUtils.getCesIspwHost();
+			String cesIspwToken = RestApiUtils.getCesIspwToken();
+			logger.info("...ces.url="+cesUrl+", ces.ispw.host="+cesIspwHost+", ces.ispw.token="+cesIspwToken);
+			
 			IspwRequestBean ispwRequestBean =
-					action.getIspwRequestBean("cw09", step.ispwRequestBody, webhookToken);
+					action.getIspwRequestBean(cesIspwHost, step.ispwRequestBody, webhookToken);
 			logger.info("ispwRequestBean=" + ispwRequestBean);
 
-			step.url = "http://localhost:48080" + ispwRequestBean.getContextPath(); // CES URL
+			step.url = cesUrl + ispwRequestBean.getContextPath(); // CES URL
 			step.requestBody = ispwRequestBean.getJsonRequest();
-			step.token = "4bc92bf0-e445-4d22-a5c5-45b3a83ea93d"; // CES TOKEN
+			step.token = cesIspwToken; // CES TOKEN
 
 			logger.info("...url=" + step.url);
 			logger.info("...requestBody=" + step.requestBody);

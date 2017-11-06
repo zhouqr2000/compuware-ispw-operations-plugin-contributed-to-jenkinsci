@@ -4,12 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 import com.compuware.ces.model.BasicAuthentication;
 import com.compuware.ces.model.HttpHeader;
 
 public class RestApiUtils {
 
+	public static String CES_URL = "ces.url";
+	public static String CES_ISPW_HOST = "ces.ispw.host";
+	public static String CES_ISPW_TOKEN = "ces.ispw.token";
+	
+	private static Logger logger = Logger.getLogger(RestApiUtils.class);
+	
 	public static String join(String delimiter, String[] stringArray, boolean appendEqualSign) {
 		String result = StringUtils.EMPTY;
 
@@ -79,5 +86,28 @@ public class RestApiUtils {
 		}
 
 		return false;
+	}
+	
+	//TODO, the following will be replaced by global settings in Jenkins in next Srpint.
+	public static String getCesUrl() {
+		return getSystemProperty(CES_URL);
+	}
+	
+	public static String getCesIspwHost() {
+		return getSystemProperty(CES_ISPW_HOST);
+	}
+	
+	public static String getCesIspwToken() {
+		return getSystemProperty(CES_ISPW_TOKEN);
+	}
+	
+	public static String getSystemProperty(String key) {
+		String result = System.getProperty(key);
+		if(StringUtils.isBlank(result)) {
+			String errorMessage = "You must provide a system property: "+key+" to use ISPW RestAPI Jenkins plugin";
+			throw new RuntimeException(errorMessage);
+		}
+		
+		return StringUtils.trimToEmpty(result);
 	}
 }
