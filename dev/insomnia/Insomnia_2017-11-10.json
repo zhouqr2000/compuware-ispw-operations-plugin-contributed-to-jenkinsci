@@ -1,0 +1,322 @@
+{
+	"_type": "export",
+	"__export_format": 3,
+	"__export_date": "2017-11-10T20:03:56.078Z",
+	"__export_source": "insomnia.desktop.app:v5.11.0",
+	"resources": [
+		{
+			"_id": "wrk_717dbd54e3e94d199ada3792dd265a3e",
+			"parentId": null,
+			"modified": 1510237267689,
+			"created": 1510237267689,
+			"name": "Insomnia",
+			"description": "",
+			"_type": "workspace"
+		},
+		{
+			"_id": "env_84ac1df83da14e3ea7842767b7027292",
+			"parentId": "wrk_717dbd54e3e94d199ada3792dd265a3e",
+			"modified": 1510237267742,
+			"created": 1510237267742,
+			"name": "Base Environment",
+			"data": {},
+			"color": null,
+			"isPrivate": false,
+			"_type": "environment"
+		},
+		{
+			"_id": "jar_93d25a7ff9f843fdbc4021eea0d7bfba",
+			"parentId": "wrk_717dbd54e3e94d199ada3792dd265a3e",
+			"modified": 1510239766255,
+			"created": 1510237267690,
+			"name": "Default Jar",
+			"cookies": [
+				{
+					"key": "JSESSIONID.cc70db24",
+					"value": "wac6rmq65tuw1y05i6bbhju1w",
+					"domain": "localhost",
+					"path": "/",
+					"httpOnly": true,
+					"hostOnly": true,
+					"creation": "2017-11-09T15:02:46.254Z",
+					"lastAccessed": "2017-11-09T15:02:46.254Z",
+					"id": "6496782746729772"
+				}
+			],
+			"_type": "cookie_jar"
+		},
+		{
+			"_id": "fld_f1c0b4330cf94715845cda3810a6be3b",
+			"parentId": "wrk_717dbd54e3e94d199ada3792dd265a3e",
+			"modified": 1510245476343,
+			"created": 1510245476343,
+			"name": "cw09-47623",
+			"description": "",
+			"environment": {},
+			"metaSortKey": -1510245476343,
+			"_type": "request_group"
+		},
+		{
+			"_id": "req_bab27eb1d0ac485faf08439ab12160e6",
+			"parentId": "fld_f1c0b4330cf94715845cda3810a6be3b",
+			"modified": 1510343859385,
+			"created": 1510239445106,
+			"url": "http://10.211.55.12:48080/compuware/ws/notify/99094a03-be26-4f1b-9d32-22eeadcaa30c/completed",
+			"name": "w10.ces.notify.simulation",
+			"description": "",
+			"method": "POST",
+			"body": {
+				"mimeType": "application/json",
+				"text": "{\n\t\"operation\":\"G\"\n}"
+			},
+			"parameters": [],
+			"headers": [
+				{
+					"name": "Content-Type",
+					"value": "application/json",
+					"id": "pair_d5c33a4e54db40baaf95bcb868618c74"
+				}
+			],
+			"authentication": {},
+			"metaSortKey": -1510242769034.5,
+			"settingStoreCookies": true,
+			"settingSendCookies": true,
+			"settingDisableRenderRequestBody": false,
+			"settingEncodeUrl": true,
+			"_type": "request"
+		},
+		{
+			"_id": "req_ffefe89716be41039617ea85ccc1fa96",
+			"parentId": "fld_f1c0b4330cf94715845cda3810a6be3b",
+			"modified": 1510245533685,
+			"created": 1510239638479,
+			"url": "http://10.211.55.12:8080/jenkins/crumbIssuer/api/json",
+			"name": "w10.jenkins.crumb",
+			"description": "",
+			"method": "GET",
+			"body": {
+				"mimeType": "application/json",
+				"text": "{}"
+			},
+			"parameters": [],
+			"headers": [
+				{
+					"name": "Content-Type",
+					"value": "application/json",
+					"id": "pair_57489af731104b059409ef40a2e561dc"
+				}
+			],
+			"authentication": {
+				"type": "basic",
+				"username": "admin",
+				"password": "library",
+				"disabled": false
+			},
+			"metaSortKey": -1510242769084.5,
+			"settingStoreCookies": true,
+			"settingSendCookies": true,
+			"settingDisableRenderRequestBody": false,
+			"settingEncodeUrl": true,
+			"_type": "request"
+		},
+		{
+			"_id": "req_368ace5f6b50483fa79effa10ab9ec3d",
+			"parentId": "fld_f1c0b4330cf94715845cda3810a6be3b",
+			"modified": 1510245509569,
+			"created": 1510240486173,
+			"url": "http://10.211.55.12:48080/ispw/cw09-47623/assignments/PLAY000313",
+			"name": "w10.getAssignInfo",
+			"description": "",
+			"method": "GET",
+			"body": {
+				"mimeType": "application/json",
+				"text": "{}"
+			},
+			"parameters": [],
+			"headers": [
+				{
+					"name": "Content-Type",
+					"value": "application/json",
+					"id": "pair_fab41c77ca854d53898d3ed3d801c4d8"
+				},
+				{
+					"name": "Authorization",
+					"value": "3837ae52-de34-4068-9c2a-3e2ddc7e9fed",
+					"id": "pair_33918f201f794a96a5c4c024bbc0baeb"
+				}
+			],
+			"authentication": {},
+			"metaSortKey": -1510242769334.5,
+			"settingStoreCookies": true,
+			"settingSendCookies": true,
+			"settingDisableRenderRequestBody": false,
+			"settingEncodeUrl": true,
+			"_type": "request"
+		},
+		{
+			"_id": "req_5ea3e7104e8b491297c47a3195c014f9",
+			"parentId": "fld_f1c0b4330cf94715845cda3810a6be3b",
+			"modified": 1510245512714,
+			"created": 1510240773347,
+			"url": "http://10.211.55.12:48080/ispw/cw09-47623/assignments/PLAY000313/tasks?level=DEV2",
+			"name": "w10.getAssignTaskLists",
+			"description": "",
+			"method": "GET",
+			"body": {
+				"mimeType": "application/json",
+				"text": "{}"
+			},
+			"parameters": [],
+			"headers": [
+				{
+					"name": "Content-Type",
+					"value": "application/json",
+					"id": "pair_fab41c77ca854d53898d3ed3d801c4d8"
+				},
+				{
+					"name": "Authorization",
+					"value": "3837ae52-de34-4068-9c2a-3e2ddc7e9fed",
+					"id": "pair_33918f201f794a96a5c4c024bbc0baeb"
+				}
+			],
+			"authentication": {},
+			"metaSortKey": -1510242769284.5,
+			"settingStoreCookies": true,
+			"settingSendCookies": true,
+			"settingDisableRenderRequestBody": false,
+			"settingEncodeUrl": true,
+			"_type": "request"
+		},
+		{
+			"_id": "req_a40f83fe4631424f91906e38e93f7a3f",
+			"parentId": "fld_f1c0b4330cf94715845cda3810a6be3b",
+			"modified": 1510245515485,
+			"created": 1510240907315,
+			"url": "http://10.211.55.12:48080/ispw/cw09-47623/assignments",
+			"name": "w10.createAssign",
+			"description": "",
+			"method": "POST",
+			"body": {
+				"mimeType": "application/json",
+				"text": "{\n  \"stream\" : \"PLAY\",\n  \"application\" : \"PLAY\",\n  \"defaultPath\" : \"DEV2\",\n  \"description\" : \"MyRest1\",\n  \"owner\" : \"PMISVZ0\",\n  \"assignmentPrefix\" : \"PLAY\"\n}"
+			},
+			"parameters": [],
+			"headers": [
+				{
+					"name": "Content-Type",
+					"value": "application/json",
+					"id": "pair_fab41c77ca854d53898d3ed3d801c4d8"
+				},
+				{
+					"name": "Authorization",
+					"value": "3837ae52-de34-4068-9c2a-3e2ddc7e9fed",
+					"id": "pair_33918f201f794a96a5c4c024bbc0baeb"
+				}
+			],
+			"authentication": {},
+			"metaSortKey": -1510242769234.5,
+			"settingStoreCookies": true,
+			"settingSendCookies": true,
+			"settingDisableRenderRequestBody": false,
+			"settingEncodeUrl": true,
+			"_type": "request"
+		},
+		{
+			"_id": "req_c4c14cae1308441aa28a439ec22691f1",
+			"parentId": "fld_f1c0b4330cf94715845cda3810a6be3b",
+			"modified": 1510245518456,
+			"created": 1510241135549,
+			"url": "http://10.211.55.12:48080/ispw/cw09-47623/assignments/PLAY000313/tasks/generate?level=DEV2?level=DEV2",
+			"name": "w10.generateNCallback",
+			"description": "",
+			"method": "POST",
+			"body": {
+				"mimeType": "application/json",
+				"text": "{\n  \"runtimeConfiguration\" : \"TPZP\",\n  \"events\" : [ {\n    \"url\" : \"http://10.101.16.139:8080/ispw-webhook-step/010474ed-5935-4df8-963e-92f4170f8073\",\n    \"body\" : \"Generated\",\n    \"method\" : \"POST\",\n    \"httpHeaders\" : [ {\n      \"name\" : \"Jenkins-Crumb\",\n      \"value\" : \"no-security\"\n    } ],\n    \"credentials\" : {\n      \"username\" : \"admin\",\n      \"password\" : \"library\"\n    },\n    \"name\" : \"complete\"\n  } ]\n}"
+			},
+			"parameters": [],
+			"headers": [
+				{
+					"name": "Content-Type",
+					"value": "application/json",
+					"id": "pair_fab41c77ca854d53898d3ed3d801c4d8"
+				},
+				{
+					"name": "Authorization",
+					"value": "3837ae52-de34-4068-9c2a-3e2ddc7e9fed",
+					"id": "pair_33918f201f794a96a5c4c024bbc0baeb"
+				}
+			],
+			"authentication": {},
+			"metaSortKey": -1510242769184.5,
+			"settingStoreCookies": true,
+			"settingSendCookies": true,
+			"settingDisableRenderRequestBody": false,
+			"settingEncodeUrl": true,
+			"_type": "request"
+		},
+		{
+			"_id": "req_f045064ccb33423cbe85f909b70ff177",
+			"parentId": "fld_f1c0b4330cf94715845cda3810a6be3b",
+			"modified": 1510245530242,
+			"created": 1510241396165,
+			"url": "http://10.211.55.12:48080/ispw/cw09-47623/assignments/PLAY000313/tasks/generate?level=DEV2",
+			"name": "w10.generate",
+			"description": "",
+			"method": "POST",
+			"body": {
+				"mimeType": "application/json",
+				"text": "{\n  \"runtimeConfiguration\" : \"TPZP\"\n}"
+			},
+			"parameters": [],
+			"headers": [
+				{
+					"name": "Content-Type",
+					"value": "application/json",
+					"id": "pair_fab41c77ca854d53898d3ed3d801c4d8"
+				},
+				{
+					"name": "Authorization",
+					"value": "3837ae52-de34-4068-9c2a-3e2ddc7e9fed",
+					"id": "pair_33918f201f794a96a5c4c024bbc0baeb"
+				}
+			],
+			"authentication": {},
+			"metaSortKey": -1510242769134.5,
+			"settingStoreCookies": true,
+			"settingSendCookies": true,
+			"settingDisableRenderRequestBody": false,
+			"settingEncodeUrl": true,
+			"_type": "request"
+		},
+		{
+			"_id": "req_73c161c3f86a4000b7034fb85c4fba44",
+			"parentId": "fld_f1c0b4330cf94715845cda3810a6be3b",
+			"modified": 1510245539907,
+			"created": 1510245131987,
+			"url": "http://10.211.55.12:48080/compuware/ws/notifications/ispw?prodInstance=cw09-47623",
+			"name": "w10.ces.notifyId.list",
+			"description": "",
+			"method": "GET",
+			"body": {
+				"mimeType": "application/json",
+				"text": "{}"
+			},
+			"parameters": [],
+			"headers": [
+				{
+					"name": "Content-Type",
+					"value": "application/json",
+					"id": "pair_d5c33a4e54db40baaf95bcb868618c74"
+				}
+			],
+			"authentication": {},
+			"metaSortKey": -1510242768984.5,
+			"settingStoreCookies": true,
+			"settingSendCookies": true,
+			"settingDisableRenderRequestBody": false,
+			"settingEncodeUrl": true,
+			"_type": "request"
+		}
+	]
+}
