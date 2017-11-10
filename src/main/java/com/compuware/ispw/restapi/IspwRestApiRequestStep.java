@@ -24,6 +24,7 @@ import com.compuware.ispw.restapi.action.GetAssignmentInfoAction;
 import com.compuware.ispw.restapi.action.GetAssignmentTaskListAction;
 import com.compuware.ispw.restapi.action.IAction;
 import com.compuware.ispw.restapi.action.IspwCommand;
+import com.compuware.ispw.restapi.action.PromoteAssignmentAction;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
@@ -108,7 +109,8 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 		this.ispwAction = ispwAction;
 
 		if (IspwCommand.CreateAssignment.equals(ispwAction)
-				|| IspwCommand.GenerateTasksInAssignment.equals(ispwAction)) {
+				|| IspwCommand.GenerateTasksInAssignment.equals(ispwAction)
+				|| IspwCommand.PromoteAssignment.equals(ispwAction)) {
 			httpMode = HttpMode.POST;
 		} else if (IspwCommand.GetAssignmentInfo.equals(ispwAction)
 				|| IspwCommand.GetAssignmentTaskList.equals(ispwAction)) {
@@ -413,10 +415,12 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 				action = new GenerateTasksInAssignmentAction();
 			} else if (IspwCommand.GetAssignmentTaskList.equals(step.ispwAction)) {
 				action = new GetAssignmentTaskListAction();
-			} else if(IspwCommand.GetAssignmentInfo.equals(step.ispwAction)) {
+			} else if (IspwCommand.GetAssignmentInfo.equals(step.ispwAction)) {
 				action = new GetAssignmentInfoAction();
-			} else if(IspwCommand.CreateAssignment.equals(step.ispwAction)) {
+			} else if (IspwCommand.CreateAssignment.equals(step.ispwAction)) {
 				action = new CreateAssignmentAction();
+			} else if (IspwCommand.PromoteAssignment.equals(step.ispwAction)) {
+				action = new PromoteAssignmentAction();
 			}
 
 			if (action == null) {

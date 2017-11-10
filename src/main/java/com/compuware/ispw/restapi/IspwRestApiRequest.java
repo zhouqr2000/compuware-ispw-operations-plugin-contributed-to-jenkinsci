@@ -28,6 +28,7 @@ import com.compuware.ispw.restapi.action.GetAssignmentInfoAction;
 import com.compuware.ispw.restapi.action.GetAssignmentTaskListAction;
 import com.compuware.ispw.restapi.action.IAction;
 import com.compuware.ispw.restapi.action.IspwCommand;
+import com.compuware.ispw.restapi.action.PromoteAssignmentAction;
 import com.compuware.ispw.restapi.auth.BasicDigestAuthentication;
 import com.compuware.ispw.restapi.auth.FormAuthentication;
 import com.compuware.ispw.restapi.util.HttpClientUtil;
@@ -127,7 +128,8 @@ public class IspwRestApiRequest extends Builder {
 		this.ispwAction = ispwAction;
 
 		if (IspwCommand.CreateAssignment.equals(ispwAction)
-				|| IspwCommand.GenerateTasksInAssignment.equals(ispwAction)) {
+				|| IspwCommand.GenerateTasksInAssignment.equals(ispwAction)
+				|| IspwCommand.PromoteAssignment.equals(ispwAction)) {
 			httpMode = HttpMode.POST;
 		} else if (IspwCommand.GetAssignmentInfo.equals(ispwAction)
 				|| IspwCommand.GetAssignmentTaskList.equals(ispwAction)) {
@@ -405,6 +407,8 @@ public class IspwRestApiRequest extends Builder {
 			action = new GetAssignmentInfoAction();
 		} else if(IspwCommand.CreateAssignment.equals(ispwAction)) {
 			action = new CreateAssignmentAction();
+		} else if(IspwCommand.PromoteAssignment.equals(ispwAction)) {
+			action = new PromoteAssignmentAction();
 		}
     	
 		if (action == null) {

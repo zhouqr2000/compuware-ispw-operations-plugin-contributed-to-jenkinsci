@@ -2,15 +2,13 @@ package com.compuware.ispw.restapi.action;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.compuware.ispw.restapi.IspwRequestBean;
-import com.compuware.ispw.restapi.WebhookToken;
 
-public abstract class AbstractAction implements IAction {
+public abstract class AbstractGetAction implements IAction {
 
-	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody,
-			WebhookToken webhookToken, String contextPath, List<String> replaceTokens) {
+	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody, String contextPath, List<String> pathTokens) {
 		IspwRequestBean bean = new IspwRequestBean();
 
 		String path = contextPath.replace("{srid}", srid);
@@ -26,7 +24,7 @@ public abstract class AbstractAction implements IAction {
 								.trimToEmpty(line.substring(indexOfEqualSign + 1, line.length()));
 
 				if (StringUtils.isNotBlank(value)) {
-					if (replaceTokens.contains(name)) {
+					if (pathTokens.contains(name)) {
 						path = path.replace("{" + name + "}", value);
 					}
 				}

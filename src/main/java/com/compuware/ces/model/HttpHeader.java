@@ -3,7 +3,7 @@ package com.compuware.ces.model;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 @XmlRootElement(name = "httpHeader")
 @XmlAccessorType(XmlAccessType.PROPERTY)

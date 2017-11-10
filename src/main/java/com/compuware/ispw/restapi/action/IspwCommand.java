@@ -6,10 +6,11 @@ public class IspwCommand {
 	public static String CreateAssignment = "CreateAssignment"; // POST
 	public static String GetAssignmentInfo = "GetAssignmentInfo"; // GET
 	public static String GetAssignmentTaskList = "GetAssignmentTaskList"; // GET
-	public static String GenerateTasksInAssignment = "GenerateTasksInAssignment";
+	public static String GenerateTasksInAssignment = "GenerateTasksInAssignment"; //POST
+	public static String PromoteAssignment = "PromoteAssignment"; //POST
 
 	private static String[] publishedActions = new String[] { CreateAssignment, GetAssignmentInfo,
-			GetAssignmentTaskList, GenerateTasksInAssignment };
+			GetAssignmentTaskList, GenerateTasksInAssignment, PromoteAssignment};
 
 	public static ListBoxModel getFillItems() {
 		ListBoxModel items = new ListBoxModel();

@@ -16,15 +16,11 @@ public class AssignmentInfo
 	private String description;
 	private String owner;
 	private String assignmentPrefix;
-	@XmlElements({
-	    @XmlElement(name="referenceNumber"),
-	    @XmlElement(name="refNumber")
-	})
+
+	@XmlElement(name="referenceNumber")
 	private String refNumber;
-	@XmlElements({
-	    @XmlElement(name="release"),
-	    @XmlElement(name="releaseId")
-	})
+	
+	@XmlElement(name="releaseId")
 	private String release;
 	private String userTag;
 	@XmlElement(name="assignmentId")
