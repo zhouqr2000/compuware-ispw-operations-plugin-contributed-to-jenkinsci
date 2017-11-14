@@ -19,12 +19,14 @@ import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
 import com.compuware.ispw.restapi.action.CreateAssignmentAction;
+import com.compuware.ispw.restapi.action.DeployAssignmentAction;
 import com.compuware.ispw.restapi.action.GenerateTasksInAssignmentAction;
 import com.compuware.ispw.restapi.action.GetAssignmentInfoAction;
 import com.compuware.ispw.restapi.action.GetAssignmentTaskListAction;
 import com.compuware.ispw.restapi.action.IAction;
 import com.compuware.ispw.restapi.action.IspwCommand;
 import com.compuware.ispw.restapi.action.PromoteAssignmentAction;
+import com.compuware.ispw.restapi.action.RegressAssignmentAction;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
@@ -421,6 +423,10 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 				action = new CreateAssignmentAction();
 			} else if (IspwCommand.PromoteAssignment.equals(step.ispwAction)) {
 				action = new PromoteAssignmentAction();
+			} else if(IspwCommand.DeployAssignment.equals(step.ispwAction)) {
+				action = new DeployAssignmentAction();
+			} else if(IspwCommand.RegressAssignment.equals(step.ispwAction)) {
+				action = new RegressAssignmentAction();
 			}
 
 			if (action == null) {

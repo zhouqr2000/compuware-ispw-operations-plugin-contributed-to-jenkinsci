@@ -15,6 +15,8 @@ public interface IAction {
 	public static String autoDeploy = "autoDeploy";
 	public static String changeType = "changeType";
 	public static String executionStatus = "executionStatus";
+	public static String dpenvlst = "dpenvlst";
+	public static String system = "system";
 	public static String httpHeaders = "httpHeaders";
 	public static String credentials = "credentials";
 	public static String eventsName = "events.name";

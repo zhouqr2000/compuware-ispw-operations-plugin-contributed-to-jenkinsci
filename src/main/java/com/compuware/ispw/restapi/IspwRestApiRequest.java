@@ -23,12 +23,14 @@ import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
 import com.compuware.ispw.restapi.action.CreateAssignmentAction;
+import com.compuware.ispw.restapi.action.DeployAssignmentAction;
 import com.compuware.ispw.restapi.action.GenerateTasksInAssignmentAction;
 import com.compuware.ispw.restapi.action.GetAssignmentInfoAction;
 import com.compuware.ispw.restapi.action.GetAssignmentTaskListAction;
 import com.compuware.ispw.restapi.action.IAction;
 import com.compuware.ispw.restapi.action.IspwCommand;
 import com.compuware.ispw.restapi.action.PromoteAssignmentAction;
+import com.compuware.ispw.restapi.action.RegressAssignmentAction;
 import com.compuware.ispw.restapi.auth.BasicDigestAuthentication;
 import com.compuware.ispw.restapi.auth.FormAuthentication;
 import com.compuware.ispw.restapi.util.HttpClientUtil;
@@ -409,6 +411,10 @@ public class IspwRestApiRequest extends Builder {
 			action = new CreateAssignmentAction();
 		} else if(IspwCommand.PromoteAssignment.equals(ispwAction)) {
 			action = new PromoteAssignmentAction();
+		} else if(IspwCommand.DeployAssignment.equals(ispwAction)) {
+			action = new DeployAssignmentAction();
+		} else if(IspwCommand.RegressAssignment.equals(ispwAction)) {
+			action = new RegressAssignmentAction();
 		}
     	
 		if (action == null) {
