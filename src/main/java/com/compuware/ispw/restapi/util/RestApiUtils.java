@@ -14,6 +14,18 @@ import org.apache.log4j.Logger;
 
 import com.compuware.ces.model.BasicAuthentication;
 import com.compuware.ces.model.HttpHeader;
+import com.compuware.ispw.restapi.HttpMode;
+import com.compuware.ispw.restapi.action.CreateAssignmentAction;
+import com.compuware.ispw.restapi.action.DeployAssignmentAction;
+import com.compuware.ispw.restapi.action.GenerateTasksInAssignmentAction;
+import com.compuware.ispw.restapi.action.GetAssignmentInfoAction;
+import com.compuware.ispw.restapi.action.GetAssignmentTaskListAction;
+import com.compuware.ispw.restapi.action.GetReleaseInfoAction;
+import com.compuware.ispw.restapi.action.GetReleaseTaskListAction;
+import com.compuware.ispw.restapi.action.IAction;
+import com.compuware.ispw.restapi.action.IspwCommand;
+import com.compuware.ispw.restapi.action.PromoteAssignmentAction;
+import com.compuware.ispw.restapi.action.RegressAssignmentAction;
 
 public class RestApiUtils {
 
@@ -125,6 +137,45 @@ public class RestApiUtils {
 
 	}
 
+	public static IAction createAction(String ispwAction) {
+		IAction action = null;
+
+		if (IspwCommand.GenerateTasksInAssignment.equals(ispwAction)) {
+			action = new GenerateTasksInAssignmentAction();
+		} else if (IspwCommand.GetAssignmentTaskList.equals(ispwAction)) {
+			action = new GetAssignmentTaskListAction();
+		} else if (IspwCommand.GetAssignmentInfo.equals(ispwAction)) {
+			action = new GetAssignmentInfoAction();
+		} else if (IspwCommand.CreateAssignment.equals(ispwAction)) {
+			action = new CreateAssignmentAction();
+		} else if (IspwCommand.PromoteAssignment.equals(ispwAction)) {
+			action = new PromoteAssignmentAction();
+		} else if (IspwCommand.DeployAssignment.equals(ispwAction)) {
+			action = new DeployAssignmentAction();
+		} else if (IspwCommand.RegressAssignment.equals(ispwAction)) {
+			action = new RegressAssignmentAction();
+		} else if (IspwCommand.GetReleaseInfo.equals(ispwAction)) {
+			action = new GetReleaseInfoAction();
+		} else if (IspwCommand.GetReleaseTaskList.equals(ispwAction)) {
+			action = new GetReleaseTaskListAction();
+		}
+
+		return action;
+	}
+
+	public static HttpMode resetHttpMode(String ispwAction) {
+		HttpMode httpMode = HttpMode.POST;
+
+		if (IspwCommand.GetAssignmentInfo.equals(ispwAction)
+				|| IspwCommand.GetAssignmentTaskList.equals(ispwAction)
+				|| IspwCommand.GetReleaseInfo.equals(ispwAction)
+				|| IspwCommand.GetReleaseTaskList.equals(ispwAction)) {
+			httpMode = HttpMode.GET;
+		}
+
+		return httpMode;
+	}
+
 	// TODO, the following will be replaced by global settings in Jenkins in next Srpint.
 	public static String getCesUrl() {
 		return getSystemProperty(CES_URL);
@@ -149,4 +200,5 @@ public class RestApiUtils {
 
 		return StringUtils.trimToEmpty(result);
 	}
+
 }

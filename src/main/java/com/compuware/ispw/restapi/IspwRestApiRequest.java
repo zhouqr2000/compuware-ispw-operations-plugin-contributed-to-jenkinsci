@@ -11,7 +11,6 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
-import org.apache.log4j.Logger;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -27,6 +26,8 @@ import com.compuware.ispw.restapi.action.DeployAssignmentAction;
 import com.compuware.ispw.restapi.action.GenerateTasksInAssignmentAction;
 import com.compuware.ispw.restapi.action.GetAssignmentInfoAction;
 import com.compuware.ispw.restapi.action.GetAssignmentTaskListAction;
+import com.compuware.ispw.restapi.action.GetReleaseInfoAction;
+import com.compuware.ispw.restapi.action.GetReleaseTaskListAction;
 import com.compuware.ispw.restapi.action.IAction;
 import com.compuware.ispw.restapi.action.IspwCommand;
 import com.compuware.ispw.restapi.action.PromoteAssignmentAction;
@@ -64,8 +65,6 @@ import hudson.util.ListBoxModel.Option;
  */
 public class IspwRestApiRequest extends Builder {
 
-	private static Logger logger = Logger.getLogger(IspwRestApiRequest.class);
-
 	private @Nonnull String url;
 	private Boolean ignoreSslErrors = DescriptorImpl.ignoreSslErrors;
 	private HttpMode httpMode = DescriptorImpl.httpMode;
@@ -88,11 +87,11 @@ public class IspwRestApiRequest extends Builder {
 	private String ispwAction = DescriptorImpl.ispwAction;
 	private String ispwRequestBody = DescriptorImpl.ispwRequestBody;
 	private Boolean consoleLogResponseBody = DescriptorImpl.consoleLogResponseBody;
-    
+
 	@DataBoundConstructor
 	public IspwRestApiRequest() {
 	}
-	
+
 	@Nonnull
 	public String getUrl() {
 		return url;
@@ -102,7 +101,7 @@ public class IspwRestApiRequest extends Builder {
 	public void setUrl(String url) {
 		this.url = url;
 	}
-	
+
 	public Boolean getIgnoreSslErrors() {
 		return ignoreSslErrors;
 	}
@@ -128,19 +127,8 @@ public class IspwRestApiRequest extends Builder {
 	@DataBoundSetter
 	public void setIspwAction(String ispwAction) {
 		this.ispwAction = ispwAction;
-
-		if (IspwCommand.CreateAssignment.equals(ispwAction)
-				|| IspwCommand.GenerateTasksInAssignment.equals(ispwAction)
-				|| IspwCommand.PromoteAssignment.equals(ispwAction)) {
-			httpMode = HttpMode.POST;
-		} else if (IspwCommand.GetAssignmentInfo.equals(ispwAction)
-				|| IspwCommand.GetAssignmentTaskList.equals(ispwAction)) {
-			httpMode = HttpMode.GET;
-		}
-
-		logger.info("ispwAction=" + ispwAction + ", httpMode=" + httpMode);
 	}
-	
+
 	public String getIspwHost() {
 		return ispwHost;
 	}
@@ -149,7 +137,7 @@ public class IspwRestApiRequest extends Builder {
 	public void setIspwHost(String ispwHost) {
 		this.ispwHost = ispwHost;
 	}
-	
+
 	public String getIspwRequestBody() {
 		return ispwRequestBody;
 	}
@@ -158,7 +146,7 @@ public class IspwRestApiRequest extends Builder {
 	public void setIspwRequestBody(String ispwRequestBody) {
 		this.ispwRequestBody = ispwRequestBody;
 	}
-	
+
 	public String getToken() {
 		return token;
 	}
@@ -167,7 +155,7 @@ public class IspwRestApiRequest extends Builder {
 	public void setToken(String token) {
 		this.token = token;
 	}
-	
+
 	public String getHttpProxy() {
 		return httpProxy;
 	}
@@ -214,7 +202,7 @@ public class IspwRestApiRequest extends Builder {
 		this.acceptType = acceptType;
 	}
 
-	public MimeType getContentType() {		
+	public MimeType getContentType() {
 		return contentType;
 	}
 
@@ -288,8 +276,10 @@ public class IspwRestApiRequest extends Builder {
 
 	@Initializer(before = InitMilestone.PLUGINS_STARTED)
 	public static void xStreamCompatibility() {
-		Items.XSTREAM2.aliasField("logResponseBody", IspwRestApiRequest.class, "consoleLogResponseBody");
-		Items.XSTREAM2.aliasField("consoleLogResponseBody", IspwRestApiRequest.class, "consoleLogResponseBody");
+		Items.XSTREAM2.aliasField("logResponseBody", IspwRestApiRequest.class,
+				"consoleLogResponseBody");
+		Items.XSTREAM2.aliasField("consoleLogResponseBody", IspwRestApiRequest.class,
+				"consoleLogResponseBody");
 		Items.XSTREAM2.alias("pair", HttpRequestNameValuePair.class);
 	}
 
@@ -301,7 +291,8 @@ public class IspwRestApiRequest extends Builder {
 			validResponseCodes = DescriptorImpl.validResponseCodes;
 		}
 		if (ignoreSslErrors == null) {
-			//default for new job false(DescriptorImpl.ignoreSslErrors) for old ones true to keep same behavior
+			// default for new job false(DescriptorImpl.ignoreSslErrors) for old ones true to keep
+			// same behavior
 			ignoreSslErrors = true;
 		}
 		if (quiet == null) {
@@ -310,7 +301,8 @@ public class IspwRestApiRequest extends Builder {
 		return this;
 	}
 
-	private List<HttpRequestNameValuePair> createParams(EnvVars envVars, AbstractBuild<?, ?> build, TaskListener listener) throws IOException {
+	private List<HttpRequestNameValuePair> createParams(EnvVars envVars, AbstractBuild<?, ?> build,
+			TaskListener listener) throws IOException {
 		Map<String, String> buildVariables = build.getBuildVariables();
 		if (buildVariables.isEmpty()) {
 			return Collections.emptyList();
@@ -328,8 +320,8 @@ public class IspwRestApiRequest extends Builder {
 		return l;
 	}
 
-	String resolveUrl(EnvVars envVars,
-					  AbstractBuild<?, ?> build, TaskListener listener) throws IOException {
+	String resolveUrl(EnvVars envVars, AbstractBuild<?, ?> build, TaskListener listener)
+			throws IOException {
 		String url = envVars.expand(getUrl());
 		if (Boolean.TRUE.equals(getPassBuildParameters()) && getHttpMode() == HttpMode.GET) {
 			List<HttpRequestNameValuePair> params = createParams(envVars, build, listener);
@@ -342,31 +334,28 @@ public class IspwRestApiRequest extends Builder {
 
 	List<HttpRequestNameValuePair> resolveHeaders(EnvVars envVars) {
 		final List<HttpRequestNameValuePair> headers = new ArrayList<>();
-		
-//		if (contentType != null && contentType != MimeType.NOT_SET) {
-//			headers.add(new HttpRequestNameValuePair("Content-type", contentType.getContentType().toString()));
-//		}
-		
-		headers.add(new HttpRequestNameValuePair("Content-type", MimeType.APPLICATION_JSON.toString()));
+
+		headers.add(new HttpRequestNameValuePair("Content-type", MimeType.APPLICATION_JSON
+				.toString()));
 		headers.add(new HttpRequestNameValuePair("Authorization", getToken()));
-		
+
 		if (acceptType != null && acceptType != MimeType.NOT_SET) {
 			headers.add(new HttpRequestNameValuePair("Accept", acceptType.getValue()));
 		}
-		
+
 		for (HttpRequestNameValuePair header : customHeaders) {
 			String headerName = envVars.expand(header.getName());
 			String headerValue = envVars.expand(header.getValue());
-			boolean maskValue = headerName.equalsIgnoreCase("Authorization") ||
-					header.getMaskValue();
+			boolean maskValue =
+					headerName.equalsIgnoreCase("Authorization") || header.getMaskValue();
 
 			headers.add(new HttpRequestNameValuePair(headerName, headerValue, maskValue));
 		}
 		return headers;
 	}
 
-	String resolveBody(EnvVars envVars,
-					  AbstractBuild<?, ?> build, TaskListener listener) throws IOException {
+	String resolveBody(EnvVars envVars, AbstractBuild<?, ?> build, TaskListener listener)
+			throws IOException {
 		String body = envVars.expand(getRequestBody());
 		if (Strings.isNullOrEmpty(body) && Boolean.TRUE.equals(getPassBuildParameters())) {
 			List<HttpRequestNameValuePair> params = createParams(envVars, build, listener);
@@ -377,84 +366,77 @@ public class IspwRestApiRequest extends Builder {
 		return body;
 	}
 
-	FilePath resolveOutputFile(EnvVars envVars, AbstractBuild<?,?> build) {
+	FilePath resolveOutputFile(EnvVars envVars, AbstractBuild<?, ?> build) {
 		if (outputFile == null || outputFile.trim().isEmpty()) {
 			return null;
 		}
 		String filePath = envVars.expand(outputFile);
 		FilePath workspace = build.getWorkspace();
 		if (workspace == null) {
-			throw new IllegalStateException("Could not find workspace to save file outputFile: " + outputFile);
+			throw new IllegalStateException("Could not find workspace to save file outputFile: "
+					+ outputFile);
 		}
 		return workspace.child(filePath);
 	}
-	
-    @Override
-    public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener)
-    throws InterruptedException, IOException
-    {
+
+	@Override
+	public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
+			throws InterruptedException, IOException {
+		PrintStream logger = listener.getLogger();
+
 		EnvVars envVars = build.getEnvironment(listener);
-		
+
 		String buildTag = envVars.get("BUILD_TAG");
 		WebhookToken webhookToken = WebhookTokenManager.getInstance().get(buildTag);
-		logger.info("...getting buildTag="+buildTag+", webhookToken="+webhookToken);
-		logger.info("...ispwAction="+ispwAction);
-		
-    	IAction action = null;
-		if (IspwCommand.GenerateTasksInAssignment.equals(ispwAction)) {
-			action = new GenerateTasksInAssignmentAction();
-		} else if (IspwCommand.GetAssignmentTaskList.equals(ispwAction)) {
-			action = new GetAssignmentTaskListAction();
-		} else if(IspwCommand.GetAssignmentInfo.equals(ispwAction)) {
-			action = new GetAssignmentInfoAction();
-		} else if(IspwCommand.CreateAssignment.equals(ispwAction)) {
-			action = new CreateAssignmentAction();
-		} else if(IspwCommand.PromoteAssignment.equals(ispwAction)) {
-			action = new PromoteAssignmentAction();
-		} else if(IspwCommand.DeployAssignment.equals(ispwAction)) {
-			action = new DeployAssignmentAction();
-		} else if(IspwCommand.RegressAssignment.equals(ispwAction)) {
-			action = new RegressAssignmentAction();
-		}
-    	
+		logger.println("...getting buildTag=" + buildTag + ", webhookToken=" + webhookToken);
+
+		IAction action = RestApiUtils.createAction(ispwAction);
+		httpMode = RestApiUtils.resetHttpMode(ispwAction);
+
 		if (action == null) {
-			logger.info("Action:" + ispwAction
+			logger.println("Action:" + ispwAction
 					+ " is not implemented, please make sure you have the correct action name");
 			return false;
 		}
+
+		logger.println("...ispwAction=" + ispwAction + ", httpMode=" + httpMode);
 		
-		//TODO, the following CES(url, ispw host, ispw token) will fetched from Global settings in future
+		// TODO, the following CES(url, ispw host, ispw token) will fetched from Global settings in
+		// future
 		String cesUrl = RestApiUtils.getCesUrl();
 		String cesIspwHost = RestApiUtils.getCesIspwHost();
 		String cesIspwToken = RestApiUtils.getCesIspwToken();
-		logger.info("...ces.url="+cesUrl+", ces.ispw.host="+cesIspwHost+", ces.ispw.token="+cesIspwToken);
-		
-		IspwRequestBean ispwRequestBean = action.getIspwRequestBean(cesIspwHost, ispwRequestBody, webhookToken);
-		logger.info("ispwRequestBean="+ispwRequestBean);
-		
+		logger.println("...ces.url=" + cesUrl + ", ces.ispw.host=" + cesIspwHost
+				+ ", ces.ispw.token=" + cesIspwToken);
+
+		IspwRequestBean ispwRequestBean =
+				action.getIspwRequestBean(cesIspwHost, ispwRequestBody, webhookToken);
+		logger.println("...ispwRequestBean=" + ispwRequestBean);
+
 		this.url = cesUrl + ispwRequestBean.getContextPath(); // CES URL
 		this.requestBody = ispwRequestBean.getJsonRequest();
 		this.token = cesIspwToken; // CES TOKEN
 
-		logger.info("...url=" + url);
-		logger.info("...requestBody=" + requestBody);
-		logger.info("...token=" + token);
-		logger.info("...httpMode=" + httpMode);
-	
+		logger.println("...url=" + url);
+		logger.println("...requestBody=" + requestBody);
+		logger.println("...token=" + token);
+		logger.println("...httpMode=" + httpMode);
+
 		for (Map.Entry<String, String> e : build.getBuildVariables().entrySet()) {
 			envVars.put(e.getKey(), e.getValue());
-			logger.info("EnvVars: "+e.getKey()+"="+e.getValue());
+			logger.println("EnvVars: " + e.getKey() + "=" + e.getValue());
 		}
 
-		HttpRequestExecution exec = HttpRequestExecution.from(this, envVars, build,
-				this.getQuiet() ? TaskListener.NULL : listener);
+		HttpRequestExecution exec =
+				HttpRequestExecution.from(this, envVars, build, this.getQuiet() ? TaskListener.NULL
+						: listener);
 		launcher.getChannel().call(exec);
 
-        return true;
-    }
+		return true;
+	}
 
 	@Extension
-    public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
+	public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 		public static final boolean ignoreSslErrors = false;
 		public static final HttpMode httpMode = HttpMode.POST;
 		public static final String httpProxy = "";
@@ -473,132 +455,136 @@ public class IspwRestApiRequest extends Builder {
 		// ISPW related
 		public static final String ispwHost = "CW09:47623";
 		public static final String ispwAction = IspwCommand.GenerateTasksInAssignment;
-		public static final String ispwRequestBody = GenerateTasksInAssignmentAction.getDefaultProps();
+		public static final String ispwRequestBody = GenerateTasksInAssignmentAction
+				.getDefaultProps();
 		public static final Boolean consoleLogResponseBody = false;
 
 		public static final List<HttpRequestNameValuePair> customHeaders = Collections
 				.<HttpRequestNameValuePair> emptyList();
 
-        public DescriptorImpl() {
-            load();
-        }
+		public DescriptorImpl() {
+			load();
+		}
 
-        @SuppressWarnings("rawtypes")
-        @Override
-        public boolean isApplicable(Class<? extends AbstractProject> aClass) {
-            return true;
-        }
+		@SuppressWarnings("rawtypes")
+		@Override
+		public boolean isApplicable(Class<? extends AbstractProject> aClass) {
+			return true;
+		}
 
-        @Override
-        public String getDisplayName() {
-            //return "HTTP Request"; //modified by pmisvz0
-        	return "ISPW Rest API Request";
-        }
+		@Override
+		public String getDisplayName() {
+			// return "HTTP Request"; //modified by pmisvz0
+			return "ISPW Rest API Request";
+		}
 
-        public ListBoxModel doFillHttpModeItems() {
-            return HttpMode.getFillItems();
-        }
-        
-        // ISPW
-        public ListBoxModel doFillIspwActionItems() {
-        	return IspwCommand.getFillItems();
-        }
+		public ListBoxModel doFillHttpModeItems() {
+			return HttpMode.getFillItems();
+		}
 
-        public ListBoxModel doFillIspwHostItems() {
-        	//TODO
-        	//These values should come from Global Configuration areas
-        	ListBoxModel items = new ListBoxModel();
-        	items.add("CES [http://localhost:48080], ISPW [cw09-47623]");
-        	items.add("CES [http://localhost:48080], ISPW [cw09-27623]");
-        	
-        	return items;
-        }
-        
-        public ListBoxModel doFillAcceptTypeItems() {
-            return MimeType.getContentTypeFillItems();
-        }
+		// ISPW
+		public ListBoxModel doFillIspwActionItems() {
+			return IspwCommand.getFillItems();
+		}
 
-        public ListBoxModel doFillContentTypeItems() {
-            return MimeType.getContentTypeFillItems();
-        }
+		public ListBoxModel doFillIspwHostItems() {
+			// TODO
+			// These values should come from Global Configuration areas
+			ListBoxModel items = new ListBoxModel();
+			items.add("CES [http://localhost:48080], ISPW [cw09-47623]");
+			items.add("CES [http://localhost:48080], ISPW [cw09-27623]");
 
-        public ListBoxModel doFillAuthenticationItems(@AncestorInPath Item project,
-													  @QueryParameter String url) {
-            return fillAuthenticationItems(project, url);
-        }
+			return items;
+		}
 
-        public static ListBoxModel fillAuthenticationItems(Item project, String url) {
+		public ListBoxModel doFillAcceptTypeItems() {
+			return MimeType.getContentTypeFillItems();
+		}
+
+		public ListBoxModel doFillContentTypeItems() {
+			return MimeType.getContentTypeFillItems();
+		}
+
+		public ListBoxModel doFillAuthenticationItems(@AncestorInPath Item project,
+				@QueryParameter String url) {
+			return fillAuthenticationItems(project, url);
+		}
+
+		public static ListBoxModel fillAuthenticationItems(Item project, String url) {
 			if (project == null || !project.hasPermission(Item.CONFIGURE)) {
 				return new StandardListBoxModel();
 			}
 
 			List<Option> options = new ArrayList<>();
-			for (BasicDigestAuthentication basic : HttpRequestGlobalConfig.get().getBasicDigestAuthentications()) {
-				options.add(new Option("(deprecated - use Jenkins Credentials) " +
-						basic.getKeyName(), basic.getKeyName()));
-            }
+			for (BasicDigestAuthentication basic : HttpRequestGlobalConfig.get()
+					.getBasicDigestAuthentications()) {
+				options.add(new Option("(deprecated - use Jenkins Credentials) "
+						+ basic.getKeyName(), basic.getKeyName()));
+			}
 
-            for (FormAuthentication formAuthentication : HttpRequestGlobalConfig.get().getFormAuthentications()) {
+			for (FormAuthentication formAuthentication : HttpRequestGlobalConfig.get()
+					.getFormAuthentications()) {
 				options.add(new Option(formAuthentication.getKeyName()));
 			}
 
-			AbstractIdCredentialsListBoxModel<StandardListBoxModel, StandardCredentials> items = new StandardListBoxModel()
-					.includeEmptyValue()
-					.includeAs(ACL.SYSTEM,
-							project, StandardUsernamePasswordCredentials.class,
+			AbstractIdCredentialsListBoxModel<StandardListBoxModel, StandardCredentials> items =
+					new StandardListBoxModel().includeEmptyValue().includeAs(ACL.SYSTEM, project,
+							StandardUsernamePasswordCredentials.class,
 							URIRequirementBuilder.fromUri(url).build());
 			items.addMissing(options);
-            return items;
-        }
+			return items;
+		}
 
-        public static List<Range<Integer>> parseToRange(String value) {
-            List<Range<Integer>> validRanges = new ArrayList<Range<Integer>>();
+		public static List<Range<Integer>> parseToRange(String value) {
+			List<Range<Integer>> validRanges = new ArrayList<Range<Integer>>();
 
-            String[] codes = value.split(",");
-            for (String code : codes) {
-                String[] fromTo = code.trim().split(":");
-                checkArgument(fromTo.length <= 2, "Code %s should be an interval from:to or a single value", code);
+			String[] codes = value.split(",");
+			for (String code : codes) {
+				String[] fromTo = code.trim().split(":");
+				checkArgument(fromTo.length <= 2,
+						"Code %s should be an interval from:to or a single value", code);
 
-                Integer from;
-                try {
-                    from = Integer.parseInt(fromTo[0]);
-                } catch (NumberFormatException nfe) {
-                    throw new IllegalArgumentException("Invalid number "+fromTo[0]);
-                }
+				Integer from;
+				try {
+					from = Integer.parseInt(fromTo[0]);
+				} catch (NumberFormatException nfe) {
+					throw new IllegalArgumentException("Invalid number " + fromTo[0]);
+				}
 
-                Integer to = from;
-                if (fromTo.length != 1) {
-                    try {
-                        to = Integer.parseInt(fromTo[1]);
-                    } catch (NumberFormatException nfe) {
-                        throw new IllegalArgumentException("Invalid number "+fromTo[1]);
-                    }
-                }
+				Integer to = from;
+				if (fromTo.length != 1) {
+					try {
+						to = Integer.parseInt(fromTo[1]);
+					} catch (NumberFormatException nfe) {
+						throw new IllegalArgumentException("Invalid number " + fromTo[1]);
+					}
+				}
 
-                checkArgument(from <= to, "Interval %s should be FROM less than TO", code);
-                validRanges.add(Ranges.closed(from, to));
-            }
+				checkArgument(from <= to, "Interval %s should be FROM less than TO", code);
+				validRanges.add(Ranges.closed(from, to));
+			}
 
-            return validRanges;
-        }
+			return validRanges;
+		}
 
-        public FormValidation doCheckValidResponseCodes(@QueryParameter String value) {
-            return checkValidResponseCodes(value);
-        }
+		public FormValidation doCheckValidResponseCodes(@QueryParameter String value) {
+			return checkValidResponseCodes(value);
+		}
 
-        public static FormValidation checkValidResponseCodes(String value) {
-            if (value == null || value.trim().isEmpty()) {
-                return FormValidation.ok();
-            }
+		public static FormValidation checkValidResponseCodes(String value) {
+			if (value == null || value.trim().isEmpty()) {
+				return FormValidation.ok();
+			}
 
-            try {
-                parseToRange(value);
-            } catch (IllegalArgumentException iae) {
-                return FormValidation.error("Response codes expected is wrong. "+iae.getMessage());
-            }
-            return FormValidation.ok();
+			try {
+				parseToRange(value);
+			} catch (IllegalArgumentException iae) {
+				return FormValidation
+						.error("Response codes expected is wrong. " + iae.getMessage());
+			}
+			return FormValidation.ok();
 
-        }
-    }
+		}
+	}
 
 }

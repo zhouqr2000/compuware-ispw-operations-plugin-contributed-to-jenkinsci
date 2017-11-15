@@ -1,6 +1,7 @@
 package com.compuware.ispw.restapi;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -8,7 +9,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepDescriptorImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractSynchronousNonBlockingStepExecution;
@@ -23,6 +23,8 @@ import com.compuware.ispw.restapi.action.DeployAssignmentAction;
 import com.compuware.ispw.restapi.action.GenerateTasksInAssignmentAction;
 import com.compuware.ispw.restapi.action.GetAssignmentInfoAction;
 import com.compuware.ispw.restapi.action.GetAssignmentTaskListAction;
+import com.compuware.ispw.restapi.action.GetReleaseInfoAction;
+import com.compuware.ispw.restapi.action.GetReleaseTaskListAction;
 import com.compuware.ispw.restapi.action.IAction;
 import com.compuware.ispw.restapi.action.IspwCommand;
 import com.compuware.ispw.restapi.action.PromoteAssignmentAction;
@@ -45,8 +47,6 @@ import hudson.util.ListBoxModel;
  */
 public final class IspwRestApiRequestStep extends AbstractStepImpl {
 
-	private static Logger logger = Logger.getLogger(IspwRestApiRequestStep.class);
-	
 	private @Nonnull String url;
 	private boolean ignoreSslErrors = DescriptorImpl.ignoreSslErrors;
 	private HttpMode httpMode = DescriptorImpl.httpMode;
@@ -109,17 +109,6 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 	@DataBoundSetter
 	public void setIspwAction(String ispwAction) {
 		this.ispwAction = ispwAction;
-
-		if (IspwCommand.CreateAssignment.equals(ispwAction)
-				|| IspwCommand.GenerateTasksInAssignment.equals(ispwAction)
-				|| IspwCommand.PromoteAssignment.equals(ispwAction)) {
-			httpMode = HttpMode.POST;
-		} else if (IspwCommand.GetAssignmentInfo.equals(ispwAction)
-				|| IspwCommand.GetAssignmentTaskList.equals(ispwAction)) {
-			httpMode = HttpMode.GET;
-		}
-
-		logger.info("ispwAction=" + ispwAction + ", httpMode=" + httpMode);
 	}
 	
 	public String getIspwHost() {
@@ -347,23 +336,6 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
         public ListBoxModel doFillHttpModeItems() {
             return HttpMode.getFillItems();
         }
-
-        // ISPW
-        /*
-        public ListBoxModel doFillIspwActionItems() {
-        	return IspwAction.getFillItems();
-        }
-
-        public ListBoxModel doFillIspwHostItems() {
-        	//TODO
-        	//These values should come from Global Configuration areas
-        	ListBoxModel items = new ListBoxModel();
-        	items.add("cw09");
-        	items.add("cwcc");
-        	
-        	return items;
-        }
-        */
  
         public ListBoxModel doFillAcceptTypeItems() {
             return MimeType.getContentTypeFillItems();
@@ -404,58 +376,45 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 
 		@Override
 		protected ResponseContentSupplier run() throws Exception {
+			PrintStream logger = listener.getLogger();
 			
 			EnvVars envVars = getContext().get(hudson.EnvVars.class);
 
 			String buildTag = envVars.get("BUILD_TAG");
 			WebhookToken webhookToken = WebhookTokenManager.getInstance().get(buildTag);
-			logger.info("...getting buildTag=" + buildTag + ", webhookToken=" + webhookToken);
-			logger.info("...ispwAction=" + step.ispwAction);
+			logger.println("...getting buildTag=" + buildTag + ", webhookToken=" + webhookToken);
 
-			IAction action = null;
-			if (IspwCommand.GenerateTasksInAssignment.equals(step.ispwAction)) {
-				action = new GenerateTasksInAssignmentAction();
-			} else if (IspwCommand.GetAssignmentTaskList.equals(step.ispwAction)) {
-				action = new GetAssignmentTaskListAction();
-			} else if (IspwCommand.GetAssignmentInfo.equals(step.ispwAction)) {
-				action = new GetAssignmentInfoAction();
-			} else if (IspwCommand.CreateAssignment.equals(step.ispwAction)) {
-				action = new CreateAssignmentAction();
-			} else if (IspwCommand.PromoteAssignment.equals(step.ispwAction)) {
-				action = new PromoteAssignmentAction();
-			} else if(IspwCommand.DeployAssignment.equals(step.ispwAction)) {
-				action = new DeployAssignmentAction();
-			} else if(IspwCommand.RegressAssignment.equals(step.ispwAction)) {
-				action = new RegressAssignmentAction();
-			}
-
+			IAction action = RestApiUtils.createAction(step.ispwAction);
+			step.httpMode = RestApiUtils.resetHttpMode(step.ispwAction);
+			
 			if (action == null) {
 				String errorMsg =
 						"Action:"
 								+ step.ispwAction
-								+ " is not implemented. Please make sure you have the correct action name.";
-				logger.info(errorMsg);
+								+ " is not implemented. Please make sure you have the correct ISPW action name.";
+				logger.println(errorMsg);
 				throw new IllegalStateException(new Exception(errorMsg));
 			}
-
+			logger.println("ispwAction=" + step.ispwAction + ", httpMode=" + step.httpMode);
+			
 			//TODO, the following CES(url, ispw host, ispw token) will fetched from Global settings in future
 			String cesUrl = RestApiUtils.getCesUrl();
 			String cesIspwHost = RestApiUtils.getCesIspwHost();
 			String cesIspwToken = RestApiUtils.getCesIspwToken();
-			logger.info("...ces.url="+cesUrl+", ces.ispw.host="+cesIspwHost+", ces.ispw.token="+cesIspwToken);
+			logger.println("...ces.url="+cesUrl+", ces.ispw.host="+cesIspwHost+", ces.ispw.token="+cesIspwToken);
 			
 			IspwRequestBean ispwRequestBean =
 					action.getIspwRequestBean(cesIspwHost, step.ispwRequestBody, webhookToken);
-			logger.info("ispwRequestBean=" + ispwRequestBean);
+			logger.println("ispwRequestBean=" + ispwRequestBean);
 
 			step.url = cesUrl + ispwRequestBean.getContextPath(); // CES URL
 			step.requestBody = ispwRequestBean.getJsonRequest();
 			step.token = cesIspwToken; // CES TOKEN
 
-			logger.info("...url=" + step.url);
-			logger.info("...requestBody=" + step.requestBody);
-			logger.info("...token=" + step.token);
-			logger.info("...httpMode=" + step.httpMode);
+			logger.println("...url=" + step.url);
+			logger.println("...requestBody=" + step.requestBody);
+			logger.println("...token=" + step.token);
+			logger.println("...httpMode=" + step.httpMode);
 			
 			HttpRequestExecution exec = HttpRequestExecution.from(step,
 					step.getQuiet() ? TaskListener.NULL : listener,

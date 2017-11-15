@@ -10,13 +10,16 @@ public class IspwCommand {
 	public static String PromoteAssignment = "PromoteAssignment"; // POST
 	public static String DeployAssignment = "DeployAssignment"; // POST
 	public static String RegressAssignment = "RegressAssignment"; // POST
+	public static String GetReleaseInfo = "GetReleaseInfo"; //GET
+	public static String GetReleaseTaskList = "GetReleaseTaskList"; //GET
 
 	private static String[] publishedActions = new String[] { CreateAssignment, GetAssignmentInfo,
 			GetAssignmentTaskList, GenerateTasksInAssignment, PromoteAssignment, DeployAssignment,
-			RegressAssignment };
+			RegressAssignment, GetReleaseInfo, GetReleaseTaskList };
 
 	public static ListBoxModel getFillItems() {
 		ListBoxModel items = new ListBoxModel();
+
 		for (String action : publishedActions) {
 			items.add(action);
 		}
