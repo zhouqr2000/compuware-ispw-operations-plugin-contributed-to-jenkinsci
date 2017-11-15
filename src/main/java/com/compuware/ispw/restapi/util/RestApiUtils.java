@@ -23,6 +23,8 @@ import com.compuware.ispw.restapi.action.GenerateTasksInReleaseAction;
 import com.compuware.ispw.restapi.action.GetAssignmentInfoAction;
 import com.compuware.ispw.restapi.action.GetAssignmentTaskListAction;
 import com.compuware.ispw.restapi.action.GetReleaseInfoAction;
+import com.compuware.ispw.restapi.action.GetReleaseTaskGenerateListingAction;
+import com.compuware.ispw.restapi.action.GetReleaseTaskInfoAction;
 import com.compuware.ispw.restapi.action.GetReleaseTaskListAction;
 import com.compuware.ispw.restapi.action.IAction;
 import com.compuware.ispw.restapi.action.IspwCommand;
@@ -162,8 +164,12 @@ public class RestApiUtils {
 			action = new GetReleaseTaskListAction();
 		} else if (IspwCommand.CreateRelease.equals(ispwAction)) {
 			action = new CreateReleaseAction();
-		} else if(IspwCommand.GenerateTasksInRelease.equals(ispwAction)) {
+		} else if (IspwCommand.GenerateTasksInRelease.equals(ispwAction)) {
 			action = new GenerateTasksInReleaseAction();
+		} else if (IspwCommand.GetReleaseTaskGenerateListing.equals(ispwAction)) {
+			action = new GetReleaseTaskGenerateListingAction();
+		} else if (IspwCommand.GetReleaseTaskInfo.equals(ispwAction)) {
+			action = new GetReleaseTaskInfoAction();
 		}
 
 		return action;
@@ -175,7 +181,9 @@ public class RestApiUtils {
 		if (IspwCommand.GetAssignmentInfo.equals(ispwAction)
 				|| IspwCommand.GetAssignmentTaskList.equals(ispwAction)
 				|| IspwCommand.GetReleaseInfo.equals(ispwAction)
-				|| IspwCommand.GetReleaseTaskList.equals(ispwAction)) {
+				|| IspwCommand.GetReleaseTaskList.equals(ispwAction)
+				|| IspwCommand.GetReleaseTaskGenerateListing.equals(ispwAction)
+				|| IspwCommand.GetReleaseTaskInfo.equals(ispwAction)) {
 			httpMode = HttpMode.GET;
 		}
 

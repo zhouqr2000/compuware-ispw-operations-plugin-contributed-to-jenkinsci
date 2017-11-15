@@ -14,11 +14,13 @@ public class IspwCommand {
 	public static String GetReleaseTaskList = "GetReleaseTaskList"; // GET
 	public static String CreateRelease = "CreateRelease"; // POST
 	public static String GenerateTasksInRelease = "GenerateTasksInRelease"; // POST
+	public static String GetReleaseTaskGenerateListing = "GetReleaseTaskGenerateListing"; // GET
+	public static String GetReleaseTaskInfo = "GetReleaseTaskInfo"; // GET
 
 	private static String[] publishedActions = new String[] { CreateAssignment, GetAssignmentInfo,
 			GetAssignmentTaskList, GenerateTasksInAssignment, PromoteAssignment, DeployAssignment,
 			RegressAssignment, GetReleaseInfo, GetReleaseTaskList, CreateRelease,
-			GenerateTasksInRelease };
+			GenerateTasksInRelease, GetReleaseTaskGenerateListing, GetReleaseTaskInfo };
 
 	public static ListBoxModel getFillItems() {
 		ListBoxModel items = new ListBoxModel();
