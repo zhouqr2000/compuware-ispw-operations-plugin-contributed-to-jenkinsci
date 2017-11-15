@@ -34,6 +34,7 @@ public interface IAction {
 	public static String assignmentPrefix = "assignmentPrefix";
 	public static String referenceNumber = "referenceNumber";
 	public static String userTag = "userTag";
+	public static String releasePrefix = "releasePrefix";
 	
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody,
 			WebhookToken webhookToken);

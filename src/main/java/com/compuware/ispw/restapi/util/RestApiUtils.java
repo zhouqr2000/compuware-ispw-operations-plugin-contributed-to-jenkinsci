@@ -16,6 +16,7 @@ import com.compuware.ces.model.BasicAuthentication;
 import com.compuware.ces.model.HttpHeader;
 import com.compuware.ispw.restapi.HttpMode;
 import com.compuware.ispw.restapi.action.CreateAssignmentAction;
+import com.compuware.ispw.restapi.action.CreateReleaseAction;
 import com.compuware.ispw.restapi.action.DeployAssignmentAction;
 import com.compuware.ispw.restapi.action.GenerateTasksInAssignmentAction;
 import com.compuware.ispw.restapi.action.GetAssignmentInfoAction;
@@ -158,6 +159,8 @@ public class RestApiUtils {
 			action = new GetReleaseInfoAction();
 		} else if (IspwCommand.GetReleaseTaskList.equals(ispwAction)) {
 			action = new GetReleaseTaskListAction();
+		} else if (IspwCommand.CreateRelease.equals(ispwAction)) {
+			action = new CreateReleaseAction();
 		}
 
 		return action;

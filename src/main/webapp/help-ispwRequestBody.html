@@ -1,6 +1,6 @@
 <div>
 
-	<p><strong>Optional common properties for all actions with callback</strong></p>
+	<p><strong>Optional common properties for all ISPW actions with callback</strong></p>
 	<p>
 	<pre>
 Optional:
@@ -15,7 +15,7 @@ events.credentials - used if 3rd party requires basic authentication - overrides
 	</pre>
 	</p>
 
-    <p><strong>Available parameters for ISPW GenerateTasksInAssignment action (with callback):</strong></p>
+    <p><strong>GenerateTasksInAssignment action (with callback):</strong></p>
 	
 	<p>
 	<pre>
@@ -42,7 +42,7 @@ events.credentials=admin:library
 	</pre>
 	</p>
 	
-    <p><strong>Available parameters for ISPW PromoteAssignment action (with callback):</strong></p>
+    <p><strong>PromoteAssignment action (with callback):</strong></p>
 	
 	<p>
 	<pre>
@@ -71,21 +71,18 @@ events.credentials=admin:library
 	</pre>
 	</p>
 	
-    <p><strong>Available parameters for ISPW CreateAssignment action:</strong></p>
+    <p><strong>CreateAssignment action:</strong></p>
 	
 	<p>
 	<pre>
-assignmentId - The Assignment for which you intend to generate tasks.
-level - All tasks in the release at this level will be generated.
-
 stream - ISPW stream name
 application - ISPW application name
 defaultPath - the default checkout path
 description - the description for the assignment
-owner - the owner of the container
 assignmentPrefix - assignment prefix
 
 Optional:
+owner - the owner of the container
 referenceNumber - reference number
 releaseId - release ID
 userTag - user tag
@@ -98,13 +95,12 @@ userTag - user tag
 stream=PLAY
 application=PLAY
 defaultPath=DEV2
-description=MyRest1
-owner=PMISVZ0
+description=MyA01
 assignmentPrefix=PLAY
 	</pre>
 	</p>
 
-    <p><strong>Available parameters for ISPW DeployAsignment action (with callback):</strong></p>
+    <p><strong>DeployAsignment action (with callback):</strong></p>
 	
 	<p>
 	<pre>
@@ -134,7 +130,7 @@ events.credentials=admin:library
 	</pre>
 	</p>
 
-    <p><strong>Available parameters for ISPW DeployAsignment action (with callback):</strong></p>
+    <p><strong>DeployAsignment action (with callback):</strong></p>
 	
 	<p>
 	<pre>
@@ -164,7 +160,7 @@ events.credentials=admin:library
 	</pre>
 	</p>
 
-    <p><strong>Available parameters for ISPW RegressAsignment action (with callback):</strong></p>
+    <p><strong>RegressAsignment action (with callback):</strong></p>
 	
 	<p>
 	<pre>
@@ -191,5 +187,33 @@ events.httpHeaders=Jenkins-Crumb:no-crumb
 events.credentials=admin:library
 	</pre>
 	</p>
+
+    <p><strong>CreateRelease action:</strong></p>
+	
+	<p>
+	<pre>
+stream - ISPW stream name
+application - ISPW application name
+description - the description for the release
+releaseId - release ID
+
+Optional:
+owner - the owner of the container
+releasePrefix - release prefix
+referenceNumber - reference number
+	</pre>
+	</p>
+	
+	<p>Example:</p>
+	<p>
+	<pre>
+stream=PLAY
+application=PLAY
+releaseId=MyR01
+description=MyR01
+assignmentPrefix=PLAY
+	</pre>
+	</p>
+
 
 </div>
