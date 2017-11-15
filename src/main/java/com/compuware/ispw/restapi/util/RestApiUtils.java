@@ -19,6 +19,7 @@ import com.compuware.ispw.restapi.action.CreateAssignmentAction;
 import com.compuware.ispw.restapi.action.CreateReleaseAction;
 import com.compuware.ispw.restapi.action.DeployAssignmentAction;
 import com.compuware.ispw.restapi.action.GenerateTasksInAssignmentAction;
+import com.compuware.ispw.restapi.action.GenerateTasksInReleaseAction;
 import com.compuware.ispw.restapi.action.GetAssignmentInfoAction;
 import com.compuware.ispw.restapi.action.GetAssignmentTaskListAction;
 import com.compuware.ispw.restapi.action.GetReleaseInfoAction;
@@ -161,6 +162,8 @@ public class RestApiUtils {
 			action = new GetReleaseTaskListAction();
 		} else if (IspwCommand.CreateRelease.equals(ispwAction)) {
 			action = new CreateReleaseAction();
+		} else if(IspwCommand.GenerateTasksInRelease.equals(ispwAction)) {
+			action = new GenerateTasksInReleaseAction();
 		}
 
 		return action;

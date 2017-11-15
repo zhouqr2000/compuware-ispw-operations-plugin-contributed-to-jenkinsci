@@ -16,7 +16,7 @@
     </f:entry>
     -->
     <f:entry field="ispwHost" title="Host" help="/plugin/compuware-ispw-restapi-request-plugin/help-ispwHost.html">
-        <f:textbox default="cw09"/>
+        <f:textbox default="cw09-47623"/>
     </f:entry>
     <f:entry field="ispwAction" title="Action" help="/plugin/compuware-ispw-restapi-request-plugin/help-ispwAction.html">
         <f:textbox default="GenerateTasksInAssignment"/>

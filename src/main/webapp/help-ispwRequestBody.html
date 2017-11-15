@@ -215,5 +215,31 @@ assignmentPrefix=PLAY
 	</pre>
 	</p>
 
+    <p><strong>GenerateTasksInRelease action (with callback):</strong></p>
+	
+	<p>
+	<pre>
+releaseId - The release for which you intend to generate tasks.
+level - All tasks in the release at this level will be generated.
+runtimeConfiguration - see ISPW administrator for valid values.
+
+Optional:
+autoDeploy - promotes can be set up to automatically Deploy as well by an option set up by the ISPW. The default is to not use Auto Deploy.
+	</pre>
+	</p>
+	
+	<p>Example:	</p>
+	
+	<p>
+	<pre>
+releaseId=JKGENRELID
+level=DEV2
+runtimeConfiguration=TPZP
+events.name=Completed
+events.body=Generated
+events.httpHeaders=Jenkins-Crumb:no-crumb
+events.credentials=admin:library
+	</pre>
+	</p>
 
 </div>

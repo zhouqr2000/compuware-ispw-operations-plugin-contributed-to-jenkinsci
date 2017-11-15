@@ -39,9 +39,10 @@ public abstract class SetInfoPostAction implements IAction {
 								.trimToEmpty(line.substring(indexOfEqualSign + 1, line.length()));
 
 				if (StringUtils.isNotBlank(value)) {
-
 					if (name.equals(assignmentId)) {
 						path = path.replace("{" + assignmentId + "}", value);
+					} else if(name.equals(releaseId)) {
+						path = path.replace("{" + releaseId + "}", value);
 					} else if (name.equals(level)) {
 						path = path.replace("{" + level + "}", value);
 					} else if (name.equals(httpHeaders)) {

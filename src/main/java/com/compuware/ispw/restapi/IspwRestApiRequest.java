@@ -453,7 +453,7 @@ public class IspwRestApiRequest extends Builder {
 		public static final String token = "";
 
 		// ISPW related
-		public static final String ispwHost = "CW09:47623";
+		public static final String ispwHost = "cw09-47623";
 		public static final String ispwAction = IspwCommand.GenerateTasksInAssignment;
 		public static final String ispwRequestBody = GenerateTasksInAssignmentAction
 				.getDefaultProps();
