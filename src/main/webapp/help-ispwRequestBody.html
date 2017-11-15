@@ -1,77 +1,167 @@
 <div>
 
-	<p><strong>Optional common properties for all ISPW actions with callback</strong></p>
-	<p>
-	<pre>
-Optional:
-httpHeaders - global custom headers used for all, colon and semicolon separated. For example, n1:v1;n2:v2;n3:v3.
-credentials - global credentials used for all call backs. User name and password are colon separated.
-events.name - event name
-events.url - callback URI
-events.method - defaults to POST
-events.body - body for callback, required if having events
-events.httpHeaders - custom headers - override global headers
-events.credentials - used if 3rd party requires basic authentication - overrides global credentials
-	</pre>
-	</p>
+	<p><strong>Optional common properties for those actions with callback</strong></p>
 
-    <p><strong>GenerateTasksInAssignment action (with callback):</strong></p>
-	
-	<p>
-	<pre>
-assignmentId - The Assignment for which you intend to generate tasks.
-level - All tasks in the release at this level will be generated.
-runtimeConfiguration - see ISPW administrator for valid values.
 
 Optional:
-autoDeploy - promotes can be set up to automatically Deploy as well by an option set up by the ISPW. The default is to not use Auto Deploy.
-	</pre>
-	</p>
-	
-	<p>Example:	</p>
-	
-	<p>
-	<pre>
+<table border="1">
+ <tr>
+   <td>httpHeaders</td>
+   <td>global custom headers used for all, colon and semicolon separated. For example, n1:v1;n2:v2;n3:v3.</td>
+ </tr>
+ <tr>
+   <td>credentials</td>
+   <td>global credentials used for all call backs. User name and password are colon separated.</td>
+ </tr>
+ <tr>
+   <td>events.name</td>
+   <td>event name</td>
+ </tr>
+ <tr>
+   <td>events.body</td>
+   <td>body for callback, required if having events</td>
+ </tr>
+ <tr>
+   <td>events.httpHeaders</td>
+   <td>custom headers - override global headers</td>
+ </tr>
+ <tr>
+   <td>events.credentials</td>
+   <td>used if 3rd party requires basic authentication - overrides global credentials</td>
+ </tr>
+</table>
+
+
+    <p><strong>GenerateTasksInAssignment / GenerateTasksInRelease actions (with callback):</strong></p>
+
+Required:
+<table border="1">
+  <tr>
+    <td>assignmentId (GenerateTasksInAssignment) or releaseId (GenerateTasksInRelease)</td>
+    <td>The container ID for which you intend to generate tasks.</td>
+  </tr>
+  <tr>
+    <td>level</td>
+    <td>All tasks in the container at this level will be generated</td>
+  </tr>
+</table>
+
+Optional:
+<table border="1">
+  <tr>
+    <td>runtimeConfiguration</td>
+    <td>see ISPW administrator for valid values</td>
+  </tr>
+  <tr>
+    <td>autoDeploy</td>
+    <td>promotes can be set up to automatically Deploy as well by an option set up by the ISPW. The default is to not use Auto Deploy</td>
+  </tr>
+</table>
+
+Example:
+<table border="1">
+  <tr>
+    <td>GenerateTasksInAssignment</td>
+    <td>GenerateTasksInRelease</td>
+  </tr>
+  <tr>
+    <td>
+		<pre>
 assignmentId=PLAY000313
 level=DEV2
 runtimeConfiguration=TPZP
 events.name=Completed
 events.body=Generated
 events.httpHeaders=Jenkins-Crumb:no-crumb
-events.credentials=admin:library
-	</pre>
-	</p>
+events.credentials=admin:library</pre>
+    </td>
+    <td>
+    	<pre>
+releaseId=JKGENRELID
+level=DEV2
+runtimeConfiguration=TPZP
+events.name=Completed
+events.body=Generated
+events.httpHeaders=Jenkins-Crumb:no-crumb
+events.credentials=admin:library</pre>
+    </td>
+  </tr>
+</table>
+
+
 	
-    <p><strong>PromoteAssignment action (with callback):</strong></p>
+    <p><strong>PromoteAssignment / PromoteRelease actions (with callback):</strong></p>
 	
-	<p>
-	<pre>
-assignmentId - The Assignment for which you intend to generate tasks.
-level - All tasks in the release at this level will be generated.
-runtimeConfiguration - see ISPW administrator for valid values.
+Required:
+<table border="1">
+  <tr>
+    <td>assignmentId (PromoteAssignment) or releaseId (PromoteRelease)</td>
+    <td>The container ID for which you intend to promote tasks.</td>
+  </tr>
+  <tr>
+    <td>level</td>
+    <td>All tasks in the release at this level will be generated</td>
+  </tr>
+</table>
 
 Optional:
-changeType - Optional, S for standard, I for incidental, or E for emergency. Default value of S.
-executionStatus - Optional, I for immediate execution or at start date/time, H to create request in hold.
-autoDeploy - promotes can be set up to automatically Deploy as well by an option set up by the ISPW. The default is to not use Auto Deploy.
-	</pre>
-	</p>
-	
-	<p>Example:	</p>
-	
-	<p>
-	<pre>
+<table border="1">
+  <tr>
+    <td>runtimeConfiguration</td>
+    <td>see ISPW administrator for valid values</td>
+  </tr>
+  <tr>
+    <td>changeType</td>
+    <td>Optional, S for standard, I for incidental, or E for emergency. Default value of S.</td>
+  </tr>
+  <tr>
+    <td>executionStatus</td>
+    <td>I for immediate execution or at start date/time, H to create request in hold</td>
+  </tr>
+  <tr>
+    <td>autoDeploy</td>
+    <td>promotes can be set up to automatically Deploy as well by an option set up by the ISPW. The default is to not use Auto Deploy</td>
+  </tr>
+</table>
+
+Example:
+
+		<table border="1">
+		  <tr>
+		    <td align="left">PromoteAssignment</td>
+		    <td align="left">PromoteRelease</td>
+		  </tr>
+		  <tr>
+		    <td>
+		  	<pre>
 assignmentId=PLAY000313
 level=DEV2
 runtimeConfiguration=TPZP
 events.name=Complete
 events.body=Promoted
 events.httpHeaders=Jenkins-Crumb:no-crumb
-events.credentials=admin:library
-	</pre>
-	</p>
+events.credentials=admin:library</pre>
+			</td>
+		    <td>
+		  	<pre>
+releaseId=JKGENRELID
+level=DEV2
+runtimeConfiguration=TPZP
+events.name=Complete
+events.body=Promoted
+events.httpHeaders=Jenkins-Crumb:no-crumb
+events.credentials=admin:library</pre>
+			</td>
+		  </tr>
+		</table>
 	
+	
+
     <p><strong>CreateAssignment action:</strong></p>
+	
+	
+	
+	
 	
 	<p>
 	<pre>
@@ -100,93 +190,143 @@ assignmentPrefix=PLAY
 	</pre>
 	</p>
 
-    <p><strong>DeployAsignment action (with callback):</strong></p>
-	
-	<p>
-	<pre>
-assignmentId - The Assignment for which you intend to generate tasks.
-level - All tasks in the release at this level will be generated.
-runtimeConfiguration - see ISPW administrator for valid values.
+
+
+
+
+    <p><strong>DeployAsignment / DeployRelease actions (with callback):</strong></p>
+Required:
+<table border="1">
+  <tr>
+    <td>assignmentId (DeployAsignment) or releaseId (DeployRelease)</td>
+    <td>The container for which you intend to deploy tasks.</td>
+  </tr>
+  <tr>
+    <td>level</td>
+    <td>All tasks in the container at this level will be generated</td>
+  </tr>
+</table>
 
 Optional:
-changeType - S for standard, I for incidental, or E for emergency. Default value of S
-executionStatus - I for immediate execution or at start date/time, H to create request in hold
-dpenvlst - The DPENVLST parameter
-system - Allows you to specify a specific System for the Deploy
-	</pre>
-	</p>
-	
-	<p>Example:	</p>
-	
-	<p>
-	<pre>
+<table border="1">
+  <tr>
+    <td>runtimeConfiguration</td>
+    <td>see ISPW administrator for valid values</td>
+  </tr>
+  <tr>
+    <td>changeType</td>
+    <td>S for standard, I for incidental, or E for emergency. Default value of S</td>
+  </tr>
+  <tr>
+    <td>executionStatus</td>
+    <td>I for immediate execution or at start date/time, H to create request in hold</td>
+  </tr>
+  <tr>
+    <td>dpenvlst</td>
+    <td>The DPENVLST parameter</td>
+  </tr>
+  <tr>
+    <td>system</td>
+    <td>Allows you to specify a specific System for the Deploy</td>
+  </tr>
+</table>
+
+Example:
+<table border="1">
+  <tr>
+    <td>DeployAsignment</td>
+    <td>
+	</td>
+  </tr>
+  <tr>
+    <td>
+      <pre>
 assignmentId=PLAY000313
 level=QA
 runtimeConfiguration=TPZP
 events.name=Completed
 events.body=Deployed
 events.httpHeaders=Jenkins-Crumb:no-crumb
-events.credentials=admin:library
-	</pre>
-	</p>
-
-    <p><strong>DeployAsignment action (with callback):</strong></p>
-	
-	<p>
-	<pre>
-assignmentId - The Assignment for which you intend to generate tasks.
-level - All tasks in the release at this level will be generated.
-runtimeConfiguration - see ISPW administrator for valid values.
-
-Optional:
-changeType - S for standard, I for incidental, or E for emergency. Default value of S
-executionStatus - I for immediate execution or at start date/time, H to create request in hold
-dpenvlst - The DPENVLST parameter
-system - Allows you to specify a specific System for the Deploy
-	</pre>
-	</p>
-	
-	<p>Example:	</p>
-	
-	<p>
-	<pre>
-assignmentId=PLAY000313
+events.credentials=admin:library</pre>
+    </td>
+    <td>    
+      <pre>
+releaseId=JKGENRELID
 level=QA
 runtimeConfiguration=TPZP
 events.name=Completed
 events.body=Deployed
 events.httpHeaders=Jenkins-Crumb:no-crumb
-events.credentials=admin:library
-	</pre>
-	</p>
+events.credentials=admin:library</pre>
+    </td>
+  </tr>
+</table>
 
-    <p><strong>RegressAsignment action (with callback):</strong></p>
+
+
+
+    <p><strong>RegressAsignment / RegressRelease actions (with callback):</strong></p>
+
+Required:
+<table border="1">
+  <tr>
+    <td>assignmentId (RegressAsignment) or releaseId (RegressRelease)</td>
+    <td>The container for which you intend to regress the tasks</td>
+  </tr>
+  <tr>
+    <td>level</td>
+    <td>All tasks in the container at this level will be generated</td>
+  </tr>
+</table>
 	
-	<p>
-	<pre>
-assignmentId - The Assignment for which you intend to generate tasks.
-level - All tasks in the release at this level will be generated.
-runtimeConfiguration - see ISPW administrator for valid values.
-
 Optional:
-changeType - S for standard, I for incidental, or E for emergency. Default value of S
-executionStatus - I for immediate execution or at start date/time, H to create request in hold
-	</pre>
-	</p>
-	
-	<p>Example:	</p>
-	
-	<p>
-	<pre>
+<table border="1">
+  <tr>
+    <td>runtimeConfiguration</td>
+    <td>see ISPW administrator for valid values</td>
+  </tr>
+  <tr>
+    <td>changeType</td>
+    <td>S for standard, I for incidental, or E for emergency. Default value of S</td>
+  </tr>
+  <tr>
+    <td>executionStatus</td>
+    <td>I for immediate execution or at start date/time, H to create request in hold</td>
+  </tr>
+</table>
+
+Example:
+<table border="1">
+  <tr>
+    <td>RegressAsignment</td>
+    <td>RegressRelease</td>
+  </tr>
+  <tr>
+    <td>
+		<pre>
 assignmentId=PLAY000313
-level=QA
+level=STG2
 runtimeConfiguration=TPZP
 events.name=Completed
 events.body=Regressed
 events.httpHeaders=Jenkins-Crumb:no-crumb
-events.credentials=admin:library
-	</pre>
-	</p>
+events.credentials=admin:library</pre>
+    </td>
+    <td>
+		<pre>
+releaseId=JKGENRELID
+level=STG2
+runtimeConfiguration=TPZP
+events.name=Completed
+events.body=Regressed
+events.httpHeaders=Jenkins-Crumb:no-crumb
+events.credentials=admin:library</pre>
+    </td>
+  </tr>
+</table>
+
+
+
 
     <p><strong>CreateRelease action:</strong></p>
 	
@@ -215,50 +355,42 @@ assignmentPrefix=PLAY
 	</pre>
 	</p>
 
-    <p><strong>GenerateTasksInRelease action (with callback):</strong></p>
-	
-	<p>
-	<pre>
-releaseId - The release for which you intend to generate tasks.
-level - All tasks in the release at this level will be generated.
-runtimeConfiguration - see ISPW administrator for valid values.
 
-Optional:
-autoDeploy - promotes can be set up to automatically Deploy as well by an option set up by the ISPW. The default is to not use Auto Deploy.
-	</pre>
-	</p>
-	
-	<p>Example:	</p>
-	
-	<p>
+
+
+
+    <p><strong>GetReleaseTaskInfo / GetReleaseTaskGenerateListing actions:</strong></p>
+
+Required:
+<table border="1">
+  <tr>
+    <td>releaseId</td>
+    <td>The release ID</td>
+  </tr>
+  <tr>
+    <td>taskId</td>
+    <td>The task ID</td>
+  </tr>
+</table>
+
+Example:
+<table border="1">
+  <tr>
+    <td>GetReleaseTaskInfo</td>
+    <td>GetReleaseTaskGenerateListing</td>
+  </tr>
+  <tr>
+    <td>
 	<pre>
 releaseId=JKGENRELID
-level=DEV2
-runtimeConfiguration=TPZP
-events.name=Completed
-events.body=Generated
-events.httpHeaders=Jenkins-Crumb:no-crumb
-events.credentials=admin:library
-	</pre>
-	</p>
-
-    <p><strong>GetReleaseTaskInfo/GetReleaseTaskGenerateListing actions:</strong></p>
-	
-	<p>
-	<pre>
-releaseId - The release ID.
-taskId - The task ID.
-	</pre>
-	</p>
-	
-	<p>Example:	</p>
-	
-	<p>
+taskId=7E1AC3D3DE25</pre>
+    </td>
+    <td>
 	<pre>
 releaseId=JKGENRELID
-taskId=7E1AC3D3DE25
-	</pre>
-	</p>
-
+taskId=7E1AC3D3DE25</pre>
+    </td>
+  </tr>
+</table>
 
 </div>

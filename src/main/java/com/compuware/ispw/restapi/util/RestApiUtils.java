@@ -18,6 +18,7 @@ import com.compuware.ispw.restapi.HttpMode;
 import com.compuware.ispw.restapi.action.CreateAssignmentAction;
 import com.compuware.ispw.restapi.action.CreateReleaseAction;
 import com.compuware.ispw.restapi.action.DeployAssignmentAction;
+import com.compuware.ispw.restapi.action.DeployReleaseAction;
 import com.compuware.ispw.restapi.action.GenerateTasksInAssignmentAction;
 import com.compuware.ispw.restapi.action.GenerateTasksInReleaseAction;
 import com.compuware.ispw.restapi.action.GetAssignmentInfoAction;
@@ -29,7 +30,9 @@ import com.compuware.ispw.restapi.action.GetReleaseTaskListAction;
 import com.compuware.ispw.restapi.action.IAction;
 import com.compuware.ispw.restapi.action.IspwCommand;
 import com.compuware.ispw.restapi.action.PromoteAssignmentAction;
+import com.compuware.ispw.restapi.action.PromoteReleaseAction;
 import com.compuware.ispw.restapi.action.RegressAssignmentAction;
+import com.compuware.ispw.restapi.action.RegressReleaseAction;
 
 public class RestApiUtils {
 
@@ -170,6 +173,12 @@ public class RestApiUtils {
 			action = new GetReleaseTaskGenerateListingAction();
 		} else if (IspwCommand.GetReleaseTaskInfo.equals(ispwAction)) {
 			action = new GetReleaseTaskInfoAction();
+		} else if (IspwCommand.DeployRelease.equals(ispwAction)) {
+			action = new DeployReleaseAction();
+		} else if (IspwCommand.PromoteRelease.equals(ispwAction)) {
+			action = new PromoteReleaseAction();
+		} else if (IspwCommand.RegressRelease.equals(ispwAction)) {
+			action = new RegressReleaseAction();
 		}
 
 		return action;
