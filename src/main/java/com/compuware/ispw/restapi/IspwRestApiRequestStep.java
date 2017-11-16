@@ -411,10 +411,20 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			step.requestBody = ispwRequestBean.getJsonRequest();
 			step.token = cesIspwToken; // CES TOKEN
 
-			logger.println("...url=" + step.url);
-			logger.println("...requestBody=" + step.requestBody);
-			logger.println("...token=" + step.token);
-			logger.println("...httpMode=" + step.httpMode);
+			// This is a generated code for Visual Studio Code - REST Client
+			logger.println();
+			logger.println();
+			logger.println("### [" + step.ispwAction + "] - " + "RFC 2616");
+			logger.println();
+			logger.println(step.httpMode+" "+step.url+" HTTP/1.1");
+			logger.println("Content-type: "+MimeType.APPLICATION_JSON.getContentType().toString());
+			logger.println("Authorization: "+step.token);
+			logger.println("");
+			logger.println(step.requestBody);
+			logger.println();
+			logger.println("###");
+			logger.println();
+			logger.println();
 			
 			HttpRequestExecution exec = HttpRequestExecution.from(step,
 					step.getQuiet() ? TaskListener.NULL : listener,

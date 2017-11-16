@@ -6,7 +6,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 public class IspwRequestBean {
 	private String contextPath = StringUtils.EMPTY;
-	private String jsonRequest = "{}"; //empty JSON
+	private String jsonRequest = "{" + Constants.LINE_SEPARATOR + "}"; // empty JSON
 
 	public String getContextPath() {
 		return contextPath;

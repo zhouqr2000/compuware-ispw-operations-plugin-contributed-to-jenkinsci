@@ -416,12 +416,22 @@ public class IspwRestApiRequest extends Builder {
 		this.url = cesUrl + ispwRequestBean.getContextPath(); // CES URL
 		this.requestBody = ispwRequestBean.getJsonRequest();
 		this.token = cesIspwToken; // CES TOKEN
-
-		logger.println("...url=" + url);
-		logger.println("...requestBody=" + requestBody);
-		logger.println("...token=" + token);
-		logger.println("...httpMode=" + httpMode);
-
+		
+		// This is a generated code for Visual Studio Code - REST Client
+		logger.println();
+		logger.println();
+		logger.println("### " + ispwAction + " - " + "RFC 2616");
+		logger.println();
+		logger.println(httpMode + " " + url + " HTTP/1.1");
+		logger.println("Content-type: " + MimeType.APPLICATION_JSON.getContentType().toString());
+		logger.println("Authorization: " + token);
+		logger.println("");
+		logger.println(requestBody);
+		logger.println();
+		logger.println("###");
+		logger.println();
+		logger.println();
+		
 		for (Map.Entry<String, String> e : build.getBuildVariables().entrySet()) {
 			envVars.put(e.getKey(), e.getValue());
 			logger.println("EnvVars: " + e.getKey() + "=" + e.getValue());
