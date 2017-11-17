@@ -1,5 +1,7 @@
 package com.compuware.ispw.restapi.action;
 
+import java.util.Arrays;
+
 import hudson.util.ListBoxModel;
 
 public class IspwCommand {
@@ -29,6 +31,8 @@ public class IspwCommand {
 	public static ListBoxModel getFillItems() {
 		ListBoxModel items = new ListBoxModel();
 
+		Arrays.sort(publishedActions);
+		
 		for (String action : publishedActions) {
 			items.add(action);
 		}

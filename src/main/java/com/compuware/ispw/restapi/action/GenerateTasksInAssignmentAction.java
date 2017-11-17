@@ -8,7 +8,7 @@ import com.compuware.ispw.restapi.util.RestApiUtils;
 public class GenerateTasksInAssignmentAction extends SetInfoPostAction {
 
 	public static String[] defaultProps =
-			new String[] { assignmentId, level, runtimeConfiguration };
+			new String[] { assignmentId, level };
 
 	public static String contextPath =
 			"/ispw/{srid}/assignments/{assignmentId}/tasks/generate?level={level}";

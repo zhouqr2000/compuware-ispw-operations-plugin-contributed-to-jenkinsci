@@ -1,9 +1,8 @@
 <div>
 
-	<p><strong>Optional common properties for those actions with callback</strong></p>
-
-
-Optional:
+<br/>
+<strong>Optional common properties for those actions with callback</strong>
+<br/>
 <table border="1">
  <tr>
    <td>httpHeaders</td>
@@ -31,8 +30,10 @@ Optional:
  </tr>
 </table>
 
-
-    <p><strong>GenerateTasksInAssignment / GenerateTasksInRelease actions (with callback):</strong></p>
+<!--GenerateTasksInAssignment/GenerateTasksInRelease-->
+<br/>
+<strong>GenerateTasksInAssignment / GenerateTasksInRelease actions (with callback):</strong>
+<br/>
 
 Required:
 <table border="1">
@@ -88,10 +89,11 @@ events.credentials=admin:library</pre>
   </tr>
 </table>
 
+<!--PromoteAssignment/PromoteRelease-->
+<br/>
+<strong>PromoteAssignment / PromoteRelease actions (with callback):</strong>
+<br/>
 
-	
-    <p><strong>PromoteAssignment / PromoteRelease actions (with callback):</strong></p>
-	
 Required:
 <table border="1">
   <tr>
@@ -155,46 +157,10 @@ events.credentials=admin:library</pre>
 		  </tr>
 		</table>
 	
-	
-
-    <p><strong>CreateAssignment action:</strong></p>
-	
-	
-	
-	
-	
-	<p>
-	<pre>
-stream - ISPW stream name
-application - ISPW application name
-defaultPath - the default checkout path
-description - the description for the assignment
-assignmentPrefix - assignment prefix
-
-Optional:
-owner - the owner of the container
-referenceNumber - reference number
-releaseId - release ID
-userTag - user tag
-	</pre>
-	</p>
-	
-	<p>Example:</p>
-	<p>
-	<pre>
-stream=PLAY
-application=PLAY
-defaultPath=DEV2
-description=MyA01
-assignmentPrefix=PLAY
-	</pre>
-	</p>
-
-
-
-
-
-    <p><strong>DeployAsignment / DeployRelease actions (with callback):</strong></p>
+<!--DeployAsignment/DeployRelease-->
+<br/>
+<strong>DeployAsignment / DeployRelease actions (with callback):</strong>
+<br/>
 Required:
 <table border="1">
   <tr>
@@ -263,9 +229,10 @@ events.credentials=admin:library</pre>
 </table>
 
 
-
-
-    <p><strong>RegressAsignment / RegressRelease actions (with callback):</strong></p>
+<!--RegressAsignment/RegressRelease-->
+<br/>
+<strong>RegressAsignment / RegressRelease actions (with callback):</strong>
+<br/>
 
 Required:
 <table border="1">
@@ -325,41 +292,184 @@ events.credentials=admin:library</pre>
   </tr>
 </table>
 
+<!--CreateAssignment/CreateRelease-->
+<br/>
+<table border="0">
+  <tr>
+    <td align="left">
+      <strong>CreateAssignment action:</strong>
+    </td>
+    <td align="left">
+      <strong>CreateRelease action:</strong>
+    </td>
+  </tr>
+  <tr>
+    <td align="left">
+      
 
-
-
-    <p><strong>CreateRelease action:</strong></p>
-	
-	<p>
-	<pre>
-stream - ISPW stream name
-application - ISPW application name
-description - the description for the release
-releaseId - release ID
+Required:
+<table border="1">
+  <tr>
+    <td>stream</td>
+    <td>ISPW stream name</td>
+  </tr>
+  <tr>
+    <td>application</td>
+    <td>ISPW application name</td>
+  </tr>
+  <tr>
+    <td>defaultPath</td>
+    <td>the default checkout path</td>
+  </tr>
+  <tr>
+    <td>description</td>
+    <td>the description for the assignment</td>
+  </tr>
+  <tr>
+    <td>assignmentPrefix</td>
+    <td>assignment prefix</td>
+  </tr>
+</table>
 
 Optional:
-owner - the owner of the container
-releasePrefix - release prefix
-referenceNumber - reference number
-	</pre>
-	</p>
-	
-	<p>Example:</p>
-	<p>
-	<pre>
+<table border="1">
+  <tr>
+    <td>owner</td>
+    <td>the owner of the container</td>
+  </tr>
+  <tr>
+    <td>referenceNumber</td>
+    <td>reference number</td>
+  </tr>
+  <tr>
+    <td>releaseId</td>
+    <td>release ID</td>
+  </tr>
+  <tr>
+    <td>userTag</td>
+    <td>user tag</td>
+  </tr>
+</table>
+
+Example:
+<table border="1">
+  <tr>
+    <td>CreateAssignment</td>
+  </tr>
+  <tr>
+    <td><pre>
+stream=PLAY
+application=PLAY
+defaultPath=DEV2
+description=MyA01
+assignmentPrefix=PLAY</pre>
+	</td>
+  </tr>
+</table>
+
+      
+    </td>
+    <td align="left">
+
+Required:
+<table border="1">
+  <tr>
+    <td>stream</td>
+    <td>ISPW stream name</td>
+  </tr>
+  <tr>
+    <td>application</td>
+    <td>ISPW application name</td>
+  </tr>  
+  <tr>
+    <td>description</td>
+    <td>the description for the release</td>
+  </tr>  
+  <tr>
+    <td>releaseId</td>
+    <td>release ID</td>
+  </tr>  
+</table>
+
+Optional:
+<table border="1">
+  <tr>
+    <td>owner</td>
+    <td>the owner of the container</td>
+  </tr>
+  <tr>
+    <td>releasePrefix</td>
+    <td>release prefix</td>
+  </tr>
+  <tr>
+    <td>referenceNumber</td>
+    <td>reference number</td>
+  </tr>
+</table>
+
+Example:
+<table border="1">
+  <tr>
+    <td>CreateRelease</td>
+  </tr>
+  <tr>
+    <td><pre>
 stream=PLAY
 application=PLAY
 releaseId=MyR01
 description=MyR01
 assignmentPrefix=PLAY
 	</pre>
-	</p>
+	</td>
+  </tr>
+</table>
+
+    </td>
+  </tr>
+</table>
 
 
+<!--GetReleaseTaskInfo/GetReleaseTaskGenerateListing-->
+<br/>
+<strong>GetAssignmentInfo / GetAssignmentTaskList actions:</strong>
+<br/>
+
+Required:
+<table border="1">
+  <tr>
+    <td>assignmentId</td>
+    <td>The assignment ID</td>
+  </tr>
+  <tr>
+    <td>level (GetAssignmentTaskList)</td>
+    <td>All tasks in the assignment at this level will be displayed</td>
+  </tr>
+</table>
+
+Example:
+<table border="1">
+  <tr>
+    <td>GetAssignmentInfo</td>
+    <td>GetAssignmentTaskList</td>
+  </tr>
+  <tr>
+    <td>
+	<pre>
+assignmentId=PLAY000313</pre>
+    </td>
+    <td>
+    <pre>
+assignmentId=PLAY000313
+level=DEV2</pre>
+    </td>
+  </tr>
+</table>
 
 
-
-    <p><strong>GetReleaseTaskInfo / GetReleaseTaskGenerateListing actions:</strong></p>
+<!--GetReleaseTaskInfo/GetReleaseTaskGenerateListing-->
+<br/>
+<strong>GetReleaseTaskInfo / GetReleaseTaskGenerateListing / GetReleaseTaskList actions:</strong>
+<br/>
 
 Required:
 <table border="1">
@@ -371,6 +481,10 @@ Required:
     <td>taskId</td>
     <td>The task ID</td>
   </tr>
+  <tr>
+    <td>level (GetReleaseTaskList)</td>
+    <td>All tasks in the release at this level will be displayed</td>
+  </tr>
 </table>
 
 Example:
@@ -378,6 +492,7 @@ Example:
   <tr>
     <td>GetReleaseTaskInfo</td>
     <td>GetReleaseTaskGenerateListing</td>
+    <td>GetReleaseTaskList</td>
   </tr>
   <tr>
     <td>
@@ -390,7 +505,19 @@ taskId=7E1AC3D3DE25</pre>
 releaseId=JKGENRELID
 taskId=7E1AC3D3DE25</pre>
     </td>
+    <td>
+    <pre>
+releaseId=JKGENRELID
+taskId=7E1AC3D3DE25
+level=DEV2</pre>
+    </td>
   </tr>
 </table>
+
+
+
+
+
+
 
 </div>
