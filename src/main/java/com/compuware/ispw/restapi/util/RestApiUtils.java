@@ -3,7 +3,10 @@ package com.compuware.ispw.restapi.util;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlElement;
 
@@ -33,6 +36,11 @@ import com.compuware.ispw.restapi.action.PromoteAssignmentAction;
 import com.compuware.ispw.restapi.action.PromoteReleaseAction;
 import com.compuware.ispw.restapi.action.RegressAssignmentAction;
 import com.compuware.ispw.restapi.action.RegressReleaseAction;
+import com.compuware.jenkins.common.configuration.CESConnection;
+import com.compuware.jenkins.common.configuration.CESToken;
+import com.compuware.jenkins.common.configuration.CpwrGlobalConfiguration;
+
+import hudson.util.ListBoxModel;
 
 public class RestApiUtils {
 
@@ -199,19 +207,45 @@ public class RestApiUtils {
 		return httpMode;
 	}
 
-	// TODO, the following will be replaced by global settings in Jenkins in next Srpint.
-	public static String getCesUrl() {
-		return getSystemProperty(CES_URL);
+	/**
+	 * Get CES Connection
+	 * 
+	 * @return the CES connection
+	 */
+	public static CESConnection getCESConnection() {
+		CpwrGlobalConfiguration globalConfig = CpwrGlobalConfiguration.get();
+		CESConnection cesConnection = globalConfig.getCESConnection();
+		
+		return cesConnection;
 	}
 
-	public static String getCesIspwHost() {
-		return getSystemProperty(CES_ISPW_HOST);
-	}
+	public static Map<String, CESToken> getIspwHostToCesToken() {
+		Map<String, CESToken> ispwHostToCesToken = new HashMap<String, CESToken>();
 
-	public static String getCesIspwToken() {
-		return getSystemProperty(CES_ISPW_TOKEN);
-	}
+		CESConnection cesConnection = getCESConnection();
+		List<CESToken> hostTokens = cesConnection.getTokens();
+		for (CESToken hostToken : hostTokens) {
+			String hostName = hostToken.getHostName();
+			String key = hostName;
+			
+			ispwHostToCesToken.put(key, hostToken);
+		}
 
+		return ispwHostToCesToken;
+	}
+	
+	public static ListBoxModel buildIspwHostItems() {
+		ListBoxModel items = new ListBoxModel();
+		
+		Iterator<String> keys = getIspwHostToCesToken().keySet().iterator();
+		while(keys.hasNext()) {
+			String key = keys.next();
+			items.add(key);
+		}
+
+		return items;
+	}
+	
 	public static String getSystemProperty(String key) {
 		String result = System.getProperty(key);
 		if (StringUtils.isBlank(result)) {

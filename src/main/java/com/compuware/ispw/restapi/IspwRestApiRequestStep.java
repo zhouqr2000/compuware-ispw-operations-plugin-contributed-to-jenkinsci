@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -31,6 +32,7 @@ import com.compuware.ispw.restapi.action.PromoteAssignmentAction;
 import com.compuware.ispw.restapi.action.RegressAssignmentAction;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
 import com.compuware.ispw.restapi.util.RestApiUtils;
+import com.compuware.jenkins.common.configuration.CESToken;
 
 import hudson.EnvVars;
 import hudson.Extension;
@@ -396,12 +398,16 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 				throw new IllegalStateException(new Exception(errorMsg));
 			}
 			logger.println("ispwAction=" + step.ispwAction + ", httpMode=" + step.httpMode);
+
+			String cesUrl = RestApiUtils.getCESConnection().getUrl();		
+			String ispwHost = step.getIspwHost();
+			Map<String, CESToken> maps = RestApiUtils.getIspwHostToCesToken();
+			CESToken cesTokens = maps.get(ispwHost);
+			String cesIspwHost = cesTokens.getHostName();
+			String cesIspwToken = cesTokens.getToken();
+			logger.println("...ces.url=" + cesUrl + ", ces.ispw.host=" + cesIspwHost
+					+ ", ces.ispw.token=" + cesIspwToken);
 			
-			//TODO, the following CES(url, ispw host, ispw token) will fetched from Global settings in future
-			String cesUrl = RestApiUtils.getCesUrl();
-			String cesIspwHost = RestApiUtils.getCesIspwHost();
-			String cesIspwToken = RestApiUtils.getCesIspwToken();
-			logger.println("...ces.url="+cesUrl+", ces.ispw.host="+cesIspwHost+", ces.ispw.token="+cesIspwToken);
 			
 			IspwRequestBean ispwRequestBean =
 					action.getIspwRequestBean(cesIspwHost, step.ispwRequestBody, webhookToken);

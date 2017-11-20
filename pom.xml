@@ -1,28 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-The MIT License
-
-Copyright (c) 2012-, Janario Oliveira, and a number of other of contributors
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<!-- The MIT License Copyright (c) 2012-, Janario Oliveira, and a number 
+	of other of contributors Permission is hereby granted, free of charge, to 
+	any person obtaining a copy of this software and associated documentation 
+	files (the "Software"), to deal in the Software without restriction, including 
+	without limitation the rights to use, copy, modify, merge, publish, distribute, 
+	sublicense, and/or sell copies of the Software, and to permit persons to 
+	whom the Software is furnished to do so, subject to the following conditions: 
+	The above copyright notice and this permission notice shall be included in 
+	all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED 
+	"AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT 
+	NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
+	PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS 
+	BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION 
+	OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH 
+	THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.jenkins-ci.plugins</groupId>
@@ -30,6 +23,7 @@ THE SOFTWARE.
 		<version>2.16</version>
 	</parent>
 
+	<groupId>com.compuware.jenkins</groupId>
 	<artifactId>compuware-ispw-restapi-request-plugin</artifactId>
 	<version>1.8.22-SNAPSHOT</version>
 	<packaging>hpi</packaging>
@@ -69,36 +63,71 @@ THE SOFTWARE.
 	</pluginRepositories>
 
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.jenkins-ci.tools</groupId>
-				<artifactId>maven-hpi-plugin</artifactId>
-				<configuration>
-					<pluginFirstClassLoader>true</pluginFirstClassLoader>
-					<compatibleSinceVersion>1.8.17</compatibleSinceVersion>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<encoding>${project.build.sourceEncoding}</encoding>
-					<showDeprecation>true</showDeprecation>
-					<compilerArgs>
-						<compilerArg>-Xlint:all,-serial,-processing</compilerArg>
-					</compilerArgs>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-enforcer-plugin</artifactId>
-				<configuration>
-					<rules>
-						<requireJavaVersion>
-							<version>[1.7,1.9)</version>
-						</requireJavaVersion>
-					</rules>
-				</configuration>
-			</plugin>
-		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.jenkins-ci.tools</groupId>
+					<artifactId>maven-hpi-plugin</artifactId>
+					<configuration>
+						<pluginFirstClassLoader>true</pluginFirstClassLoader>
+						<compatibleSinceVersion>1.8.17</compatibleSinceVersion>
+					</configuration>
+				</plugin>
+				<plugin>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<encoding>${project.build.sourceEncoding}</encoding>
+						<showDeprecation>true</showDeprecation>
+						<compilerArgs>
+							<compilerArg>-Xlint:all,-serial,-processing</compilerArg>
+						</compilerArgs>
+					</configuration>
+				</plugin>
+				<plugin>
+					<artifactId>maven-enforcer-plugin</artifactId>
+					<configuration>
+						<rules>
+							<requireJavaVersion>
+								<version>[1.7,1.9)</version>
+							</requireJavaVersion>
+						</rules>
+					</configuration>
+				</plugin>
+
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-javadoc-plugin
+										</artifactId>
+										<versionRange>
+											[2.10.1,)
+										</versionRange>
+										<goals>
+											<goal>javadoc</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 
 	<dependencies>
@@ -127,75 +156,66 @@ THE SOFTWARE.
 
 		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
 		<dependency>
-		    <groupId>com.fasterxml.jackson.core</groupId>
-		    <artifactId>jackson-databind</artifactId>
-		    <version>2.9.1</version>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.9.1</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.module/jackson-module-jaxb-annotations -->
 		<dependency>
-		    <groupId>com.fasterxml.jackson.module</groupId>
-		    <artifactId>jackson-module-jaxb-annotations</artifactId>
-		    <version>2.9.1</version>
+			<groupId>com.fasterxml.jackson.module</groupId>
+			<artifactId>jackson-module-jaxb-annotations</artifactId>
+			<version>2.9.1</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils -->
 		<dependency>
-		    <groupId>commons-beanutils</groupId>
-		    <artifactId>commons-beanutils</artifactId>
-		    <version>1.9.2</version>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+			<version>1.9.2</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
 		<dependency>
-		    <groupId>org.apache.commons</groupId>
-		    <artifactId>commons-lang3</artifactId>
-		    <version>3.4</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.4</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.compuware.jenkins</groupId>
+			<artifactId>compuware-common-configuration</artifactId>
+			<version>1.0.3-SNAPSHOT</version>
+	    </dependency>
+
 
 		<!-- Test framework -->
-		<!-- 
-		<dependency>
-			<groupId>org.jenkins-ci.plugins.workflow</groupId>
-			<artifactId>workflow-step-api</artifactId>
-			<version>${workflow.version}</version>
-			<classifier>tests</classifier>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.jenkins-ci.plugins.workflow</groupId>
-			<artifactId>workflow-aggregator</artifactId>
-			<version>${workflow.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-servlets</artifactId>
-			<version>9.2.21.v20170120</version>
-			<scope>test</scope>
-		</dependency>
-		-->
+		<!-- <dependency> <groupId>org.jenkins-ci.plugins.workflow</groupId> <artifactId>workflow-step-api</artifactId> 
+			<version>${workflow.version}</version> <classifier>tests</classifier> <scope>test</scope> 
+			</dependency> <dependency> <groupId>org.jenkins-ci.plugins.workflow</groupId> 
+			<artifactId>workflow-aggregator</artifactId> <version>${workflow.version}</version> 
+			<scope>test</scope> </dependency> <dependency> <groupId>org.eclipse.jetty</groupId> 
+			<artifactId>jetty-servlets</artifactId> <version>9.2.21.v20170120</version> 
+			<scope>test</scope> </dependency> -->
 	</dependencies>
 
-<!-- 
-	<scm>
-		<connection>scm:git:ssh://github.com/jenkinsci/compuware-ispw-restapi-request-plugin.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/jenkinsci/compuware-ispw-restapi-request-plugin.git</developerConnection>
-		<url>https://github.com/jenkinsci/compuware-ispw-restapi-request-plugin</url>
-		<tag>HEAD</tag>
-	</scm>
-	 -->
-	<developers>
-		<developer>
-			<id>janario</id>
+	<!-- <scm> <connection>scm:git:ssh://github.com/jenkinsci/compuware-ispw-restapi-request-plugin.git</connection> 
+		<developerConnection>scm:git:ssh://git@github.com/jenkinsci/compuware-ispw-restapi-request-plugin.git</developerConnection> 
+		<url>https://github.com/jenkinsci/compuware-ispw-restapi-request-plugin</url> 
+		<tag>HEAD</tag> </scm> -->
+
+	<contributors>
+		<contributor>
 			<name>Janario Oliveira</name>
 			<email>janario.oliveira@gmail.com</email>
-		</developer>
-	</developers>
-	<contributors>
+		</contributor>
 		<contributor>
 			<name>Martin d'Anjou</name>
 			<email>martin.danjou14@gmail.com</email>
+		</contributor>
+		<contributor>
+			<name>Sam Zhou</name>
+			<email>zhou3r@gmail.com</email>
 		</contributor>
 	</contributors>
 </project>

@@ -37,6 +37,8 @@ import com.compuware.ispw.restapi.auth.FormAuthentication;
 import com.compuware.ispw.restapi.util.HttpClientUtil;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
 import com.compuware.ispw.restapi.util.RestApiUtils;
+import com.compuware.jenkins.common.configuration.CESConnection;
+import com.compuware.jenkins.common.configuration.CESToken;
 import com.google.common.base.Strings;
 import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
@@ -400,12 +402,12 @@ public class IspwRestApiRequest extends Builder {
 		}
 
 		logger.println("...ispwAction=" + ispwAction + ", httpMode=" + httpMode);
-		
-		// TODO, the following CES(url, ispw host, ispw token) will fetched from Global settings in
-		// future
-		String cesUrl = RestApiUtils.getCesUrl();
-		String cesIspwHost = RestApiUtils.getCesIspwHost();
-		String cesIspwToken = RestApiUtils.getCesIspwToken();
+		String cesUrl = RestApiUtils.getCESConnection().getUrl();		
+		String ispwHost = getIspwHost();
+		Map<String, CESToken> maps = RestApiUtils.getIspwHostToCesToken();
+		CESToken cesTokens = maps.get(ispwHost);
+		String cesIspwHost = cesTokens.getHostName();
+		String cesIspwToken = cesTokens.getToken();
 		logger.println("...ces.url=" + cesUrl + ", ces.ispw.host=" + cesIspwHost
 				+ ", ces.ispw.token=" + cesIspwToken);
 
@@ -498,13 +500,7 @@ public class IspwRestApiRequest extends Builder {
 		}
 
 		public ListBoxModel doFillIspwHostItems() {
-			// TODO
-			// These values should come from Global Configuration areas
-			ListBoxModel items = new ListBoxModel();
-			items.add("CES [http://localhost:48080], ISPW [cw09-47623]");
-			items.add("CES [http://localhost:48080], ISPW [cw09-27623]");
-
-			return items;
+			return RestApiUtils.buildIspwHostItems();
 		}
 
 		public ListBoxModel doFillAcceptTypeItems() {
