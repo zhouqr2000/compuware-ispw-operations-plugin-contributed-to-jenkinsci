@@ -6,10 +6,10 @@ import com.compuware.ispw.restapi.WebhookToken;
 
 public class CreateReleaseAction extends AbstractPostAction {
 
-	public static String[] defaultProps = new String[] { application, stream, description,
+	private static final String[] defaultProps = new String[] { application, stream, description,
 			releaseId };
 
-	public static String contextPath = "/ispw/{srid}/releases";
+	private static final String contextPath = "/ispw/{srid}/releases";
 
 	@Override
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody,

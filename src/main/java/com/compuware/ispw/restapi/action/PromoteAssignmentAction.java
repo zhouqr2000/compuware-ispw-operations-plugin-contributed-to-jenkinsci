@@ -7,13 +7,13 @@ import com.compuware.ispw.restapi.util.RestApiUtils;
 
 public class PromoteAssignmentAction extends SetInfoPostAction {
 
-	public static String[] defaultProps =
+	private static final String[] defaultProps =
 			new String[] { assignmentId, level, runtimeConfiguration };
 
-	public static String contextPath =
+	private static final String contextPath =
 			"/ispw/{srid}/assignments/{assignmentId}/tasks/promote?level={level}";
 
-	public static String getDefaultProps() {
+	public static final String getDefaultProps() {
 		return RestApiUtils.join(Constants.LINE_SEPARATOR, defaultProps, true);
 	}
 

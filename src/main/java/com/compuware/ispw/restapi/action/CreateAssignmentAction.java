@@ -6,10 +6,10 @@ import com.compuware.ispw.restapi.WebhookToken;
 
 public class CreateAssignmentAction extends AbstractPostAction {
 
-	public static String[] defaultProps = new String[] { stream, application, defaultPath,
+	private static final String[] defaultProps = new String[] { stream, application, defaultPath,
 			description, owner, assignmentPrefix };
 
-	public static String contextPath = "/ispw/{srid}/assignments";
+	private static final String contextPath = "/ispw/{srid}/assignments";
 
 	@Override
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody,

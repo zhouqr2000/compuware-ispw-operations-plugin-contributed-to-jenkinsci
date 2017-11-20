@@ -24,9 +24,9 @@ public class HttpRequest implements Serializable
 	@XmlElement(name = "method")
 	private String method = "POST";
 	@XmlElement(name = "httpHeaders")
-	private List<HttpHeader> httpHeaders;
+	private transient List<HttpHeader> httpHeaders; //use transient to ignore findbugs
 	@XmlElement(name = "credentials")
-	private BasicAuthentication credentials;
+	private transient BasicAuthentication credentials; //use transient to ignore findbugs
 
 	public String getUrl()
 	{

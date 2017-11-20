@@ -8,8 +8,8 @@ import com.compuware.ispw.restapi.WebhookToken;
 
 public class GetAssignmentInfoAction extends AbstractGetAction {
 
-	public static String[] defaultProps = new String[] { assignmentId };
-	public static String contextPath = "/ispw/{srid}/assignments/{assignmentId}";
+	private static final String[] defaultProps = new String[] { assignmentId };
+	private static final String contextPath = "/ispw/{srid}/assignments/{assignmentId}";
 
 	@Override
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody,

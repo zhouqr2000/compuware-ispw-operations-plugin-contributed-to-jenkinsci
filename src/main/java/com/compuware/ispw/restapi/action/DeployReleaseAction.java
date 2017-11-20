@@ -7,10 +7,10 @@ import com.compuware.ispw.restapi.util.RestApiUtils;
 
 public class DeployReleaseAction extends SetInfoPostAction {
 
-	public static String[] defaultProps =
+	private static final String[] defaultProps =
 			new String[] { releaseId, level };
 
-	public static String contextPath =
+	private static final String contextPath =
 			"/ispw/{srid}/releases/{releaseId}/tasks/deploy?level={level}";
 
 	public static String getDefaultProps() {

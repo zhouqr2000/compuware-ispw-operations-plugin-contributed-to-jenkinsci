@@ -7,13 +7,13 @@ import com.compuware.ispw.restapi.util.RestApiUtils;
 
 public class RegressReleaseAction extends SetInfoPostAction {
 
-	public static String[] defaultProps =
+	private static final String[] defaultProps =
 			new String[] { releaseId, level };
 
-	public static String contextPath =
+	private static final String contextPath =
 			"/ispw/{srid}/releases/{releaseId}/tasks/regress?level={level}";
 
-	public static String getDefaultProps() {
+	public static final String getDefaultProps() {
 		return RestApiUtils.join(Constants.LINE_SEPARATOR, defaultProps, true);
 	}
 

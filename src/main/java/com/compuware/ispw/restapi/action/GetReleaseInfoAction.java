@@ -8,8 +8,8 @@ import com.compuware.ispw.restapi.WebhookToken;
 
 public class GetReleaseInfoAction extends AbstractGetAction {
 
-	public static String[] defaultProps = new String[] { releaseId };
-	public static String contextPath = "/ispw/{srid}/releases/{releaseId}";
+	private static final String[] defaultProps = new String[] { releaseId };
+	private static final String contextPath = "/ispw/{srid}/releases/{releaseId}";
 
 	@Override
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody,

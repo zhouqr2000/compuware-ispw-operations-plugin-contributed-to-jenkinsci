@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
+import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepDescriptorImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractSynchronousNonBlockingStepExecution;
@@ -19,17 +20,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
-import com.compuware.ispw.restapi.action.CreateAssignmentAction;
-import com.compuware.ispw.restapi.action.DeployAssignmentAction;
-import com.compuware.ispw.restapi.action.GenerateTasksInAssignmentAction;
-import com.compuware.ispw.restapi.action.GetAssignmentInfoAction;
-import com.compuware.ispw.restapi.action.GetAssignmentTaskListAction;
-import com.compuware.ispw.restapi.action.GetReleaseInfoAction;
-import com.compuware.ispw.restapi.action.GetReleaseTaskListAction;
 import com.compuware.ispw.restapi.action.IAction;
-import com.compuware.ispw.restapi.action.IspwCommand;
-import com.compuware.ispw.restapi.action.PromoteAssignmentAction;
-import com.compuware.ispw.restapi.action.RegressAssignmentAction;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 import com.compuware.jenkins.common.configuration.CESToken;
@@ -49,7 +40,7 @@ import hudson.util.ListBoxModel;
  */
 public final class IspwRestApiRequestStep extends AbstractStepImpl {
 
-	private @Nonnull String url;
+	private @Nonnull String url = StringUtils.EMPTY;
 	private boolean ignoreSslErrors = DescriptorImpl.ignoreSslErrors;
 	private HttpMode httpMode = DescriptorImpl.httpMode;
 	private String httpProxy = DescriptorImpl.httpProxy;

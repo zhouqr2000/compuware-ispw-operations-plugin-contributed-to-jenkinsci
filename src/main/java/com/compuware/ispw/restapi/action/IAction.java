@@ -5,36 +5,36 @@ import com.compuware.ispw.restapi.WebhookToken;
 
 public interface IAction {
 	
-	public static String assignmentId = "assignmentId";
-	public static String level = "level";
-	public static String taskId = "taskId";
-	public static String releaseId = "releaseId";
-	public static String setId = "setId";
+	public static final String assignmentId = "assignmentId";
+	public static final String level = "level";
+	public static final String taskId = "taskId";
+	public static final String releaseId = "releaseId";
+	public static final String setId = "setId";
 	
-	public static String runtimeConfiguration = "runtimeConfiguration";
-	public static String autoDeploy = "autoDeploy";
-	public static String changeType = "changeType";
-	public static String executionStatus = "executionStatus";
-	public static String dpenvlst = "dpenvlst";
-	public static String system = "system";
-	public static String httpHeaders = "httpHeaders";
-	public static String credentials = "credentials";
-	public static String eventsName = "events.name";
-	public static String eventsUrl = "events.url";
-	public static String eventsMethod = "events.method";
-	public static String eventsBody = "events.body";
-	public static String eventsHttpHeaders = "events.httpHeaders";
-	public static String eventsCredentials = "events.credentials";
+	public static final String runtimeConfiguration = "runtimeConfiguration";
+	public static final String autoDeploy = "autoDeploy";
+	public static final String changeType = "changeType";
+	public static final String executionStatus = "executionStatus";
+	public static final String dpenvlst = "dpenvlst";
+	public static final String system = "system";
+	public static final String httpHeaders = "httpHeaders";
+	public static final String credentials = "credentials";
+	public static final String eventsName = "events.name";
+	public static final String eventsUrl = "events.url";
+	public static final String eventsMethod = "events.method";
+	public static final String eventsBody = "events.body";
+	public static final String eventsHttpHeaders = "events.httpHeaders";
+	public static final String eventsCredentials = "events.credentials";
 	
-	public static String stream = "stream";
-	public static String application = "application";
-	public static String defaultPath = "defaultPath";
-	public static String description = "description";
-	public static String owner = "owner";
-	public static String assignmentPrefix = "assignmentPrefix";
-	public static String referenceNumber = "referenceNumber";
-	public static String userTag = "userTag";
-	public static String releasePrefix = "releasePrefix";
+	public static final String stream = "stream";
+	public static final String application = "application";
+	public static final String defaultPath = "defaultPath";
+	public static final String description = "description";
+	public static final String owner = "owner";
+	public static final String assignmentPrefix = "assignmentPrefix";
+	public static final String referenceNumber = "referenceNumber";
+	public static final String userTag = "userTag";
+	public static final String releasePrefix = "releasePrefix";
 	
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody,
 			WebhookToken webhookToken);

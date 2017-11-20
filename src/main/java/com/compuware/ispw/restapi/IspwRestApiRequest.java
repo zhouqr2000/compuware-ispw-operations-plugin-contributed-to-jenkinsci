@@ -11,6 +11,7 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -21,23 +22,14 @@ import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
-import com.compuware.ispw.restapi.action.CreateAssignmentAction;
-import com.compuware.ispw.restapi.action.DeployAssignmentAction;
 import com.compuware.ispw.restapi.action.GenerateTasksInAssignmentAction;
-import com.compuware.ispw.restapi.action.GetAssignmentInfoAction;
-import com.compuware.ispw.restapi.action.GetAssignmentTaskListAction;
-import com.compuware.ispw.restapi.action.GetReleaseInfoAction;
-import com.compuware.ispw.restapi.action.GetReleaseTaskListAction;
 import com.compuware.ispw.restapi.action.IAction;
 import com.compuware.ispw.restapi.action.IspwCommand;
-import com.compuware.ispw.restapi.action.PromoteAssignmentAction;
-import com.compuware.ispw.restapi.action.RegressAssignmentAction;
 import com.compuware.ispw.restapi.auth.BasicDigestAuthentication;
 import com.compuware.ispw.restapi.auth.FormAuthentication;
 import com.compuware.ispw.restapi.util.HttpClientUtil;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
 import com.compuware.ispw.restapi.util.RestApiUtils;
-import com.compuware.jenkins.common.configuration.CESConnection;
 import com.compuware.jenkins.common.configuration.CESToken;
 import com.google.common.base.Strings;
 import com.google.common.collect.Range;
@@ -67,7 +59,7 @@ import hudson.util.ListBoxModel.Option;
  */
 public class IspwRestApiRequest extends Builder {
 
-	private @Nonnull String url;
+	private @Nonnull String url = StringUtils.EMPTY;
 	private Boolean ignoreSslErrors = DescriptorImpl.ignoreSslErrors;
 	private HttpMode httpMode = DescriptorImpl.httpMode;
 	private String httpProxy = DescriptorImpl.httpProxy;

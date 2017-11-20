@@ -8,8 +8,8 @@ import com.compuware.ispw.restapi.WebhookToken;
 
 public class GetAssignmentTaskListAction extends AbstractGetAction {
 
-	public static String[] defaultProps = new String[] { assignmentId, level };
-	public static String contextPath =
+	private static final String[] defaultProps = new String[] { assignmentId, level };
+	private static final String contextPath =
 			"/ispw/{srid}/assignments/{assignmentId}/tasks?level={level}";
 
 	@Override
