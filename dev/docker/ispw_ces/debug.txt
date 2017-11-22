@@ -1,0 +1,13 @@
+
+Debug RestAPI:
+
+### GetReleaseTaskList - RFC 2616
+
+GET http://10.211.55.12:48080/ispw/cw09-47623/releases/JKGENRELID/tasks?level=DEV2 HTTP/1.1
+Content-type: application/json
+Authorization: 3837ae52-de34-4068-9c2a-3e2ddc7e9fed
+
+{
+}
+
+###

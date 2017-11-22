@@ -1,0 +1,3 @@
+compuware-common-configuration
+compuware-scm-downloader
+compuware-topaz-for-total-test

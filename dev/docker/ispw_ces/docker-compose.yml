@@ -1,0 +1,13 @@
+version: '3'
+services:
+  jenkins:
+    image: sam/ces
+    container_name: sam_ces_1
+    volumes:
+      - 'compuware_home:/opt/Compuware'
+    restart: always
+    ports:
+      - '48080:48080'
+      - '1545:1545'
+volumes:
+  compuware_home: null
