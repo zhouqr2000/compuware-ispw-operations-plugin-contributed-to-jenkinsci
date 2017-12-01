@@ -22,7 +22,6 @@ import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
-import com.compuware.ispw.restapi.action.GenerateTasksInAssignmentAction;
 import com.compuware.ispw.restapi.action.IAction;
 import com.compuware.ispw.restapi.action.IspwCommand;
 import com.compuware.ispw.restapi.auth.BasicDigestAuthentication;
@@ -30,7 +29,7 @@ import com.compuware.ispw.restapi.auth.FormAuthentication;
 import com.compuware.ispw.restapi.util.HttpClientUtil;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
 import com.compuware.ispw.restapi.util.RestApiUtils;
-import com.compuware.jenkins.common.configuration.CESToken;
+import com.compuware.jenkins.common.configuration.HostConnection;
 import com.google.common.base.Strings;
 import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
@@ -53,9 +52,11 @@ import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import hudson.util.ListBoxModel.Option;
+import jenkins.model.Jenkins;
 
 /**
  * @author Janario Oliveira
+ * @author Sam Zhou
  */
 public class IspwRestApiRequest extends Builder {
 
@@ -77,7 +78,8 @@ public class IspwRestApiRequest extends Builder {
 	private List<HttpRequestNameValuePair> customHeaders = DescriptorImpl.customHeaders;
 
 	// ISPW
-	private String ispwHost = DescriptorImpl.ispwHost;
+	private String connectionId = DescriptorImpl.connectionId;
+	private String credentialsId = DescriptorImpl.credentialsId;
 	private String ispwAction = DescriptorImpl.ispwAction;
 	private String ispwRequestBody = DescriptorImpl.ispwRequestBody;
 	private Boolean consoleLogResponseBody = DescriptorImpl.consoleLogResponseBody;
@@ -123,15 +125,30 @@ public class IspwRestApiRequest extends Builder {
 		this.ispwAction = ispwAction;
 	}
 
-	public String getIspwHost() {
-		return ispwHost;
+	public String getConnectionId() {
+		return connectionId;
 	}
 
 	@DataBoundSetter
-	public void setIspwHost(String ispwHost) {
-		this.ispwHost = ispwHost;
+	public void setConnectionId(String connectionId) {
+		this.connectionId = connectionId;
 	}
 
+	/**
+	 * Gets the value of the 'Login Credentials'
+	 * 
+	 * @return <code>String</code> value of m_credentialsId
+	 */
+	public String getCredentialsId()
+	{
+		return credentialsId;
+	}
+	
+	@DataBoundSetter
+	public void setCredentialsId(String credentialsId) {
+		this.credentialsId = credentialsId;
+	}
+	
 	public String getIspwRequestBody() {
 		return ispwRequestBody;
 	}
@@ -394,12 +411,21 @@ public class IspwRestApiRequest extends Builder {
 		}
 
 		logger.println("...ispwAction=" + ispwAction + ", httpMode=" + httpMode);
-		String cesUrl = RestApiUtils.getCESConnection().getUrl();		
-		String ispwHost = getIspwHost();
-		Map<String, CESToken> maps = RestApiUtils.getIspwHostToCesToken();
-		CESToken cesTokens = maps.get(ispwHost);
-		String cesIspwHost = cesTokens.getHostName();
-		String cesIspwToken = cesTokens.getToken();
+
+		String cesUrl = StringUtils.EMPTY;
+		String cesIspwHost = StringUtils.EMPTY;
+
+		HostConnection hostConnection = RestApiUtils.getCesUrl(connectionId);
+		if (hostConnection != null) {
+			cesUrl = StringUtils.trimToEmpty(hostConnection.getCesUrl());
+
+			String host = StringUtils.trimToEmpty(hostConnection.getHost());
+			String port = StringUtils.trimToEmpty(hostConnection.getPort());
+			cesIspwHost = host + "-" + port;
+		}
+
+		String cesIspwToken = RestApiUtils.getCesToken(credentialsId);
+
 		logger.println("...ces.url=" + cesUrl + ", ces.ispw.host=" + cesIspwHost
 				+ ", ces.ispw.token=" + cesIspwToken);
 
@@ -410,7 +436,7 @@ public class IspwRestApiRequest extends Builder {
 		this.url = cesUrl + ispwRequestBean.getContextPath(); // CES URL
 		this.requestBody = ispwRequestBean.getJsonRequest();
 		this.token = cesIspwToken; // CES TOKEN
-		
+
 		// This is a generated code for Visual Studio Code - REST Client
 		logger.println();
 		logger.println();
@@ -425,7 +451,7 @@ public class IspwRestApiRequest extends Builder {
 		logger.println("###");
 		logger.println();
 		logger.println();
-		
+
 		for (Map.Entry<String, String> e : build.getBuildVariables().entrySet()) {
 			envVars.put(e.getKey(), e.getValue());
 			logger.println("EnvVars: " + e.getKey() + "=" + e.getValue());
@@ -457,10 +483,10 @@ public class IspwRestApiRequest extends Builder {
 		public static final String token = "";
 
 		// ISPW related
-		public static final String ispwHost = "cw09-47623";
-		public static final String ispwAction = IspwCommand.GenerateTasksInAssignment;
-		public static final String ispwRequestBody = GenerateTasksInAssignmentAction
-				.getDefaultProps();
+		public static final String connectionId = StringUtils.EMPTY;
+		public static final String credentialsId = StringUtils.EMPTY;
+		public static final String ispwAction = StringUtils.EMPTY;
+		public static final String ispwRequestBody = StringUtils.EMPTY;
 		public static final Boolean consoleLogResponseBody = false;
 
 		public static final List<HttpRequestNameValuePair> customHeaders = Collections
@@ -487,14 +513,23 @@ public class IspwRestApiRequest extends Builder {
 		}
 
 		// ISPW
-		public ListBoxModel doFillIspwActionItems() {
-			return IspwCommand.getFillItems();
+		public ListBoxModel doFillIspwActionItems(@AncestorInPath Jenkins context, @QueryParameter String ispwAction,
+				@AncestorInPath Item project) {
+			return RestApiUtils.buildIspwActionItems(context, ispwAction, project);
 		}
 
-		public ListBoxModel doFillIspwHostItems() {
-			return RestApiUtils.buildIspwHostItems();
+		public ListBoxModel doFillConnectionIdItems(@AncestorInPath Jenkins context, @QueryParameter String connectionId,
+				@AncestorInPath Item project)
+		{
+			return RestApiUtils.buildConnectionIdItems(context,  connectionId, project);
 		}
-
+		
+		public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Jenkins context, @QueryParameter String credentialsId,
+				@AncestorInPath Item project) {
+			return RestApiUtils.buildCredentialsIdItems(context, credentialsId, project);
+		}
+		
+		
 		public ListBoxModel doFillAcceptTypeItems() {
 			return MimeType.getContentTypeFillItems();
 		}

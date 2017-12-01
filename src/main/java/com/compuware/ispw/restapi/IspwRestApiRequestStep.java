@@ -5,7 +5,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -21,9 +20,10 @@ import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
 import com.compuware.ispw.restapi.action.IAction;
+import com.compuware.ispw.restapi.action.IspwCommand;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
 import com.compuware.ispw.restapi.util.RestApiUtils;
-import com.compuware.jenkins.common.configuration.CESToken;
+import com.compuware.jenkins.common.configuration.HostConnection;
 
 import hudson.EnvVars;
 import hudson.Extension;
@@ -34,6 +34,7 @@ import hudson.model.TaskListener;
 import hudson.model.Run;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import jenkins.model.Jenkins;
 
 /**
  * @author Martin d'Anjou
@@ -58,8 +59,9 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 	private String token = DescriptorImpl.token; // modified by pmisvz0
 
 	// ISPW
-	private String ispwHost; // = DescriptorImpl.ispwHost;
-	private String ispwAction; // = DescriptorImpl.ispwAction;
+	private String connectionId = DescriptorImpl.connectionId;
+	private String credentialsId = DescriptorImpl.credentialsId;
+	private String ispwAction = DescriptorImpl.ispwAction;
 	private String ispwRequestBody = DescriptorImpl.ispwRequestBody;
 	private Boolean consoleLogResponseBody = DescriptorImpl.consoleLogResponseBody;
 	
@@ -104,13 +106,29 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 		this.ispwAction = ispwAction;
 	}
 	
-	public String getIspwHost() {
-		return ispwHost;
+
+	public String getConnectionId() {
+		return connectionId;
 	}
 
 	@DataBoundSetter
-	public void setIspwHost(String ispwHost) {
-		this.ispwHost = ispwHost;
+	public void setConnectionId(String connectionId) {
+		this.connectionId = connectionId;
+	}
+
+	/**
+	 * Gets the value of the 'Login Credentials'
+	 * 
+	 * @return <code>String</code> value of m_credentialsId
+	 */
+	public String getCredentialsId()
+	{
+		return credentialsId;
+	}
+	
+	@DataBoundSetter
+	public void setCredentialsId(String credentialsId) {
+		this.credentialsId = credentialsId;
 	}
 	
 	public String getIspwRequestBody() {
@@ -259,10 +277,6 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 	List<HttpRequestNameValuePair> resolveHeaders() {
 		final List<HttpRequestNameValuePair> headers = new ArrayList<>();
 		
-//		if (contentType != null && contentType != MimeType.NOT_SET) {
-//			headers.add(new HttpRequestNameValuePair("Content-type", contentType.getContentType().toString()));
-//		}
-		
 		// ISPW
 		headers.add(new HttpRequestNameValuePair("Content-type", MimeType.APPLICATION_JSON.toString()));
 		headers.add(new HttpRequestNameValuePair("Authorization", getToken()));
@@ -305,10 +319,10 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 		public static final ResponseHandle responseHandle = ResponseHandle.STRING;
 
 		// ISPW related
-		public static final String ispwHost = IspwRestApiRequest.DescriptorImpl.ispwHost;
-		public static final String ispwAction = IspwRestApiRequest.DescriptorImpl.ispwAction;
-		public static final String ispwRequestBody =
-				IspwRestApiRequest.DescriptorImpl.ispwRequestBody;
+		public static final String connectionId = StringUtils.EMPTY;
+		public static final String credentialsId = StringUtils.EMPTY;
+		public static final String ispwAction = StringUtils.EMPTY;
+		public static final String ispwRequestBody = StringUtils.EMPTY;
 		public static final Boolean consoleLogResponseBody =
 				IspwRestApiRequest.DescriptorImpl.consoleLogResponseBody;
 		
@@ -326,6 +340,24 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			return "Perform an ISPW Rest API Request and return a JSON object";
 		}
 
+		// ISPW
+		public ListBoxModel doFillIspwActionItems(@AncestorInPath Jenkins context, @QueryParameter String ispwAction,
+				@AncestorInPath Item project) {
+			return RestApiUtils.buildIspwActionItems(context, ispwAction, project);
+		}
+
+		public ListBoxModel doFillConnectionIdItems(@AncestorInPath Jenkins context, @QueryParameter String connectionId,
+				@AncestorInPath Item project)
+		{
+			return RestApiUtils.buildConnectionIdItems(context,  connectionId, project);
+		}
+		
+		public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Jenkins context, @QueryParameter String credentialsId,
+				@AncestorInPath Item project) {
+			return RestApiUtils.buildCredentialsIdItems(context, credentialsId, project);
+		
+		}
+		
         public ListBoxModel doFillHttpModeItems() {
             return HttpMode.getFillItems();
         }
@@ -355,7 +387,7 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
             return IspwRestApiRequest.DescriptorImpl.checkValidResponseCodes(value);
         }
 
-    }
+	}
 
     public static final class Execution extends AbstractSynchronousNonBlockingStepExecution<ResponseContentSupplier> {
 
@@ -370,7 +402,7 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 		@Override
 		protected ResponseContentSupplier run() throws Exception {
 			PrintStream logger = listener.getLogger();
-			
+
 			EnvVars envVars = getContext().get(hudson.EnvVars.class);
 
 			String buildTag = envVars.get("BUILD_TAG");
@@ -379,7 +411,7 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 
 			IAction action = RestApiUtils.createAction(step.ispwAction);
 			step.httpMode = RestApiUtils.resetHttpMode(step.ispwAction);
-			
+
 			if (action == null) {
 				String errorMsg =
 						"Action:"
@@ -390,16 +422,23 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			}
 			logger.println("ispwAction=" + step.ispwAction + ", httpMode=" + step.httpMode);
 
-			String cesUrl = RestApiUtils.getCESConnection().getUrl();		
-			String ispwHost = step.getIspwHost();
-			Map<String, CESToken> maps = RestApiUtils.getIspwHostToCesToken();
-			CESToken cesTokens = maps.get(ispwHost);
-			String cesIspwHost = cesTokens.getHostName();
-			String cesIspwToken = cesTokens.getToken();
+			String cesUrl = StringUtils.EMPTY;
+			String cesIspwHost = StringUtils.EMPTY;
+
+			HostConnection hostConnection = RestApiUtils.getCesUrl(step.connectionId);
+			if (hostConnection != null) {
+				cesUrl = StringUtils.trimToEmpty(hostConnection.getCesUrl());
+
+				String host = StringUtils.trimToEmpty(hostConnection.getHost());
+				String port = StringUtils.trimToEmpty(hostConnection.getPort());
+				cesIspwHost = host + "-" + port;
+			}
+
+			String cesIspwToken = RestApiUtils.getCesToken(step.credentialsId);
+
 			logger.println("...ces.url=" + cesUrl + ", ces.ispw.host=" + cesIspwHost
 					+ ", ces.ispw.token=" + cesIspwToken);
-			
-			
+
 			IspwRequestBean ispwRequestBean =
 					action.getIspwRequestBean(cesIspwHost, step.ispwRequestBody, webhookToken);
 			logger.println("ispwRequestBean=" + ispwRequestBean);
@@ -413,19 +452,19 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			logger.println();
 			logger.println("### [" + step.ispwAction + "] - " + "RFC 2616");
 			logger.println();
-			logger.println(step.httpMode+" "+step.url+" HTTP/1.1");
-			logger.println("Content-type: "+MimeType.APPLICATION_JSON.getContentType().toString());
-			logger.println("Authorization: "+step.token);
+			logger.println(step.httpMode + " " + step.url + " HTTP/1.1");
+			logger.println("Content-type: " + MimeType.APPLICATION_JSON.getContentType().toString());
+			logger.println("Authorization: " + step.token);
 			logger.println("");
 			logger.println(step.requestBody);
 			logger.println();
 			logger.println("###");
 			logger.println();
 			logger.println();
-			
-			HttpRequestExecution exec = HttpRequestExecution.from(step,
-					step.getQuiet() ? TaskListener.NULL : listener,
-					this);
+
+			HttpRequestExecution exec =
+					HttpRequestExecution.from(step, step.getQuiet() ? TaskListener.NULL : listener,
+							this);
 
 			Launcher launcher = getContext().get(Launcher.class);
 			if (launcher != null) {
@@ -458,5 +497,6 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 		public Item getProject() {
 			return run.getParent();
 		}
-	}
+
+    }
 }

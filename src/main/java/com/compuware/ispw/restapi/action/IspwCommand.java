@@ -1,8 +1,5 @@
 package com.compuware.ispw.restapi.action;
 
-import java.util.Arrays;
-
-import hudson.util.ListBoxModel;
 
 public class IspwCommand {
 	public static final String CreateAssignment = "CreateAssignment"; // POST
@@ -22,21 +19,10 @@ public class IspwCommand {
 	public static final String DeployRelease = "DeployRelease"; // POST
 	public static final String RegressRelease = "RegressRelease"; // POST
 
-	private static final String[] publishedActions = new String[] { CreateAssignment, GetAssignmentInfo,
+	public static final String[] publishedActions = new String[] { CreateAssignment, GetAssignmentInfo,
 			GetAssignmentTaskList, GenerateTasksInAssignment, PromoteAssignment, DeployAssignment,
 			RegressAssignment, GetReleaseInfo, GetReleaseTaskList, CreateRelease,
 			GenerateTasksInRelease, GetReleaseTaskGenerateListing, GetReleaseTaskInfo,
 			PromoteRelease, DeployRelease, RegressRelease };
 
-	public static ListBoxModel getFillItems() {
-		ListBoxModel items = new ListBoxModel();
-
-		Arrays.sort(publishedActions);
-		
-		for (String action : publishedActions) {
-			items.add(action);
-		}
-
-		return items;
-	}
 }

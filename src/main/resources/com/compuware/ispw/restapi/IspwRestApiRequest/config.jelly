@@ -1,30 +1,24 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form" xmlns:c="/lib/credentials" xmlns:cc="/lib/compuware">
 
-	<!--
-    <f:entry field="url" title="URL" help="/plugin/compuware-ispw-restapi-request-plugin/help-url.html">
-        <f:textbox />
-    </f:entry>
-    <f:entry field="httpMode" title="HTTP mode" help="/plugin/compuware-ispw-restapi-request-plugin/help-httpMode.html">
-        <f:select />
-    </f:entry>
-    <f:entry field="token" title="Token">
-        <f:textbox />
-    </f:entry>
-    <f:entry field="requestBody" title="Request body" help="/plugin/http_request/help-requestBody.html">
-        <f:textarea />
-    </f:entry>
-    -->
-    <f:entry field="ispwHost" title="Host" help="/plugin/compuware-ispw-restapi-request-plugin/help-ispwHost.html">
-        <f:select default="${descriptor.ispwHost}"/>
-    </f:entry>
+	<f:entry title="Host connection" field="connectionId" help="/plugin/compuware-ispw-restapi-request-plugin/help-connectionId.html">
+    	<cc:hostSelect default="${descriptor.connectionId}"/>
+	</f:entry>
+
+	<f:entry title="CES secret token" field="credentialsId" help="/plugin/compuware-ispw-restapi-request-plugin/help-credentialsId.html">
+		<c:select/>
+	</f:entry>
+    
     <f:entry field="ispwAction" title="Action" help="/plugin/compuware-ispw-restapi-request-plugin/help-ispwAction.html">
         <f:select default="${descriptor.ispwAction}"/>
     </f:entry>
+
     <f:entry field="ispwRequestBody" title="Request" help="/plugin/compuware-ispw-restapi-request-plugin/help-ispwRequestBody.html">
         <f:textarea default="${descriptor.ispwRequestBody}"/>
     </f:entry>
+
     <f:entry field="consoleLogResponseBody" title="Response body in console?" help="/plugin/compuware-ispw-restapi-request-plugin/help-consoleLogResponseBody.html">
         <f:booleanRadio/>
     </f:entry>
+
  </j:jelly>

@@ -1,12 +1,15 @@
 package com.compuware.ispw.restapi.util;
 
+import static com.cloudbees.plugins.credentials.CredentialsMatchers.filter;
+import static com.cloudbees.plugins.credentials.CredentialsMatchers.withId;
+import static com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.annotation.XmlElement;
 
@@ -14,7 +17,13 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.log4j.Logger;
+import org.jenkinsci.plugins.plaincredentials.StringCredentials;
+import org.kohsuke.stapler.AncestorInPath;
+import org.kohsuke.stapler.QueryParameter;
 
+import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
+import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.compuware.ces.model.BasicAuthentication;
 import com.compuware.ces.model.HttpHeader;
 import com.compuware.ispw.restapi.HttpMode;
@@ -36,17 +45,16 @@ import com.compuware.ispw.restapi.action.PromoteAssignmentAction;
 import com.compuware.ispw.restapi.action.PromoteReleaseAction;
 import com.compuware.ispw.restapi.action.RegressAssignmentAction;
 import com.compuware.ispw.restapi.action.RegressReleaseAction;
-import com.compuware.jenkins.common.configuration.CESConnection;
-import com.compuware.jenkins.common.configuration.CESToken;
 import com.compuware.jenkins.common.configuration.CpwrGlobalConfiguration;
+import com.compuware.jenkins.common.configuration.HostConnection;
 
+import hudson.model.Item;
+import hudson.security.ACL;
 import hudson.util.ListBoxModel;
+import hudson.util.ListBoxModel.Option;
+import jenkins.model.Jenkins;
 
 public class RestApiUtils {
-
-	public static String CES_URL = "ces.url";
-	public static String CES_ISPW_HOST = "ces.ispw.host";
-	public static String CES_ISPW_TOKEN = "ces.ispw.token";
 
 	private static Logger logger = Logger.getLogger(RestApiUtils.class);
 
@@ -206,44 +214,96 @@ public class RestApiUtils {
 
 		return httpMode;
 	}
-
-	/**
-	 * Get CES Connection
-	 * 
-	 * @return the CES connection
-	 */
-	public static CESConnection getCESConnection() {
+	
+	public static ListBoxModel buildConnectionIdItems(@AncestorInPath Jenkins context, @QueryParameter String connectionId,
+			@AncestorInPath Item project) {
 		CpwrGlobalConfiguration globalConfig = CpwrGlobalConfiguration.get();
-		CESConnection cesConnection = globalConfig.getCESConnection();
-		
-		return cesConnection;
-	}
+		HostConnection[] hostConnections = globalConfig.getHostConnections();
 
-	public static Map<String, CESToken> getIspwHostToCesToken() {
-		Map<String, CESToken> ispwHostToCesToken = new HashMap<String, CESToken>();
+		ListBoxModel model = new ListBoxModel();
+		model.add(new Option(StringUtils.EMPTY, StringUtils.EMPTY, false));
 
-		CESConnection cesConnection = getCESConnection();
-		List<CESToken> hostTokens = cesConnection.getTokens();
-		for (CESToken hostToken : hostTokens) {
-			String hostName = hostToken.getHostName();
-			String key = hostName;
-			
-			ispwHostToCesToken.put(key, hostToken);
+		for (HostConnection connection : hostConnections)
+		{
+			boolean isSelected = false;
+			if (connectionId != null)
+			{
+				isSelected = connectionId.matches(connection.getConnectionId());
+			}
+
+			model.add(new Option(connection.getDescription() + " [" + connection.getHostPort() + ']', //$NON-NLS-1$
+					connection.getConnectionId(), isSelected));
 		}
 
-		return ispwHostToCesToken;
+		return model;
 	}
 	
-	public static ListBoxModel buildIspwHostItems() {
-		ListBoxModel items = new ListBoxModel();
-		
-		Iterator<String> keys = getIspwHostToCesToken().keySet().iterator();
-		while(keys.hasNext()) {
-			String key = keys.next();
-			items.add(key);
+	public static HostConnection getCesUrl(String connectionId) {
+		CpwrGlobalConfiguration globalConfig = CpwrGlobalConfiguration.get();
+		HostConnection hostConnection = globalConfig.getHostConnection(connectionId);
+		return hostConnection;
+	}
+
+	public static String getCesToken(String credentialsId) {
+		List<StringCredentials> creds =
+				filter(lookupCredentials(StringCredentials.class, Jenkins.getInstance(),
+						ACL.SYSTEM, Collections.<DomainRequirement> emptyList()),
+						withId(StringUtils.trimToEmpty(credentialsId)));
+
+		String token = StringUtils.EMPTY;
+		if (creds != null && creds.size() > 0) {
+			StringCredentials cred = creds.get(0);
+			token = cred.getSecret().getPlainText();
 		}
 
-		return items;
+		return token;
+	}
+	
+	public static ListBoxModel buildCredentialsIdItems(@AncestorInPath Jenkins context, @QueryParameter String credentialsId,
+			@AncestorInPath Item project)
+	{
+		List<StringCredentials> creds = CredentialsProvider.lookupCredentials(
+				StringCredentials.class, project, ACL.SYSTEM,
+				Collections.<DomainRequirement> emptyList());
+
+		StandardListBoxModel model = new StandardListBoxModel();
+
+		model.add(new Option(StringUtils.EMPTY, StringUtils.EMPTY, false));
+
+		for (StringCredentials c : creds) {
+			boolean isSelected = false;
+
+			if (credentialsId != null) {
+				isSelected = credentialsId.matches(c.getId());
+			}
+
+			String description = StringUtils.trimToEmpty(c.getDescription());
+			model.add(new Option(description, c.getId(), isSelected));
+		}
+
+		return model;
+	}
+	
+	public static ListBoxModel buildIspwActionItems(@AncestorInPath Jenkins context, @QueryParameter String ispwAction,
+			@AncestorInPath Item project) {
+		
+		ListBoxModel model = new ListBoxModel();
+		
+		model.add(new Option(StringUtils.EMPTY, StringUtils.EMPTY, false));
+
+		Arrays.sort(IspwCommand.publishedActions);
+		
+		for (String action : IspwCommand.publishedActions) {
+			boolean isSelected = false;
+
+			if (ispwAction != null) {
+				isSelected = action.matches(ispwAction);
+			}			
+
+			model.add(new Option(action, action, isSelected));
+		}
+
+		return model;
 	}
 	
 	public static String getSystemProperty(String key) {
