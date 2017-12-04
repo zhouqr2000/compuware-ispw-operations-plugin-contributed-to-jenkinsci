@@ -25,9 +25,9 @@
 
 	<groupId>com.compuware.jenkins</groupId>
 	<artifactId>compuware-ispw-restapi-request-plugin</artifactId>
-	<version>1.8.22-SNAPSHOT</version>
+	<version>1.0.99-SNAPSHOT</version>
 	<packaging>hpi</packaging>
-	<name>Compuware ISPW RestAPI Request Plugin</name>
+	<name>Compuware ISPW Operations Plugin</name>
 	<description>This plugin sends an ISPW Rest API request to an url with some parameters.
 		See the release notes for changes and compatibility https://github.com/jenkinsci/http-request-plugin/releases</description>
 	<url>http://wiki.jenkins-ci.org/display/JENKINS/CompuwareISPWRestAPIRequestPlugin</url>

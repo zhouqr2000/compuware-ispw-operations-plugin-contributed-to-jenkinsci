@@ -504,8 +504,7 @@ public class IspwRestApiRequest extends Builder {
 
 		@Override
 		public String getDisplayName() {
-			// return "HTTP Request"; //modified by pmisvz0
-			return "ISPW Rest API Request";
+			return "Execute a Compuware ISPW Operation";
 		}
 
 		public ListBoxModel doFillHttpModeItems() {

@@ -332,12 +332,12 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 
 		@Override
 		public String getFunctionName() {
-			return "ispwRestApiRequest";
+			return "ispwOperation";
 		}
 
 		@Override
 		public String getDisplayName() {
-			return "Perform an ISPW Rest API Request and return a JSON object";
+			return "Perform a Compuware ISPW Rest API Request and return a JSON object";
 		}
 
 		// ISPW
