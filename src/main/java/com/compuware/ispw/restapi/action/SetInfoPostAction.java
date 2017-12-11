@@ -9,7 +9,7 @@ import com.compuware.ces.model.BasicAuthentication;
 import com.compuware.ces.model.HttpHeader;
 import com.compuware.ispw.model.rest.SetInfo;
 import com.compuware.ispw.restapi.IspwRequestBean;
-import com.compuware.ispw.restapi.JsonGenerator;
+import com.compuware.ispw.restapi.JsonProcessor;
 import com.compuware.ispw.restapi.WebhookToken;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
@@ -93,7 +93,7 @@ public abstract class SetInfoPostAction implements IAction {
 
 		bean.setContextPath(path);
 
-		JsonGenerator jsonGenerator = new JsonGenerator();
+		JsonProcessor jsonGenerator = new JsonProcessor();
 		String jsonRequest = jsonGenerator.generate(setInfo);
 		bean.setJsonRequest(jsonRequest);
 		return bean;

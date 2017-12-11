@@ -3,7 +3,7 @@ package com.compuware.ispw.restapi.action;
 import org.apache.commons.lang3.StringUtils;
 
 import com.compuware.ispw.restapi.IspwRequestBean;
-import com.compuware.ispw.restapi.JsonGenerator;
+import com.compuware.ispw.restapi.JsonProcessor;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
 public abstract class AbstractPostAction implements IAction {
@@ -33,7 +33,7 @@ public abstract class AbstractPostAction implements IAction {
 
 		bean.setContextPath(path);
 
-		JsonGenerator jsonGenerator = new JsonGenerator();
+		JsonProcessor jsonGenerator = new JsonProcessor();
 		String jsonRequest = jsonGenerator.generate(jsonObject);
 		bean.setJsonRequest(jsonRequest);
 

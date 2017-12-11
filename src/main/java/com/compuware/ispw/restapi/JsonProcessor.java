@@ -4,6 +4,8 @@ import java.io.StringWriter;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.log4j.Logger;
 
 import com.compuware.ces.communications.service.data.EventCallback;
@@ -16,47 +18,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 
-public class JsonGenerator {
+public class JsonProcessor {
 
-	private static Logger logger = Logger.getLogger(JsonGenerator.class);
-
-	/*
-	 * Moxy - not work public String generate(boolean includeRoot, Object object) { String json =
-	 * "{}";
-	 * 
-	 * try { Map<String, Object> jaxbProperties = new HashMap<String, Object>(2);
-	 * jaxbProperties.put(JAXBContextProperties.MEDIA_TYPE, "application/json");
-	 * jaxbProperties.put(JAXBContextProperties.JSON_INCLUDE_ROOT, includeRoot); JAXBContext jc =
-	 * JAXBContext.newInstance(new Class[] { object.getClass() }, jaxbProperties);
-	 * 
-	 * Marshaller marshaller = jc.createMarshaller();
-	 * marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-	 * 
-	 * StringWriter stringWriter = new StringWriter(); marshaller.marshal(object, stringWriter);
-	 * 
-	 * json = stringWriter.toString(); } catch (Exception x) { logger.error(x.getMessage(), x); }
-	 * return json; }
-	 */
-
-	/*
-	 * Jettison - not work public String generate(boolean includeRoot, Object object) { String json
-	 * = "{}";
-	 * 
-	 * try { Map<String, Object> jaxbProperties = new HashMap<String, Object>(2); JAXBContext jc =
-	 * JAXBContext.newInstance(new Class[] { object.getClass() }, jaxbProperties);
-	 * 
-	 * Configuration config = new Configuration(); MappedNamespaceConvention con = new
-	 * MappedNamespaceConvention(config); StringWriter stringWriter = new StringWriter();
-	 * MappedXMLStreamWriter xmlStreamWriter = new MappedXMLStreamWriter(con, stringWriter);
-	 * 
-	 * Marshaller marshaller = jc.createMarshaller();
-	 * marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true); marshaller.marshal(object,
-	 * xmlStreamWriter);
-	 * 
-	 * json = stringWriter.toString(); } catch (Exception x) { logger.error(x.getMessage(), x); }
-	 * return json; }
-	 */
-
+	private static Logger logger = Logger.getLogger(JsonProcessor.class);
+	
 	public String generate(Object object) {
 		String json = "{}";
 
@@ -72,12 +37,32 @@ public class JsonGenerator {
 
 			StringWriter stringWriter = new StringWriter();
 			mapper.writeValue(stringWriter, object);
-
-			json = stringWriter.toString();
+			
+			json = stringWriter.toString();			
 		} catch (Exception x) {
 			logger.error(x.getMessage(), x);
 		}
 		return json;
+	}
+
+	public <T> T parse(String json, Class<T> clazz) {
+		T object = null;
+
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+
+			mapper.writerWithDefaultPrettyPrinter();
+			mapper.setSerializationInclusion(Include.NON_NULL);
+			mapper.enable(SerializationFeature.INDENT_OUTPUT);
+			AnnotationIntrospector introspector =
+					new JaxbAnnotationIntrospector(mapper.getTypeFactory());
+			mapper.setAnnotationIntrospector(introspector);
+
+			object = mapper.readValue(json, clazz);
+		} catch (Exception x) {
+			logger.error(x.getMessage(), x);
+		}
+		return object;
 	}
 
 	public void test() {
@@ -111,13 +96,18 @@ public class JsonGenerator {
 
 			String json = generate(setInfo);
 			logger.info("setInfo json=" + json);
+
+			SetInfo setInfo2 = parse(json, SetInfo.class);
+			logger.info("setInfo2="
+					+ ReflectionToStringBuilder.toString(setInfo2, ToStringStyle.MULTI_LINE_STYLE));
+
 		} catch (Exception x) {
 			logger.error(x.getMessage(), x);
 		}
 	}
 
 	public static void main(String[] args) {
-		JsonGenerator generator = new JsonGenerator();
+		JsonProcessor generator = new JsonProcessor();
 		generator.test();
 	}
 }

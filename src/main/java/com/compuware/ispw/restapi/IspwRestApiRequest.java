@@ -460,7 +460,12 @@ public class IspwRestApiRequest extends Builder {
 		HttpRequestExecution exec =
 				HttpRequestExecution.from(this, envVars, build, this.getQuiet() ? TaskListener.NULL
 						: listener);
-		launcher.getChannel().call(exec);
+		
+		ResponseContentSupplier supplier = launcher.getChannel().call(exec);
+		
+		//TEST by Sam
+		String responseJson = supplier.getContent();
+		logger.println("responseJson="+responseJson);
 
 		return true;
 	}
