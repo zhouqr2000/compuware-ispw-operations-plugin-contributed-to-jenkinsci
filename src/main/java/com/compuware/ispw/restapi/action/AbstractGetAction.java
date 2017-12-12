@@ -1,16 +1,30 @@
 package com.compuware.ispw.restapi.action;
 
+import java.io.PrintStream;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
+import com.compuware.ispw.restapi.util.RestApiUtils;
 
 public abstract class AbstractGetAction implements IAction {
 
-	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody, String contextPath, List<String> pathTokens) {
-		IspwRequestBean bean = new IspwRequestBean();
+	private PrintStream logger;
 
+	public AbstractGetAction(PrintStream logger) {
+		this.logger = logger;
+	}
+	
+	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody, String contextPath, List<String> pathTokens) {
+		
+		IspwRequestBean bean = new IspwRequestBean();
+		
+		IspwContextPathBean ispwContextPathBean = new IspwContextPathBean();
+		ispwContextPathBean.setSrid(srid);
+		bean.setIspwContextPathBean(ispwContextPathBean);
+		
 		String path = contextPath.replace("{srid}", srid);
 
 		String[] lines = ispwRequestBody.split("\n");
@@ -26,6 +40,8 @@ public abstract class AbstractGetAction implements IAction {
 				if (StringUtils.isNotBlank(value)) {
 					if (pathTokens.contains(name)) {
 						path = path.replace("{" + name + "}", value);
+
+						RestApiUtils.reflectSetter(ispwContextPathBean, name, value);
 					}
 				}
 			}
@@ -34,6 +50,10 @@ public abstract class AbstractGetAction implements IAction {
 		bean.setContextPath(path);
 		return bean;
 
+	}
+
+	public PrintStream getLogger() {
+		return logger;
 	}
 
 }

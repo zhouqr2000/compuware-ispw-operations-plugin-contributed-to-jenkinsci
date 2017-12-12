@@ -71,7 +71,6 @@ public class IspwRestApiRequest extends Builder {
 	private MimeType contentType = DescriptorImpl.contentType;
 	private String outputFile = DescriptorImpl.outputFile;
 	private Integer timeout = DescriptorImpl.timeout;
-	private Boolean quiet = DescriptorImpl.quiet;
 	private String requestBody = DescriptorImpl.requestBody;
 	private String authentication = DescriptorImpl.authentication;
 	private String token = DescriptorImpl.token;
@@ -93,27 +92,12 @@ public class IspwRestApiRequest extends Builder {
 		return url;
 	}
 
-	@DataBoundSetter
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
 	public Boolean getIgnoreSslErrors() {
 		return ignoreSslErrors;
 	}
 
-	@DataBoundSetter
-	public void setIgnoreSslErrors(Boolean ignoreSslErrors) {
-		this.ignoreSslErrors = ignoreSslErrors;
-	}
-
 	public HttpMode getHttpMode() {
 		return httpMode;
-	}
-
-	@DataBoundSetter
-	public void setHttpMode(HttpMode httpMode) {
-		this.httpMode = httpMode;
 	}
 
 	public String getIspwAction() {
@@ -134,11 +118,6 @@ public class IspwRestApiRequest extends Builder {
 		this.connectionId = connectionId;
 	}
 
-	/**
-	 * Gets the value of the 'Login Credentials'
-	 * 
-	 * @return <code>String</code> value of m_credentialsId
-	 */
 	public String getCredentialsId()
 	{
 		return credentialsId;
@@ -162,27 +141,12 @@ public class IspwRestApiRequest extends Builder {
 		return token;
 	}
 
-	@DataBoundSetter
-	public void setToken(String token) {
-		this.token = token;
-	}
-
 	public String getHttpProxy() {
 		return httpProxy;
 	}
 
-	@DataBoundSetter
-	public void setHttpProxy(String httpProxy) {
-		this.httpProxy = httpProxy;
-	}
-
 	public Boolean getPassBuildParameters() {
 		return passBuildParameters;
-	}
-
-	@DataBoundSetter
-	public void setPassBuildParameters(Boolean passBuildParameters) {
-		this.passBuildParameters = passBuildParameters;
 	}
 
 	@Nonnull
@@ -190,54 +154,24 @@ public class IspwRestApiRequest extends Builder {
 		return validResponseCodes;
 	}
 
-	@DataBoundSetter
-	public void setValidResponseCodes(String validResponseCodes) {
-		this.validResponseCodes = validResponseCodes;
-	}
-
 	public String getValidResponseContent() {
 		return validResponseContent;
-	}
-
-	@DataBoundSetter
-	public void setValidResponseContent(String validResponseContent) {
-		this.validResponseContent = validResponseContent;
 	}
 
 	public MimeType getAcceptType() {
 		return acceptType;
 	}
 
-	@DataBoundSetter
-	public void setAcceptType(MimeType acceptType) {
-		this.acceptType = acceptType;
-	}
-
 	public MimeType getContentType() {
 		return contentType;
-	}
-
-	@DataBoundSetter
-	public void setContentType(MimeType contentType) {
-		this.contentType = contentType;
 	}
 
 	public String getOutputFile() {
 		return outputFile;
 	}
 
-	@DataBoundSetter
-	public void setOutputFile(String outputFile) {
-		this.outputFile = outputFile;
-	}
-
 	public Integer getTimeout() {
 		return timeout;
-	}
-
-	@DataBoundSetter
-	public void setTimeout(Integer timeout) {
-		this.timeout = timeout;
 	}
 
 	public Boolean getConsoleLogResponseBody() {
@@ -249,40 +183,16 @@ public class IspwRestApiRequest extends Builder {
 		this.consoleLogResponseBody = consoleLogResponseBody;
 	}
 
-	public Boolean getQuiet() {
-		return quiet;
-	}
-
-	@DataBoundSetter
-	public void setQuiet(Boolean quiet) {
-		this.quiet = quiet;
-	}
-
 	public String getAuthentication() {
 		return authentication;
-	}
-
-	@DataBoundSetter
-	public void setAuthentication(String authentication) {
-		this.authentication = authentication;
 	}
 
 	public String getRequestBody() {
 		return requestBody;
 	}
 
-	@DataBoundSetter
-	public void setRequestBody(String requestBody) {
-		this.requestBody = requestBody;
-	}
-
 	public List<HttpRequestNameValuePair> getCustomHeaders() {
 		return customHeaders;
-	}
-
-	@DataBoundSetter
-	public void setCustomHeaders(List<HttpRequestNameValuePair> customHeaders) {
-		this.customHeaders = customHeaders;
 	}
 
 	@Initializer(before = InitMilestone.PLUGINS_STARTED)
@@ -306,9 +216,7 @@ public class IspwRestApiRequest extends Builder {
 			// same behavior
 			ignoreSslErrors = true;
 		}
-		if (quiet == null) {
-			quiet = false;
-		}
+
 		return this;
 	}
 
@@ -399,18 +307,21 @@ public class IspwRestApiRequest extends Builder {
 
 		String buildTag = envVars.get("BUILD_TAG");
 		WebhookToken webhookToken = WebhookTokenManager.getInstance().get(buildTag);
-		logger.println("...getting buildTag=" + buildTag + ", webhookToken=" + webhookToken);
+		
+		if (RestApiUtils.isIspwDebugMode())
+			logger.println("...getting buildTag=" + buildTag + ", webhookToken=" + webhookToken);
 
-		IAction action = RestApiUtils.createAction(ispwAction);
+		IAction action = RestApiUtils.createAction(ispwAction, logger);
 		httpMode = RestApiUtils.resetHttpMode(ispwAction);
 
 		if (action == null) {
 			logger.println("Action:" + ispwAction
-					+ " is not implemented, please make sure you have the correct action name");
+					+ " is not implemented, please make sure you have the correct ISPW action name");
 			return false;
 		}
 
-		logger.println("...ispwAction=" + ispwAction + ", httpMode=" + httpMode);
+		if (RestApiUtils.isIspwDebugMode())
+			logger.println("...ispwAction=" + ispwAction + ", httpMode=" + httpMode);
 
 		String cesUrl = StringUtils.EMPTY;
 		String cesIspwHost = StringUtils.EMPTY;
@@ -426,47 +337,56 @@ public class IspwRestApiRequest extends Builder {
 
 		String cesIspwToken = RestApiUtils.getCesToken(credentialsId);
 
-		logger.println("...ces.url=" + cesUrl + ", ces.ispw.host=" + cesIspwHost
-				+ ", ces.ispw.token=" + cesIspwToken);
+		if (RestApiUtils.isIspwDebugMode())
+			logger.println("...ces.url=" + cesUrl + ", ces.ispw.host=" + cesIspwHost
+					+ ", ces.ispw.token=" + cesIspwToken);
 
 		IspwRequestBean ispwRequestBean =
 				action.getIspwRequestBean(cesIspwHost, ispwRequestBody, webhookToken);
-		logger.println("...ispwRequestBean=" + ispwRequestBean);
+		
+		if (RestApiUtils.isIspwDebugMode())
+			logger.println("...ispwRequestBean=" + ispwRequestBean);
 
 		this.url = cesUrl + ispwRequestBean.getContextPath(); // CES URL
 		this.requestBody = ispwRequestBean.getJsonRequest();
 		this.token = cesIspwToken; // CES TOKEN
 
 		// This is a generated code for Visual Studio Code - REST Client
-		logger.println();
-		logger.println();
-		logger.println("### " + ispwAction + " - " + "RFC 2616");
-		logger.println();
-		logger.println(httpMode + " " + url + " HTTP/1.1");
-		logger.println("Content-type: " + MimeType.APPLICATION_JSON.getContentType().toString());
-		logger.println("Authorization: " + token);
-		logger.println("");
-		logger.println(requestBody);
-		logger.println();
-		logger.println("###");
-		logger.println();
-		logger.println();
+		if (consoleLogResponseBody) {
+			logger.println();
+			logger.println();
+			logger.println("### " + ispwAction + " - " + "RFC 2616");
+			logger.println();
+			logger.println(httpMode + " " + url + " HTTP/1.1");
+			logger.println("Content-type: " + MimeType.APPLICATION_JSON.getContentType().toString());
+			logger.println("Authorization: " + RestApiUtils.maskToken(token));
+			logger.println("");
+			logger.println(requestBody);
+			logger.println();
+			logger.println("###");
+			logger.println();
+			logger.println();
+		}
 
 		for (Map.Entry<String, String> e : build.getBuildVariables().entrySet()) {
 			envVars.put(e.getKey(), e.getValue());
-			logger.println("EnvVars: " + e.getKey() + "=" + e.getValue());
+			
+			if (RestApiUtils.isIspwDebugMode())
+				logger.println("EnvVars: " + e.getKey() + "=" + e.getValue());
 		}
 
+		RestApiUtils.startLog(logger, ispwAction, ispwRequestBean.getIspwContextPathBean(), ispwRequestBean.getJsonObject());
 		HttpRequestExecution exec =
-				HttpRequestExecution.from(this, envVars, build, this.getQuiet() ? TaskListener.NULL
-						: listener);
+				HttpRequestExecution.from(this, envVars, build, listener);
 		
 		ResponseContentSupplier supplier = launcher.getChannel().call(exec);
 		
-		//TEST by Sam
 		String responseJson = supplier.getContent();
-		logger.println("responseJson="+responseJson);
+		if (RestApiUtils.isIspwDebugMode())
+			logger.println("responseJson=" + responseJson);
 
+		RestApiUtils.endLog(logger, ispwAction, ispwRequestBean, responseJson, true);
+		
 		return true;
 	}
 

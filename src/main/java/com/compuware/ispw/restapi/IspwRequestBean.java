@@ -5,9 +5,17 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 public class IspwRequestBean {
+	
+	private IspwContextPathBean ispwContextPathBean = null;
+	private Object jsonObject = null;
 	private String contextPath = StringUtils.EMPTY;
 	private String jsonRequest = "{" + Constants.LINE_SEPARATOR + "}"; // empty JSON
 
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+	}
+	
 	public String getContextPath() {
 		return contextPath;
 	}
@@ -24,9 +32,20 @@ public class IspwRequestBean {
 		this.jsonRequest = jsonRequest;
 	}
 
-	@Override
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+	public Object getJsonObject() {
+		return jsonObject;
+	}
+
+	public void setJsonObject(Object jsonObject) {
+		this.jsonObject = jsonObject;
+	}
+
+	public IspwContextPathBean getIspwContextPathBean() {
+		return ispwContextPathBean;
+	}
+
+	public void setIspwContextPathBean(IspwContextPathBean ispwContextPathBean) {
+		this.ispwContextPathBean = ispwContextPathBean;
 	}
 
 }

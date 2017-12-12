@@ -1,5 +1,7 @@
 package com.compuware.ispw.restapi.action;
 
+import java.io.PrintStream;
+
 import com.compuware.ispw.model.rest.ReleaseInfo;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
@@ -11,6 +13,10 @@ public class CreateReleaseAction extends AbstractPostAction {
 
 	private static final String contextPath = "/ispw/{srid}/releases";
 
+	public CreateReleaseAction(PrintStream logger) {
+		super(logger);
+	}
+	
 	@Override
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody,
 			WebhookToken webhookToken) {

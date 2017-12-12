@@ -46,6 +46,7 @@ import com.compuware.ispw.restapi.auth.CredentialBasicAuthentication;
 import com.compuware.ispw.restapi.util.HttpClientUtil;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
 import com.compuware.ispw.restapi.util.RequestAction;
+import com.compuware.ispw.restapi.util.RestApiUtils;
 import com.google.common.collect.Range;
 import com.google.common.io.ByteStreams;
 
@@ -173,8 +174,13 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 		this.validResponseCodes = validResponseCodes;
 		this.validResponseContent = validResponseContent != null ? validResponseContent : "";
 		this.consoleLogResponseBody = Boolean.TRUE.equals(consoleLogResponseBody);
+		
+		
+		/* Force to use response handle
 		this.responseHandle = this.consoleLogResponseBody || !this.validResponseContent.isEmpty() ?
-				ResponseHandle.STRING : responseHandle;
+				ResponseHandle.STRING : responseHandle;*/
+		this.responseHandle = ResponseHandle.STRING;
+		
 		this.outputFile = outputFile;
 
 		this.localLogger = logger;
@@ -183,11 +189,13 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 
 	@Override
 	public ResponseContentSupplier call() throws RuntimeException {
-		logger().println("HttpMethod: " + httpMode);
-		logger().println("URL: " + url);
-		for (HttpRequestNameValuePair header : headers) {
-			logger().print(header.getName() + ": ");
-			logger().println(header.getMaskValue() ? "*****" : header.getValue());
+		if (RestApiUtils.isIspwDebugMode()) {
+			logger().println("HttpMethod: " + httpMode);
+			logger().println("URL: " + url);
+			for (HttpRequestNameValuePair header : headers) {
+				logger().print(header.getName() + ": ");
+				logger().println(header.getMaskValue() ? "*****" : header.getValue());
+			}
 		}
 
 		try {
@@ -298,7 +306,8 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 		List<Range<Integer>> ranges = DescriptorImpl.parseToRange(validResponseCodes);
 		for (Range<Integer> range : ranges) {
 			if (range.contains(response.getStatus())) {
-				logger().println("Success code from " + range);
+				if (RestApiUtils.isIspwDebugMode())
+					logger().println("Success code from " + range);
 				return;
 			}
 		}

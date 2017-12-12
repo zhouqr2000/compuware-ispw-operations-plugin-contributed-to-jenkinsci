@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import com.compuware.ces.communications.service.data.EventCallback;
 import com.compuware.ces.model.BasicAuthentication;
 import com.compuware.ces.model.HttpHeader;
+import com.compuware.ispw.model.rest.AssignmentInfo;
 import com.compuware.ispw.model.rest.SetInfo;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
@@ -101,6 +102,13 @@ public class JsonProcessor {
 			logger.info("setInfo2="
 					+ ReflectionToStringBuilder.toString(setInfo2, ToStringStyle.MULTI_LINE_STYLE));
 
+			String jsonAssignInfo =
+					"{\"stream\":\"PLAY\",\"application\":\"PLAY\",\"defaultPath\":\"DEV2\",\"description\":\"JkGen\",\"owner\":\"PMISVZ0\",\"refNumber\":\" \",\"releaseId\":\" \",\"userTag\":\" \",\"assignmentId\":\"PLAY000313\"}";
+			AssignmentInfo assignInfo = parse(jsonAssignInfo, AssignmentInfo.class);
+
+			logger.info("assignInfo="
+					+ ReflectionToStringBuilder
+							.toString(assignInfo, ToStringStyle.MULTI_LINE_STYLE));
 		} catch (Exception x) {
 			logger.error(x.getMessage(), x);
 		}

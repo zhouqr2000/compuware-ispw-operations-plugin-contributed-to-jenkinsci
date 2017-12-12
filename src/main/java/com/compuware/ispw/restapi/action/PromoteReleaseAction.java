@@ -1,5 +1,7 @@
 package com.compuware.ispw.restapi.action;
 
+import java.io.PrintStream;
+
 import com.compuware.ispw.restapi.Constants;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
@@ -17,6 +19,10 @@ public class PromoteReleaseAction extends SetInfoPostAction {
 		return RestApiUtils.join(Constants.LINE_SEPARATOR, defaultProps, true);
 	}
 
+	public PromoteReleaseAction(PrintStream logger) {
+		super(logger);
+	}
+	
 	@Override
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody,
 			WebhookToken webhookToken) {

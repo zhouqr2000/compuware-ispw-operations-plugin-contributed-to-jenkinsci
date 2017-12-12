@@ -1,5 +1,6 @@
 package com.compuware.ispw.restapi.action;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 import org.apache.commons.lang3.StringUtils;
@@ -8,6 +9,7 @@ import com.compuware.ces.communications.service.data.EventCallback;
 import com.compuware.ces.model.BasicAuthentication;
 import com.compuware.ces.model.HttpHeader;
 import com.compuware.ispw.model.rest.SetInfo;
+import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.JsonProcessor;
 import com.compuware.ispw.restapi.WebhookToken;
@@ -15,13 +17,24 @@ import com.compuware.ispw.restapi.util.RestApiUtils;
 
 public abstract class SetInfoPostAction implements IAction {
 
+	private PrintStream logger;
+
+	public SetInfoPostAction(PrintStream logger) {
+		this.logger = logger;
+	}
+	
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody,
 			WebhookToken webhookToken, String contextPath) {
 
 		IspwRequestBean bean = new IspwRequestBean();
 
+		IspwContextPathBean ispwContextPathBean = new IspwContextPathBean();
+		ispwContextPathBean.setSrid(srid);
+		bean.setIspwContextPathBean(ispwContextPathBean);
+		
 		String path = contextPath.replace("{srid}", srid);
 		SetInfo setInfo = new SetInfo();
+		bean.setJsonObject(setInfo);
 
 		boolean hasEvent = false;
 		ArrayList<EventCallback> events = new ArrayList<EventCallback>();
@@ -41,10 +54,13 @@ public abstract class SetInfoPostAction implements IAction {
 				if (StringUtils.isNotBlank(value)) {
 					if (name.equals(assignmentId)) {
 						path = path.replace("{" + assignmentId + "}", value);
+						ispwContextPathBean.setAssignmentId(value);
 					} else if(name.equals(releaseId)) {
 						path = path.replace("{" + releaseId + "}", value);
+						ispwContextPathBean.setReleaseId(value);
 					} else if (name.equals(level)) {
 						path = path.replace("{" + level + "}", value);
+						ispwContextPathBean.setLevel(value);
 					} else if (name.equals(httpHeaders)) {
 						ArrayList<HttpHeader> httpHeaders = RestApiUtils.toHttpHeaders(value);
 						if (!httpHeaders.isEmpty()) {
@@ -100,4 +116,9 @@ public abstract class SetInfoPostAction implements IAction {
 
 	}
 
+	public PrintStream getLogger() {
+		return logger;
+	}
+
+	
 }

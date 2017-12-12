@@ -4,6 +4,7 @@ import static com.cloudbees.plugins.credentials.CredentialsMatchers.filter;
 import static com.cloudbees.plugins.credentials.CredentialsMatchers.withId;
 import static com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials;
 
+import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -26,7 +27,17 @@ import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.compuware.ces.model.BasicAuthentication;
 import com.compuware.ces.model.HttpHeader;
+import com.compuware.ispw.model.request.Assignment;
+import com.compuware.ispw.model.rest.AssignmentInfo;
+import com.compuware.ispw.model.rest.ReleaseInfo;
+import com.compuware.ispw.model.rest.TaskInfo;
+import com.compuware.ispw.model.rest.TaskListResponse;
+import com.compuware.ispw.model.rest.TaskResponse;
+import com.compuware.ispw.restapi.Constants;
 import com.compuware.ispw.restapi.HttpMode;
+import com.compuware.ispw.restapi.IspwContextPathBean;
+import com.compuware.ispw.restapi.IspwRequestBean;
+import com.compuware.ispw.restapi.JsonProcessor;
 import com.compuware.ispw.restapi.action.CreateAssignmentAction;
 import com.compuware.ispw.restapi.action.CreateReleaseAction;
 import com.compuware.ispw.restapi.action.DeployAssignmentAction;
@@ -159,42 +170,154 @@ public class RestApiUtils {
 		}
 
 	}
-
-	public static IAction createAction(String ispwAction) {
+	
+	public static void startLog(PrintStream logger, String ispwAction, IspwContextPathBean ispwContextPathBean, Object jsonObject) {
+		if (IspwCommand.GenerateTasksInAssignment.equals(ispwAction)) {
+			logger.println("...generating tasks in assignment "
+					+ ispwContextPathBean.getAssignmentId() + " at level "
+					+ ispwContextPathBean.getLevel());
+		} else if (IspwCommand.GetAssignmentTaskList.equals(ispwAction)) {
+			logger.println("...listing tasks in assignment " + ispwContextPathBean.getAssignmentId());
+		} else if (IspwCommand.GetAssignmentInfo.equals(ispwAction)) {
+			logger.println("...getting info on assignment "+ispwContextPathBean.getAssignmentId());
+		} else if (IspwCommand.CreateAssignment.equals(ispwAction)) {
+			AssignmentInfo assignmentInfo = (AssignmentInfo) jsonObject;
+			logger.println("...creating assignment " + assignmentInfo.getStream() + "/"
+					+ assignmentInfo.getApplication() + "/" + assignmentInfo.getDefaultPath()
+					+ " with description - " + assignmentInfo.getDescription());
+		} else if (IspwCommand.PromoteAssignment.equals(ispwAction)) {
+			logger.println("...promoting assignment " + ispwContextPathBean.getAssignmentId()
+					+ " at level " + ispwContextPathBean.getLevel());
+		} else if (IspwCommand.DeployAssignment.equals(ispwAction)) {
+			logger.println("...deploying assignment " + ispwContextPathBean.getAssignmentId()
+					+ " at level " + ispwContextPathBean.getLevel());
+		} else if (IspwCommand.RegressAssignment.equals(ispwAction)) {
+			logger.println("...regressing assignment " + ispwContextPathBean.getAssignmentId()
+					+ " at level " + ispwContextPathBean.getLevel());
+		} else if (IspwCommand.GetReleaseInfo.equals(ispwAction)) {
+			logger.println("...getting info on release "+ispwContextPathBean.getReleaseId());
+		} else if (IspwCommand.GetReleaseTaskList.equals(ispwAction)) {
+			logger.println("...listing tasks in release " + ispwContextPathBean.getReleaseId());
+		} else if (IspwCommand.CreateRelease.equals(ispwAction)) {
+			ReleaseInfo releaseInfo = (ReleaseInfo) jsonObject;
+			logger.println("...creating assignment on " + releaseInfo.getStream() + "/"
+					+ releaseInfo.getApplication() + " as " + releaseInfo.getReleaseId() + " - "
+					+ releaseInfo.getDescription());
+		} else if (IspwCommand.GenerateTasksInRelease.equals(ispwAction)) {
+			logger.println("...generating tasks in release " + ispwContextPathBean.getReleaseId()
+					+ " at level " + ispwContextPathBean.getLevel());
+		} else if (IspwCommand.GetReleaseTaskGenerateListing.equals(ispwAction)) {
+			logger.println("...getting release task generate listing of task "
+					+ ispwContextPathBean.getTaskId() + " in release "
+					+ ispwContextPathBean.getReleaseId());
+		} else if (IspwCommand.GetReleaseTaskInfo.equals(ispwAction)) {
+			logger.println("...getting task " + ispwContextPathBean.getTaskId() + " in release "
+					+ ispwContextPathBean.getReleaseId());
+		} else if (IspwCommand.DeployRelease.equals(ispwAction)) {
+			logger.println("...deploying tasks in release " + ispwContextPathBean.getReleaseId()
+					+ " at level " + ispwContextPathBean.getLevel());
+		} else if (IspwCommand.PromoteRelease.equals(ispwAction)) {
+			logger.println("...promoting tasks in release " + ispwContextPathBean.getReleaseId()
+					+ " at level " + ispwContextPathBean.getLevel());
+		} else if (IspwCommand.RegressRelease.equals(ispwAction)) {
+			logger.println("...regressing tasks in release " + ispwContextPathBean.getReleaseId()
+					+ " at level " + ispwContextPathBean.getLevel());
+		}
+	}
+	
+	public static void endLog(PrintStream logger, String ispwAction, IspwRequestBean ispwRequestBean, String responseJson, boolean block) {
+		JsonProcessor jsonProcessor = new JsonProcessor();
+		
+		if (IspwCommand.GenerateTasksInAssignment.equals(ispwAction)) {
+			TaskResponse taskResponse = jsonProcessor.parse(responseJson, TaskResponse.class);
+			logger.println("...set "+taskResponse.getSetId()+" created to generate");
+		} else if (IspwCommand.GetAssignmentTaskList.equals(ispwAction)) {
+			TaskListResponse listResponse = jsonProcessor.parse(responseJson, TaskListResponse.class);
+			
+			logger.println("...taskId, module, userId, version, status, application/stream/level, release");
+			for(TaskInfo taskInfo: listResponse.getTasks()) {
+				logger.println("..." + taskInfo.getTaskId() + ", " + taskInfo.getModuleName() + "."
+						+ taskInfo.getModuleType() + ", " + taskInfo.getUserId() + ", "
+						+ taskInfo.getVersion() + ", " + taskInfo.getStatus() + ", "
+						+ taskInfo.getApplication() + "/" + taskInfo.getStream() + "/"
+						+ taskInfo.getLevel() + ", " + taskInfo.getRelease());
+			}
+		} else if (IspwCommand.GetAssignmentInfo.equals(ispwAction)) {
+			AssignmentInfo assignment = jsonProcessor.parse(responseJson, AssignmentInfo.class);
+			logger.println("...stream/application/default path: " + assignment.getStream() + "/"
+					+ assignment.getApplication() + "/" + assignment.getDefaultPath());
+			logger.println("...assignment: " + assignment.getProjectNumber() + " - "
+					+ assignment.getDescription());
+			logger.println("...owner: " + assignment.getOwner());
+			logger.println("...reference number: " + assignment.getRefNumber());
+			logger.println("...release: " + assignment.getRelease());
+			logger.println("...user tag: " + assignment.getUserTag());
+		} else if (IspwCommand.CreateAssignment.equals(ispwAction)) {
+			
+		} else if (IspwCommand.PromoteAssignment.equals(ispwAction)) {
+			
+		} else if (IspwCommand.DeployAssignment.equals(ispwAction)) {
+			
+		} else if (IspwCommand.RegressAssignment.equals(ispwAction)) {
+			
+		} else if (IspwCommand.GetReleaseInfo.equals(ispwAction)) {
+			
+		} else if (IspwCommand.GetReleaseTaskList.equals(ispwAction)) {
+			
+		} else if (IspwCommand.CreateRelease.equals(ispwAction)) {
+			
+		} else if (IspwCommand.GenerateTasksInRelease.equals(ispwAction)) {
+			
+		} else if (IspwCommand.GetReleaseTaskGenerateListing.equals(ispwAction)) {
+			
+		} else if (IspwCommand.GetReleaseTaskInfo.equals(ispwAction)) {
+			
+		} else if (IspwCommand.DeployRelease.equals(ispwAction)) {
+			
+		} else if (IspwCommand.PromoteRelease.equals(ispwAction)) {
+			
+		} else if (IspwCommand.RegressRelease.equals(ispwAction)) {
+			
+		}
+		
+		logger.println("...done");
+	}
+	
+	public static IAction createAction(String ispwAction, PrintStream logger) {
 		IAction action = null;
 
 		if (IspwCommand.GenerateTasksInAssignment.equals(ispwAction)) {
-			action = new GenerateTasksInAssignmentAction();
+			action = new GenerateTasksInAssignmentAction(logger);
 		} else if (IspwCommand.GetAssignmentTaskList.equals(ispwAction)) {
-			action = new GetAssignmentTaskListAction();
+			action = new GetAssignmentTaskListAction(logger);
 		} else if (IspwCommand.GetAssignmentInfo.equals(ispwAction)) {
-			action = new GetAssignmentInfoAction();
+			action = new GetAssignmentInfoAction(logger);
 		} else if (IspwCommand.CreateAssignment.equals(ispwAction)) {
-			action = new CreateAssignmentAction();
+			action = new CreateAssignmentAction(logger);
 		} else if (IspwCommand.PromoteAssignment.equals(ispwAction)) {
-			action = new PromoteAssignmentAction();
+			action = new PromoteAssignmentAction(logger);
 		} else if (IspwCommand.DeployAssignment.equals(ispwAction)) {
-			action = new DeployAssignmentAction();
+			action = new DeployAssignmentAction(logger);
 		} else if (IspwCommand.RegressAssignment.equals(ispwAction)) {
-			action = new RegressAssignmentAction();
+			action = new RegressAssignmentAction(logger);
 		} else if (IspwCommand.GetReleaseInfo.equals(ispwAction)) {
-			action = new GetReleaseInfoAction();
+			action = new GetReleaseInfoAction(logger);
 		} else if (IspwCommand.GetReleaseTaskList.equals(ispwAction)) {
-			action = new GetReleaseTaskListAction();
+			action = new GetReleaseTaskListAction(logger);
 		} else if (IspwCommand.CreateRelease.equals(ispwAction)) {
-			action = new CreateReleaseAction();
+			action = new CreateReleaseAction(logger);
 		} else if (IspwCommand.GenerateTasksInRelease.equals(ispwAction)) {
-			action = new GenerateTasksInReleaseAction();
+			action = new GenerateTasksInReleaseAction(logger);
 		} else if (IspwCommand.GetReleaseTaskGenerateListing.equals(ispwAction)) {
-			action = new GetReleaseTaskGenerateListingAction();
+			action = new GetReleaseTaskGenerateListingAction(logger);
 		} else if (IspwCommand.GetReleaseTaskInfo.equals(ispwAction)) {
-			action = new GetReleaseTaskInfoAction();
+			action = new GetReleaseTaskInfoAction(logger);
 		} else if (IspwCommand.DeployRelease.equals(ispwAction)) {
-			action = new DeployReleaseAction();
+			action = new DeployReleaseAction(logger);
 		} else if (IspwCommand.PromoteRelease.equals(ispwAction)) {
-			action = new PromoteReleaseAction();
+			action = new PromoteReleaseAction(logger);
 		} else if (IspwCommand.RegressRelease.equals(ispwAction)) {
-			action = new RegressReleaseAction();
+			action = new RegressReleaseAction(logger);
 		}
 
 		return action;
@@ -306,16 +429,39 @@ public class RestApiUtils {
 		return model;
 	}
 	
+	public static String maskToken(String token) {
+		
+		if (isIspwDebugMode()) {
+			return token;
+		} else {
+			StringBuffer masked =
+					new StringBuffer(StringUtils.trimToEmpty(token));
+			
+			if (token.length() >= 8) {
+				masked.setLength(0);
+				String s1 = token.substring(0, 2);
+				masked.append(s1);
+				
+				for(int i=0; i<token.length()-4; i++)
+					masked.append("*");
+				
+				String s2 = token.substring(token.length() - 2, token.length());
+				masked.append(s2);
+			}
+
+			return masked.toString();
+		}
+		
+	}
+	
 	public static String getSystemProperty(String key) {
 		String result = System.getProperty(key);
-		if (StringUtils.isBlank(result)) {
-			String errorMessage =
-					"You must provide a system property: " + key
-							+ " to use ISPW RestAPI Jenkins plugin";
-			throw new RuntimeException(errorMessage);
-		}
-
 		return StringUtils.trimToEmpty(result);
+	}
+	
+	public static boolean isIspwDebugMode() {
+		String debugMode = getSystemProperty(Constants.ISPW_DEBUG_MODE);
+		return Constants.TRUE.equalsIgnoreCase(debugMode);
 	}
 
 }

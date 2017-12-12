@@ -4,6 +4,8 @@ import org.apache.log4j.Logger;
 import org.jenkinsci.plugins.workflow.steps.AbstractSynchronousStepExecution;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 
+import com.compuware.ispw.restapi.util.RestApiUtils;
+
 import hudson.EnvVars;
 import hudson.model.Hudson;
 
@@ -35,7 +37,8 @@ public class RegisterWebhookExecution extends AbstractSynchronousStepExecution<W
 		String buildTag = envVars.get("BUILD_TAG");
 		WebhookTokenManager.getInstance().put(buildTag, webhookToken);
 
-		logger.info("...registering buildTag=" + buildTag + ", webhookToken=" + webhookToken.toString());
+		if(RestApiUtils.isIspwDebugMode())
+			logger.info("...registering buildTag=" + buildTag + ", webhookToken=" + webhookToken.toString());
 
 		return webhookToken;
 	}

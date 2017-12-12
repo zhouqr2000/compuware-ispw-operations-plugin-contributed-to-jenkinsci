@@ -7,13 +7,12 @@ import java.util.List;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
 
-public class GetAssignmentTaskListAction extends AbstractGetAction {
+public class GetSetInfoAction extends AbstractGetAction {
 
-	private static final String[] defaultProps = new String[] { assignmentId, level };
-	private static final String contextPath =
-			"/ispw/{srid}/assignments/{assignmentId}/tasks?level={level}";
-
-	public GetAssignmentTaskListAction(PrintStream logger) {
+	private static final String[] defaultProps = new String[] { setId };
+	private static final String contextPath = "/ispw/{srid}/sets/{setId}";
+	
+	public GetSetInfoAction(PrintStream logger) {
 		super(logger);
 	}
 	

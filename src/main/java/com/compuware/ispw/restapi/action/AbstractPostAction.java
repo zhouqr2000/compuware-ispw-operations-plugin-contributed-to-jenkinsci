@@ -1,18 +1,32 @@
 package com.compuware.ispw.restapi.action;
 
+import java.io.PrintStream;
+
 import org.apache.commons.lang3.StringUtils;
 
+import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.JsonProcessor;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
 public abstract class AbstractPostAction implements IAction {
 
+	private PrintStream logger;
+
+	public AbstractPostAction(PrintStream logger) {
+		this.logger = logger;
+	}
+	
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody,
 			String contextPath, Object jsonObject) {
 
 		IspwRequestBean bean = new IspwRequestBean();
-
+		bean.setJsonObject(jsonObject);
+		
+		IspwContextPathBean ispwContextPathBean = new IspwContextPathBean();
+		ispwContextPathBean.setSrid(srid);
+		bean.setIspwContextPathBean(ispwContextPathBean);
+		
 		String path = contextPath.replace("{srid}", srid);
 
 		String[] lines = ispwRequestBody.split("\n");
@@ -38,6 +52,10 @@ public abstract class AbstractPostAction implements IAction {
 		bean.setJsonRequest(jsonRequest);
 
 		return bean;
+	}
+
+	public PrintStream getLogger() {
+		return logger;
 	}
 
 }

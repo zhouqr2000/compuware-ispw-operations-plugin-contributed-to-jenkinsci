@@ -50,7 +50,6 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 	private MimeType acceptType = DescriptorImpl.acceptType;
 	private MimeType contentType = DescriptorImpl.contentType;
 	private Integer timeout = DescriptorImpl.timeout;
-	private Boolean quiet = DescriptorImpl.quiet;
 	private String authentication = DescriptorImpl.authentication;
 	private String requestBody = DescriptorImpl.requestBody;
 	private List<HttpRequestNameValuePair> customHeaders = DescriptorImpl.customHeaders;
@@ -72,25 +71,10 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
     public String getUrl() {
         return url;
     }
-
-	@DataBoundSetter
-	public void setUrl(String url) {
-		this.url = url;
-	}
     
 	public boolean isIgnoreSslErrors() {
 		return ignoreSslErrors;
 	}
-
-	@DataBoundSetter
-	public void setIgnoreSslErrors(boolean ignoreSslErrors) {
-		this.ignoreSslErrors = ignoreSslErrors;
-	}
-
-	@DataBoundSetter
-    public void setHttpMode(HttpMode httpMode) {
-        this.httpMode = httpMode;
-    }
 
     public HttpMode getHttpMode() {
         return httpMode;
@@ -116,11 +100,6 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 		this.connectionId = connectionId;
 	}
 
-	/**
-	 * Gets the value of the 'Login Credentials'
-	 * 
-	 * @return <code>String</code> value of m_credentialsId
-	 */
 	public String getCredentialsId()
 	{
 		return credentialsId;
@@ -143,62 +122,25 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 	public String getToken() {
 		return token;
 	}
-
-	//modified by pmisvz0
-	@DataBoundSetter
-	public void setToken(String token) {
-		this.token = token;
-	}
-    
-    @DataBoundSetter
-    public void setHttpProxy(String httpProxy) {
-        this.httpProxy = httpProxy;
-    }
-    //modify end
     
     public String getHttpProxy() {
         return httpProxy;
     }
 
-    @DataBoundSetter
-    public void setValidResponseCodes(String validResponseCodes) {
-        this.validResponseCodes = validResponseCodes;
-    }
-
     public String getValidResponseCodes() {
         return validResponseCodes;
     }
-
-    @DataBoundSetter
-    public void setValidResponseContent(String validResponseContent) {
-        this.validResponseContent = validResponseContent;
-    }
-
+    
     public String getValidResponseContent() {
         return validResponseContent;
-    }
-
-    @DataBoundSetter
-    public void setAcceptType(MimeType acceptType) {
-        this.acceptType = acceptType;
     }
 
     public MimeType getAcceptType() {
         return acceptType;
     }
-
-    @DataBoundSetter
-    public void setContentType(MimeType contentType) {
-        this.contentType = contentType;
-    }
-
+    
     public MimeType getContentType() {
         return contentType;
-    }
-
-    @DataBoundSetter
-    public void setTimeout(Integer timeout) {
-        this.timeout = timeout;
     }
 
     public Integer getTimeout() {
@@ -214,38 +156,14 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
         return consoleLogResponseBody;
     }
 
-    @DataBoundSetter
-    public void setQuiet(Boolean quiet) {
-        this.quiet = quiet;
-    }
-
-    public Boolean getQuiet() {
-        return quiet;
-    }
-
-    @DataBoundSetter
-    public void setAuthentication(String authentication) {
-        this.authentication = authentication;
-    }
-
     public String getAuthentication() {
         return authentication;
-    }
-
-    @DataBoundSetter
-    public void setRequestBody(String requestBody) {
-        this.requestBody = requestBody;
     }
 
     public String getRequestBody() {
         return requestBody;
     }
-
-    @DataBoundSetter
-    public void setCustomHeaders(List<HttpRequestNameValuePair> customHeaders) {
-        this.customHeaders = customHeaders;
-    }
-
+    
     public List<HttpRequestNameValuePair> getCustomHeaders() {
         return customHeaders;
     }
@@ -254,19 +172,8 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 		return outputFile;
 	}
 
-	@DataBoundSetter
-	public void setOutputFile(String outputFile) {
-		this.outputFile = outputFile;
-	}
-
 	public ResponseHandle getResponseHandle() {
 		return responseHandle;
-	}
-
-
-	@DataBoundSetter
-	public void setResponseHandle(ResponseHandle responseHandle) {
-		this.responseHandle = responseHandle;
 	}
 
 	@Override
@@ -407,9 +314,11 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 
 			String buildTag = envVars.get("BUILD_TAG");
 			WebhookToken webhookToken = WebhookTokenManager.getInstance().get(buildTag);
-			logger.println("...getting buildTag=" + buildTag + ", webhookToken=" + webhookToken);
+			
+			if(RestApiUtils.isIspwDebugMode())
+				logger.println("...getting buildTag=" + buildTag + ", webhookToken=" + webhookToken);
 
-			IAction action = RestApiUtils.createAction(step.ispwAction);
+			IAction action = RestApiUtils.createAction(step.ispwAction, logger);
 			step.httpMode = RestApiUtils.resetHttpMode(step.ispwAction);
 
 			if (action == null) {
@@ -420,7 +329,9 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 				logger.println(errorMsg);
 				throw new IllegalStateException(new Exception(errorMsg));
 			}
-			logger.println("ispwAction=" + step.ispwAction + ", httpMode=" + step.httpMode);
+			
+			if(RestApiUtils.isIspwDebugMode())
+				logger.println("ispwAction=" + step.ispwAction + ", httpMode=" + step.httpMode);
 
 			String cesUrl = StringUtils.EMPTY;
 			String cesIspwHost = StringUtils.EMPTY;
@@ -436,42 +347,58 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 
 			String cesIspwToken = RestApiUtils.getCesToken(step.credentialsId);
 
-			logger.println("...ces.url=" + cesUrl + ", ces.ispw.host=" + cesIspwHost
-					+ ", ces.ispw.token=" + cesIspwToken);
+			if (RestApiUtils.isIspwDebugMode())
+				logger.println("...ces.url=" + cesUrl + ", ces.ispw.host=" + cesIspwHost
+						+ ", ces.ispw.token=" + cesIspwToken);
 
 			IspwRequestBean ispwRequestBean =
 					action.getIspwRequestBean(cesIspwHost, step.ispwRequestBody, webhookToken);
-			logger.println("ispwRequestBean=" + ispwRequestBean);
+
+			if (RestApiUtils.isIspwDebugMode())
+				logger.println("ispwRequestBean=" + ispwRequestBean);
 
 			step.url = cesUrl + ispwRequestBean.getContextPath(); // CES URL
 			step.requestBody = ispwRequestBean.getJsonRequest();
 			step.token = cesIspwToken; // CES TOKEN
 
 			// This is a generated code for Visual Studio Code - REST Client
-			logger.println();
-			logger.println();
-			logger.println("### [" + step.ispwAction + "] - " + "RFC 2616");
-			logger.println();
-			logger.println(step.httpMode + " " + step.url + " HTTP/1.1");
-			logger.println("Content-type: " + MimeType.APPLICATION_JSON.getContentType().toString());
-			logger.println("Authorization: " + step.token);
-			logger.println("");
-			logger.println(step.requestBody);
-			logger.println();
-			logger.println("###");
-			logger.println();
-			logger.println();
-
-			HttpRequestExecution exec =
-					HttpRequestExecution.from(step, step.getQuiet() ? TaskListener.NULL : listener,
-							this);
-
-			Launcher launcher = getContext().get(Launcher.class);
-			if (launcher != null) {
-				return launcher.getChannel().call(exec);
+			if (step.consoleLogResponseBody) {
+				logger.println();
+				logger.println();
+				logger.println("### [" + step.ispwAction + "] - " + "RFC 2616");
+				logger.println();
+				logger.println(step.httpMode + " " + step.url + " HTTP/1.1");
+				logger.println("Content-type: "
+						+ MimeType.APPLICATION_JSON.getContentType().toString());
+				logger.println("Authorization: " + RestApiUtils.maskToken(step.token));
+				logger.println("");
+				logger.println(step.requestBody);
+				logger.println();
+				logger.println("###");
+				logger.println();
+				logger.println();
 			}
 
-			return exec.call();
+			RestApiUtils.startLog(logger, step.ispwAction, ispwRequestBean.getIspwContextPathBean(), ispwRequestBean.getJsonObject());
+
+			HttpRequestExecution exec =
+					HttpRequestExecution.from(step, listener, this);
+
+			Launcher launcher = getContext().get(Launcher.class);
+			ResponseContentSupplier supplier = null;
+			if (launcher != null) {
+				supplier = launcher.getChannel().call(exec);
+			} else {
+				supplier = exec.call();
+			}
+			
+			String responseJson = supplier.getContent();
+			if (RestApiUtils.isIspwDebugMode())
+				logger.println("responseJson=" + responseJson);
+
+			RestApiUtils.endLog(logger, step.ispwAction, ispwRequestBean, responseJson, true);
+			
+			return supplier;
 		}
 
         private static final long serialVersionUID = 1L;

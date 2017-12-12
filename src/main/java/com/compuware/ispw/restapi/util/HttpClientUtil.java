@@ -126,10 +126,14 @@ public class HttpClientUtil {
 
     public HttpResponse execute(HttpClient client, HttpContext context, HttpRequestBase method,
 								PrintStream logger) throws IOException, InterruptedException {
-        logger.println("Sending request to url: " + method.getURI());
+    	
+    	if(RestApiUtils.isIspwDebugMode())
+    		logger.println("Sending request to url: " + method.getURI());
         
         final HttpResponse httpResponse = client.execute(method, context);
-        logger.println("Response Code: " + httpResponse.getStatusLine());
+        
+        if(RestApiUtils.isIspwDebugMode())
+        	logger.println("Response Code: " + httpResponse.getStatusLine());
         
         return httpResponse;
     }
