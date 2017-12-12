@@ -30,6 +30,7 @@ import com.compuware.ces.model.HttpHeader;
 import com.compuware.ispw.model.request.Assignment;
 import com.compuware.ispw.model.rest.AssignmentInfo;
 import com.compuware.ispw.model.rest.ReleaseInfo;
+import com.compuware.ispw.model.rest.SetInfoResponse;
 import com.compuware.ispw.model.rest.TaskInfo;
 import com.compuware.ispw.model.rest.TaskListResponse;
 import com.compuware.ispw.model.rest.TaskResponse;
@@ -50,6 +51,7 @@ import com.compuware.ispw.restapi.action.GetReleaseInfoAction;
 import com.compuware.ispw.restapi.action.GetReleaseTaskGenerateListingAction;
 import com.compuware.ispw.restapi.action.GetReleaseTaskInfoAction;
 import com.compuware.ispw.restapi.action.GetReleaseTaskListAction;
+import com.compuware.ispw.restapi.action.GetSetInfoAction;
 import com.compuware.ispw.restapi.action.IAction;
 import com.compuware.ispw.restapi.action.IspwCommand;
 import com.compuware.ispw.restapi.action.PromoteAssignmentAction;
@@ -222,6 +224,8 @@ public class RestApiUtils {
 		} else if (IspwCommand.RegressRelease.equals(ispwAction)) {
 			logger.println("...regressing tasks in release " + ispwContextPathBean.getReleaseId()
 					+ " at level " + ispwContextPathBean.getLevel());
+		} else if(IspwCommand.GetSetInfoAction.equals(ispwAction)) {
+			logger.println("...getting info on set "+ispwContextPathBean.getSetId());
 		}
 	}
 	
@@ -230,7 +234,7 @@ public class RestApiUtils {
 		
 		if (IspwCommand.GenerateTasksInAssignment.equals(ispwAction)) {
 			TaskResponse taskResponse = jsonProcessor.parse(responseJson, TaskResponse.class);
-			logger.println("...set "+taskResponse.getSetId()+" created to generate");
+			logger.println("...set "+taskResponse.getSetId()+" created to generate");	
 		} else if (IspwCommand.GetAssignmentTaskList.equals(ispwAction)) {
 			TaskListResponse listResponse = jsonProcessor.parse(responseJson, TaskListResponse.class);
 			
@@ -278,6 +282,13 @@ public class RestApiUtils {
 			
 		} else if (IspwCommand.RegressRelease.equals(ispwAction)) {
 			
+		} else if(IspwCommand.GetSetInfoAction.equals(ispwAction)) {
+			SetInfoResponse setInfoResp = jsonProcessor.parse(responseJson, SetInfoResponse.class);
+			logger.println("...setId, state, owner, application/stream, startDate/startTime");
+			logger.println("..." + setInfoResp.getSetid() + ", " + setInfoResp.getState() + ", "
+					+ setInfoResp.getOwner() + ", " + setInfoResp.getApplicationId() + "/"
+					+ setInfoResp.getStreamName() + ", " + setInfoResp.getStartDate() + "/"
+					+ setInfoResp.getStartTime());
 		}
 		
 		logger.println("...done");
@@ -318,6 +329,8 @@ public class RestApiUtils {
 			action = new PromoteReleaseAction(logger);
 		} else if (IspwCommand.RegressRelease.equals(ispwAction)) {
 			action = new RegressReleaseAction(logger);
+		} else if(IspwCommand.GetSetInfoAction.equals(ispwAction)) {
+			action = new GetSetInfoAction(logger);
 		}
 
 		return action;
@@ -331,7 +344,8 @@ public class RestApiUtils {
 				|| IspwCommand.GetReleaseInfo.equals(ispwAction)
 				|| IspwCommand.GetReleaseTaskList.equals(ispwAction)
 				|| IspwCommand.GetReleaseTaskGenerateListing.equals(ispwAction)
-				|| IspwCommand.GetReleaseTaskInfo.equals(ispwAction)) {
+				|| IspwCommand.GetReleaseTaskInfo.equals(ispwAction)
+				|| IspwCommand.GetSetInfoAction.equals(ispwAction)) {
 			httpMode = HttpMode.GET;
 		}
 

@@ -18,11 +18,12 @@ public class IspwCommand {
 	public static final String PromoteRelease = "PromoteRelease"; // POST
 	public static final String DeployRelease = "DeployRelease"; // POST
 	public static final String RegressRelease = "RegressRelease"; // POST
+	public static final String GetSetInfoAction = "GetSetInfoAction"; //GET
 
 	public static final String[] publishedActions = new String[] { CreateAssignment, GetAssignmentInfo,
 			GetAssignmentTaskList, GenerateTasksInAssignment, PromoteAssignment, DeployAssignment,
 			RegressAssignment, GetReleaseInfo, GetReleaseTaskList, CreateRelease,
 			GenerateTasksInRelease, GetReleaseTaskGenerateListing, GetReleaseTaskInfo,
-			PromoteRelease, DeployRelease, RegressRelease };
+			PromoteRelease, DeployRelease, RegressRelease, GetSetInfoAction };
 
 }
