@@ -178,6 +178,7 @@ public class RestApiUtils {
 	}
 	
 	public static void startLog(PrintStream logger, String ispwAction, IspwContextPathBean ispwContextPathBean, Object jsonObject) {
+		logger.println("--------------------");
 		if (IspwCommand.GenerateTasksInAssignment.equals(ispwAction)) {
 			logger.println("...generating tasks in assignment "
 					+ ispwContextPathBean.getAssignmentId() + " at level "
