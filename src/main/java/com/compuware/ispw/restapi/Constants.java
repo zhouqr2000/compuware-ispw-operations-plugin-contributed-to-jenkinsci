@@ -11,4 +11,12 @@ public class Constants {
 	public static final String Release = "Release";
 	
 	public static final String Action = "Action";
+	
+	public static String SET_STATE_DISPATCHED = "Dispatched";
+	public static String SET_STATE_EXECUTING = "Executing";
+	public static String SET_STATE_CLOSED = "Closed";
+
+	public static int POLLING_COUNT = 60;
+	public static int POLLING_INTERVAL = 1500;
+
 }

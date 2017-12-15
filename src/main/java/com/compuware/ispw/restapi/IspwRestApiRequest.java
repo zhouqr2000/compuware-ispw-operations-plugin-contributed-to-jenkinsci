@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,9 @@ import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
+import com.compuware.ispw.model.rest.SetInfoResponse;
+import com.compuware.ispw.model.rest.TaskResponse;
+import com.compuware.ispw.restapi.action.GetSetInfoAction;
 import com.compuware.ispw.restapi.action.IAction;
 import com.compuware.ispw.restapi.action.IspwCommand;
 import com.compuware.ispw.restapi.auth.BasicDigestAuthentication;
@@ -385,7 +389,45 @@ public class IspwRestApiRequest extends Builder {
 		if (RestApiUtils.isIspwDebugMode())
 			logger.println("responseJson=" + responseJson);
 
-		RestApiUtils.endLog(logger, ispwAction, ispwRequestBean, responseJson, true);
+		Object respObject = RestApiUtils.endLog(logger, ispwAction, ispwRequestBean, responseJson, true);
+		
+		// polling status if no webhook
+		if (webhookToken == null) {
+			if (respObject != null && respObject instanceof TaskResponse) {
+				TaskResponse taskResp = (TaskResponse) respObject;
+				String setId = taskResp.getSetId();
+
+				HashSet<String> set = new HashSet<String>();
+
+				int i = 0;
+				for (; i < 60; i++) {
+					Thread.sleep(Constants.POLLING_INTERVAL);
+					HttpRequestExecution poller =
+							HttpRequestExecution.createPoller(setId, webhookToken, this, envVars,
+									build, listener);
+					ResponseContentSupplier pollerSupplier = launcher.getChannel().call(poller);
+					String pollingJson = pollerSupplier.getContent();
+
+					JsonProcessor jsonProcessor = new JsonProcessor();
+					SetInfoResponse setInfoResp =
+							jsonProcessor.parse(pollingJson, SetInfoResponse.class);
+					String setState = StringUtils.trimToEmpty(setInfoResp.getState());
+					if (!set.contains(setState)) {
+						logger.println("...set " + setInfoResp.getSetid() + " status - " + setState);
+						set.add(setState);
+
+						if (setState.equals(Constants.SET_STATE_CLOSED)) {
+							logger.println("...action " + ispwAction + " completed");
+							break;
+						}
+					}
+				}
+
+				if (i == 60) {
+					logger.println("...warn - max timeout reached");
+				}
+			}
+		}
 		
 		return true;
 	}

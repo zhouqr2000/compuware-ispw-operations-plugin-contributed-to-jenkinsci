@@ -41,12 +41,16 @@ import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredenti
 import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
 import com.compuware.ispw.restapi.IspwRestApiRequest.DescriptorImpl;
 import com.compuware.ispw.restapi.IspwRestApiRequestStep.Execution;
+import com.compuware.ispw.restapi.action.GetSetInfoAction;
+import com.compuware.ispw.restapi.action.IAction;
+import com.compuware.ispw.restapi.action.IspwCommand;
 import com.compuware.ispw.restapi.auth.Authenticator;
 import com.compuware.ispw.restapi.auth.CredentialBasicAuthentication;
 import com.compuware.ispw.restapi.util.HttpClientUtil;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
 import com.compuware.ispw.restapi.util.RequestAction;
 import com.compuware.ispw.restapi.util.RestApiUtils;
+import com.compuware.jenkins.common.configuration.HostConnection;
 import com.google.common.collect.Range;
 import com.google.common.io.ByteStreams;
 
@@ -87,6 +91,95 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 	private final OutputStream remoteLogger;
 	private transient PrintStream localLogger;
 
+	//create poller for rest api request
+	static HttpRequestExecution createPoller(String setId, WebhookToken webhookToken, IspwRestApiRequest http, EnvVars envVars,
+			AbstractBuild<?, ?> build, TaskListener taskListener) {
+
+		PrintStream logger = taskListener.getLogger();
+		IAction action = RestApiUtils.createAction(IspwCommand.GetSetInfoAction, logger);
+
+		String cesUrl = StringUtils.EMPTY;
+		String cesIspwHost = StringUtils.EMPTY;
+
+		HostConnection hostConnection = RestApiUtils.getCesUrl(http.getConnectionId());
+		if (hostConnection != null) {
+			cesUrl = StringUtils.trimToEmpty(hostConnection.getCesUrl());
+
+			String host = StringUtils.trimToEmpty(hostConnection.getHost());
+			String port = StringUtils.trimToEmpty(hostConnection.getPort());
+			cesIspwHost = host + "-" + port;
+		}
+
+		String cesIspwToken = RestApiUtils.getCesToken(http.getCredentialsId());
+		if (RestApiUtils.isIspwDebugMode())
+			logger.println("...ces.url=" + cesUrl + ", ces.ispw.host=" + cesIspwHost
+					+ ", ces.ispw.token=" + cesIspwToken);
+
+		// no webhook, polling set status
+		IspwRequestBean ispwRequestBean =
+				action.getIspwRequestBean(cesIspwHost, "setId=" + setId, webhookToken);
+
+		String url = cesUrl + ispwRequestBean.getContextPath(); // CES URL
+		String body = ispwRequestBean.getJsonRequest();
+		List<HttpRequestNameValuePair> headers = http.resolveHeaders(envVars);
+
+		FilePath outputFile = http.resolveOutputFile(envVars, build);
+		Item project = build.getProject();
+
+		return new HttpRequestExecution(url, HttpMode.GET, http.getIgnoreSslErrors(),
+				http.getHttpProxy(), body, headers, http.getTimeout(), http.getAuthentication(),
+				http.getValidResponseCodes(), http.getValidResponseContent(),
+				http.getConsoleLogResponseBody(), outputFile, ResponseHandle.STRING,
+
+				project, taskListener.getLogger());
+
+	}
+	
+	//create poller for rest api request step
+	static HttpRequestExecution createPoller(String setId, WebhookToken webhookToken, IspwRestApiRequestStep step, TaskListener taskListener, Execution execution) {
+		
+		PrintStream logger = taskListener.getLogger();
+		IAction action = RestApiUtils.createAction(IspwCommand.GetSetInfoAction, logger);
+
+		String cesUrl = StringUtils.EMPTY;
+		String cesIspwHost = StringUtils.EMPTY;
+
+		HostConnection hostConnection = RestApiUtils.getCesUrl(step.getConnectionId());
+		if (hostConnection != null) {
+			cesUrl = StringUtils.trimToEmpty(hostConnection.getCesUrl());
+
+			String host = StringUtils.trimToEmpty(hostConnection.getHost());
+			String port = StringUtils.trimToEmpty(hostConnection.getPort());
+			cesIspwHost = host + "-" + port;
+		}
+
+		String cesIspwToken = RestApiUtils.getCesToken(step.getCredentialsId());
+		if (RestApiUtils.isIspwDebugMode())
+			logger.println("...ces.url=" + cesUrl + ", ces.ispw.host=" + cesIspwHost
+					+ ", ces.ispw.token=" + cesIspwToken);
+
+		// no webhook, polling set status
+		IspwRequestBean ispwRequestBean =
+				action.getIspwRequestBean(cesIspwHost, "setId=" + setId, webhookToken);
+
+		String url = cesUrl + ispwRequestBean.getContextPath(); // CES URL
+		String body = ispwRequestBean.getJsonRequest();
+		
+		List<HttpRequestNameValuePair> headers = step.resolveHeaders();
+		FilePath outputFile = execution.resolveOutputFile();
+		Item project = execution.getProject();
+		
+		return new HttpRequestExecution(
+				url, HttpMode.GET, step.isIgnoreSslErrors(),
+				step.getHttpProxy(), body, headers, step.getTimeout(),
+				step.getAuthentication(),
+
+				step.getValidResponseCodes(), step.getValidResponseContent(),
+				step.getConsoleLogResponseBody(), outputFile,
+				step.getResponseHandle(),
+				project, taskListener.getLogger());
+	}
+	
 	static HttpRequestExecution from(IspwRestApiRequest http,
 									 EnvVars envVars, AbstractBuild<?, ?> build, TaskListener taskListener) {
 		try {

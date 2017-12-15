@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -19,6 +20,8 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
+import com.compuware.ispw.model.rest.SetInfoResponse;
+import com.compuware.ispw.model.rest.TaskResponse;
 import com.compuware.ispw.restapi.action.IAction;
 import com.compuware.ispw.restapi.action.IspwCommand;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
@@ -396,7 +399,47 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			if (RestApiUtils.isIspwDebugMode())
 				logger.println("responseJson=" + responseJson);
 
-			RestApiUtils.endLog(logger, step.ispwAction, ispwRequestBean, responseJson, true);
+			Object respObject = RestApiUtils.endLog(logger, step.ispwAction, ispwRequestBean, responseJson, true);
+			
+			// polling status if no webhook
+			if (webhookToken == null) {
+				if (respObject != null && respObject instanceof TaskResponse) {
+					TaskResponse taskResp = (TaskResponse) respObject;
+					String setId = taskResp.getSetId();
+
+					HashSet<String> set = new HashSet<String>();
+
+					int i = 0;
+					for (; i < 60; i++) {
+						Thread.sleep(Constants.POLLING_INTERVAL);
+						HttpRequestExecution poller =
+								HttpRequestExecution.createPoller(setId, webhookToken, step,
+										listener, this);
+						ResponseContentSupplier pollerSupplier = launcher.getChannel().call(poller);
+						String pollingJson = pollerSupplier.getContent();
+
+						JsonProcessor jsonProcessor = new JsonProcessor();
+						SetInfoResponse setInfoResp =
+								jsonProcessor.parse(pollingJson, SetInfoResponse.class);
+						String setState = StringUtils.trimToEmpty(setInfoResp.getState());
+						if (!set.contains(setState)) {
+							logger.println("...set " + setInfoResp.getSetid() + " status - "
+									+ setState);
+							set.add(setState);
+
+							if (setState.equals(Constants.SET_STATE_CLOSED)) {
+								logger.println("...action " + step.ispwAction + " completed");
+								break;
+							}
+						}
+					}
+
+					if (i == 60) {
+						logger.println("...warn - max timeout reached");
+					}
+				}
+			}
+
 			
 			return supplier;
 		}

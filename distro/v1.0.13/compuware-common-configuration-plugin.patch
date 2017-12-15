@@ -1,0 +1,158 @@
+diff --git a/src/main/java/com/compuware/jenkins/common/configuration/CpwrGlobalConfiguration.java b/src/main/java/com/compuware/jenkins/common/configuration/CpwrGlobalConfiguration.java
+index c044bfc..a59fc4a 100644
+--- a/src/main/java/com/compuware/jenkins/common/configuration/CpwrGlobalConfiguration.java
++++ b/src/main/java/com/compuware/jenkins/common/configuration/CpwrGlobalConfiguration.java
+@@ -62,6 +62,7 @@
+ 	private static final String CODE_PAGE_ID = "codePage"; //$NON-NLS-1$
+ 	private static final String TIMEOUT_ID = "timeout"; //$NON-NLS-1$
+ 	private static final String CONNECTION_ID = "connectionId"; //$NON-NLS-1$
++	private static final String CES_URL_ID = "cesUrl"; //$NON-NLS-1$
+ 	private static final String TOPAZ_CLI_LOCATION_WINDOWS_ID = "topazCLILocationWindows"; //$NON-NLS-1$
+ 	private static final String TOPAZ_CLI_LOCATION_LINUX_ID = "topazCLILocationLinux"; //$NON-NLS-1$
+ 	private static final String DEFAULT_TOPAZ_CLI_LOCATION_WINDOWS = "C:\\Program Files\\Compuware\\Topaz Workbench CLI"; //$NON-NLS-1$
+@@ -134,9 +135,13 @@
+ 
+ 		for (int i = 0; i < m_hostConnections.length; i++)
+ 		{
+-			hostConnections[i] = new HostConnection(m_hostConnections[i].getDescription(),
+-					m_hostConnections[i].getHostPort(), m_hostConnections[i].getCodePage(),
+-					m_hostConnections[i].getTimeout(), m_hostConnections[i].getConnectionId());
++			hostConnections[i] = new HostConnection(
++					m_hostConnections[i].getDescription(),
++					m_hostConnections[i].getHostPort(),
++					m_hostConnections[i].getCodePage(),
++					m_hostConnections[i].getTimeout(),
++					m_hostConnections[i].getConnectionId(),
++					m_hostConnections[i].getCesUrl());
+ 		}
+ 
+ 		return hostConnections;
+@@ -247,9 +252,13 @@
+ 			for (int i = 0; i < jsonHostConnections.size(); i++)
+ 			{
+ 				JSONObject jsonHostConnection = jsonHostConnections.getJSONObject(i);
+-				hostConnectionArray[i] = new HostConnection(jsonHostConnection.getString(DESCRIPTION_ID),
+-						jsonHostConnection.getString(HOST_PORT_ID), jsonHostConnection.getString(CODE_PAGE_ID),
+-						jsonHostConnection.getString(TIMEOUT_ID), jsonHostConnection.getString(CONNECTION_ID));
++				hostConnectionArray[i] = new HostConnection(
++						jsonHostConnection.getString(DESCRIPTION_ID),
++						jsonHostConnection.getString(HOST_PORT_ID),
++						jsonHostConnection.getString(CODE_PAGE_ID),
++						jsonHostConnection.getString(TIMEOUT_ID),
++						jsonHostConnection.getString(CONNECTION_ID),
++						jsonHostConnection.getString(CES_URL_ID));
+ 			}
+ 		}
+ 
+diff --git a/src/main/java/com/compuware/jenkins/common/configuration/HostConnection.java b/src/main/java/com/compuware/jenkins/common/configuration/HostConnection.java
+index 20bc793..cd7e1ef 100644
+--- a/src/main/java/com/compuware/jenkins/common/configuration/HostConnection.java
++++ b/src/main/java/com/compuware/jenkins/common/configuration/HostConnection.java
+@@ -37,6 +37,8 @@
+ 	private final String m_codePage;
+ 	private final String m_timeout;
+ 	private final String m_connectionId;
++	private final String m_cesUrl;
++
+ 
+ 	/**
+ 	 * Constructor.
+@@ -51,15 +53,18 @@
+ 	 *            the read/write timeout to honor on the host connection
+ 	 * @param connectionId
+ 	 *            a unique identifier
++	 * @param cesUrl
++	 *            a CES URL
+ 	 */
+ 	@DataBoundConstructor
+-	public HostConnection(String description, String hostPort, String codePage, String timeout, String connectionId)
++	public HostConnection(String description, String hostPort, String codePage, String timeout, String connectionId, String cesUrl)
+ 	{
+ 		m_description = StringUtils.trimToEmpty(description);
+ 		m_hostPort = StringUtils.trimToEmpty(hostPort);
+ 		m_codePage = StringUtils.trimToEmpty(codePage);
+ 		m_timeout = StringUtils.trimToEmpty(timeout);
+ 		m_connectionId = generateId(connectionId);
++		m_cesUrl = StringUtils.trimToEmpty(cesUrl);
+ 	}
+ 
+ 	/**
+@@ -159,6 +164,14 @@
+ 	}
+ 
+ 	/**
++	 * Get the CES URL
++	 * @return the CES URL
++	 */
++	public String getCesUrl() {
++		return m_cesUrl;
++	}
++	
++	/**
+ 	 * DescriptorImpl is used to create instances of <code>CodeCoverageBuilder</code>. It also contains the global configuration
+ 	 * options as fields, just like the <code>CodeCoverageBuilder</code> contains the configuration options for a job
+ 	 */
+diff --git a/src/main/resources/com/compuware/jenkins/common/configuration/HostConnection/HostConnection.jelly b/src/main/resources/com/compuware/jenkins/common/configuration/HostConnection/HostConnection.jelly
+index 818fcc1..ceba894 100644
+--- a/src/main/resources/com/compuware/jenkins/common/configuration/HostConnection/HostConnection.jelly
++++ b/src/main/resources/com/compuware/jenkins/common/configuration/HostConnection/HostConnection.jelly
+@@ -13,6 +13,9 @@
+ 	    <f:entry title="${%timeout}" field="timeout" help="/plugin/compuware-common-configuration/help-timeout.html">
+ 	        <f:textbox value="${hostConn.getTimeout()}" checkUrl="'${rootURL}/descriptorByName/HostConnection/checkTimeout?value='+this.value"/>
+ 	    </f:entry>
++	    <f:entry title="${%cesUrl}" field="cesUrl" help="/plugin/compuware-common-configuration/help-cesUrl.html">
++	        <f:textbox value="${hostConn.getCesUrl()}" default=""/>
++	    </f:entry>
+ 	    <f:invisibleEntry>
+ 	    	<f:textbox field="connectionId" value="${hostConn.getConnectionId()}"/>
+ 	    </f:invisibleEntry>
+diff --git a/src/main/resources/com/compuware/jenkins/common/configuration/HostConnection/HostConnection.properties b/src/main/resources/com/compuware/jenkins/common/configuration/HostConnection/HostConnection.properties
+index 252402b..75b951b 100644
+--- a/src/main/resources/com/compuware/jenkins/common/configuration/HostConnection/HostConnection.properties
++++ b/src/main/resources/com/compuware/jenkins/common/configuration/HostConnection/HostConnection.properties
+@@ -2,4 +2,5 @@
+ hostPort=Host:port
+ deleteHostConnection=Delete Host Connection
+ description=Description
+-timeout=Read/write timeout (minutes)
+\ No newline at end of file
++timeout=Read/write timeout (minutes)
++cesUrl=CES URL
+\ No newline at end of file
+diff --git a/src/main/resources/lib/compuware/hostSelect.jelly b/src/main/resources/lib/compuware/hostSelect.jelly
+index 1095f0f..3551d6f 100644
+--- a/src/main/resources/lib/compuware/hostSelect.jelly
++++ b/src/main/resources/lib/compuware/hostSelect.jelly
+@@ -10,7 +10,7 @@
+ 	
+ 	<div class="host-selection-control">
+ 		<f:select clazz="${attrs.clazz} host-select" field="${attrs.field}" value="${attrs.value}" default="${attrs.default}" />
+-    	<a class="configure" href="/configure#cpwr-config">Manage connections</a>
++    	<a class="configure" href="../../configure#cpwr-config">Manage connections</a>
+     </div>
+     
+ </j:jelly>
+\ No newline at end of file
+diff --git a/src/main/webapp/help-cesUrl.html b/src/main/webapp/help-cesUrl.html
+new file mode 100644
+index 0000000..65345ec
+--- /dev/null
++++ b/src/main/webapp/help-cesUrl.html
+@@ -0,0 +1,3 @@
++<div>
++This field allows you to specify CES URL. The default is empty.
++</div>
+\ No newline at end of file
+diff --git a/src/test/java/com/compuware/jenkins/common/configuration/HostConnectionTest.java b/src/test/java/com/compuware/jenkins/common/configuration/HostConnectionTest.java
+index 632650e..4739b7d 100644
+--- a/src/test/java/com/compuware/jenkins/common/configuration/HostConnectionTest.java
++++ b/src/test/java/com/compuware/jenkins/common/configuration/HostConnectionTest.java
+@@ -41,7 +41,7 @@
+ 	@Before
+ 	public void setUp()
+ 	{
+-		m_globalHostConnectionConfig = new HostConnection("test", "cw01:1234", "1047", "0", "1");
++		m_globalHostConnectionConfig = new HostConnection("test", "cw01:1234", "1047", "0", "1", "2");
+ 	}
+ 
+ 	/**
