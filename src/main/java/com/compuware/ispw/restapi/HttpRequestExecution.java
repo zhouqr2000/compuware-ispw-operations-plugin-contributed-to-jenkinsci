@@ -54,9 +54,9 @@ import hudson.AbortException;
 import hudson.CloseProofOutputStream;
 import hudson.EnvVars;
 import hudson.FilePath;
-import hudson.model.AbstractBuild;
 import hudson.model.Item;
 import hudson.model.TaskListener;
+import hudson.model.AbstractBuild;
 import hudson.remoting.RemoteOutputStream;
 import hudson.security.ACL;
 import jenkins.security.MasterToSlaveCallable;
@@ -315,19 +315,27 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 	}
 
 	private void processResponse(ResponseContentSupplier response) throws IOException, InterruptedException {
-		//logs
+		
+		// logs
 		if (consoleLogResponseBody) {
 			logger().println("Response: \n" + response.getContent());
 		}
 
-		//validate status code
-		responseCodeIsValid(response);
+		try {
+			// validate status code
+			responseCodeIsValid(response);
 
-		//validate content
-		if (!validResponseContent.isEmpty()) {
-			if (!response.getContent().contains(validResponseContent)) {
-				throw new AbortException("Fail: Response doesn't contain expected content '" + validResponseContent + "'");
+			// validate content
+			if (!validResponseContent.isEmpty()) {
+				if (!response.getContent().contains(validResponseContent)) {
+					throw new AbortException("Fail: Response doesn't contain expected content '"
+							+ validResponseContent + "'");
+				}
 			}
+		} catch (AbortException x) {
+			RestApiUtils.logMessageIfAny(logger(), response, true);
+
+			throw x;
 		}
 
 		//save file

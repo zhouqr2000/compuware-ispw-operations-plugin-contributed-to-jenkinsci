@@ -27,18 +27,22 @@ import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.compuware.ces.model.BasicAuthentication;
 import com.compuware.ces.model.HttpHeader;
-import com.compuware.ispw.model.request.Assignment;
 import com.compuware.ispw.model.rest.AssignmentInfo;
+import com.compuware.ispw.model.rest.AssignmentResponse;
+import com.compuware.ispw.model.rest.MessageResponse;
 import com.compuware.ispw.model.rest.ReleaseInfo;
+import com.compuware.ispw.model.rest.ReleaseResponse;
 import com.compuware.ispw.model.rest.SetInfoResponse;
 import com.compuware.ispw.model.rest.TaskInfo;
 import com.compuware.ispw.model.rest.TaskListResponse;
+import com.compuware.ispw.model.rest.TaskListingResponse;
 import com.compuware.ispw.model.rest.TaskResponse;
 import com.compuware.ispw.restapi.Constants;
 import com.compuware.ispw.restapi.HttpMode;
 import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.JsonProcessor;
+import com.compuware.ispw.restapi.ResponseContentSupplier;
 import com.compuware.ispw.restapi.action.CreateAssignmentAction;
 import com.compuware.ispw.restapi.action.CreateReleaseAction;
 import com.compuware.ispw.restapi.action.DeployAssignmentAction;
@@ -202,7 +206,7 @@ public class RestApiUtils {
 			logger.println("...listing tasks in release " + ispwContextPathBean.getReleaseId());
 		} else if (IspwCommand.CreateRelease.equals(ispwAction)) {
 			ReleaseInfo releaseInfo = (ReleaseInfo) jsonObject;
-			logger.println("...creating assignment on " + releaseInfo.getStream() + "/"
+			logger.println("...creating release on " + releaseInfo.getStream() + "/"
 					+ releaseInfo.getApplication() + " as " + releaseInfo.getReleaseId() + " - "
 					+ releaseInfo.getDescription());
 		} else if (IspwCommand.GenerateTasksInRelease.equals(ispwAction)) {
@@ -257,31 +261,64 @@ public class RestApiUtils {
 			logger.println("...release: " + assignment.getRelease());
 			logger.println("...user tag: " + assignment.getUserTag());
 		} else if (IspwCommand.CreateAssignment.equals(ispwAction)) {
-			
+			AssignmentResponse assignResp =
+					jsonProcessor.parse(responseJson, AssignmentResponse.class);
+			logger.println("...created assignment " + assignResp.getAssignmentId());
 		} else if (IspwCommand.PromoteAssignment.equals(ispwAction)) {
-			
+			TaskResponse taskResp = jsonProcessor.parse(responseJson, TaskResponse.class);
+			logger.println("...set "+taskResp.getSetId()+" created to promote assignment "+ispwRequestBean.getIspwContextPathBean().getAssignmentId());
 		} else if (IspwCommand.DeployAssignment.equals(ispwAction)) {
-			
+			TaskResponse taskResp = jsonProcessor.parse(responseJson, TaskResponse.class);
+			logger.println("...set "+taskResp.getSetId()+" created to deploy assignment "+ispwRequestBean.getIspwContextPathBean().getAssignmentId());			
 		} else if (IspwCommand.RegressAssignment.equals(ispwAction)) {
-			
+			TaskResponse taskResp = jsonProcessor.parse(responseJson, TaskResponse.class);
+			logger.println("...set "+taskResp.getSetId()+" created to regress assignment "+ispwRequestBean.getIspwContextPathBean().getAssignmentId());
 		} else if (IspwCommand.GetReleaseInfo.equals(ispwAction)) {
-			
+			ReleaseInfo assignment = jsonProcessor.parse(responseJson, ReleaseInfo.class);
+			logger.println("...stream/application: " + assignment.getStream() + "/"
+					+ assignment.getApplication());
+			logger.println("...release: " + assignment.getReleaseId() + " - "
+					+ assignment.getDescription());
+			logger.println("...owner: " + assignment.getOwner());
+			logger.println("...work reference #: " + assignment.getWorkRefNumber());
+			logger.println("...release reference: " + assignment.getReleasePreference());
+			logger.println("...user tag: " + assignment.getUserTag());
 		} else if (IspwCommand.GetReleaseTaskList.equals(ispwAction)) {
-			
+			TaskListResponse listResponse = jsonProcessor.parse(responseJson, TaskListResponse.class);
+			logger.println("...taskId, module, userId, version, status, application/stream/level, release");
+			for(TaskInfo taskInfo: listResponse.getTasks()) {
+				logger.println("..." + taskInfo.getTaskId() + ", " + taskInfo.getModuleName() + "."
+						+ taskInfo.getModuleType() + ", " + taskInfo.getUserId() + ", "
+						+ taskInfo.getVersion() + ", " + taskInfo.getStatus() + ", "
+						+ taskInfo.getApplication() + "/" + taskInfo.getStream() + "/"
+						+ taskInfo.getLevel() + ", " + taskInfo.getRelease());
+			}
 		} else if (IspwCommand.CreateRelease.equals(ispwAction)) {
-			
+			ReleaseResponse releaseResp = jsonProcessor.parse(responseJson, ReleaseResponse.class);
+			logger.println("...created release " + releaseResp.getReleaseId());
 		} else if (IspwCommand.GenerateTasksInRelease.equals(ispwAction)) {
-			
+			TaskResponse taskResp = jsonProcessor.parse(responseJson, TaskResponse.class);
+			logger.println("...set "+taskResp.getSetId()+" created to generate release "+ispwRequestBean.getIspwContextPathBean().getReleaseId());
 		} else if (IspwCommand.GetReleaseTaskGenerateListing.equals(ispwAction)) {
-			
+			TaskListingResponse listingResp = jsonProcessor.parse(responseJson, TaskListingResponse.class);
+			logger.println("...listing: "+listingResp.getListing());
 		} else if (IspwCommand.GetReleaseTaskInfo.equals(ispwAction)) {
-			
+			TaskInfo taskInfo = jsonProcessor.parse(responseJson,  TaskInfo.class);
+			logger.println("...taskId, module, userId, version, status, application/stream/level, release");
+			logger.println("..." + taskInfo.getTaskId() + ", " + taskInfo.getModuleName() + "."
+					+ taskInfo.getModuleType() + ", " + taskInfo.getUserId() + ", "
+					+ taskInfo.getVersion() + ", " + taskInfo.getStatus() + ", "
+					+ taskInfo.getApplication() + "/" + taskInfo.getStream() + "/"
+					+ taskInfo.getLevel() + ", " + taskInfo.getRelease());
 		} else if (IspwCommand.DeployRelease.equals(ispwAction)) {
-			
+			TaskResponse taskResp = jsonProcessor.parse(responseJson, TaskResponse.class);
+			logger.println("...set "+taskResp.getSetId()+" created to deploy release "+ispwRequestBean.getIspwContextPathBean().getReleaseId());
 		} else if (IspwCommand.PromoteRelease.equals(ispwAction)) {
-			
+			TaskResponse taskResp = jsonProcessor.parse(responseJson, TaskResponse.class);
+			logger.println("...set "+taskResp.getSetId()+" created to promote release "+ispwRequestBean.getIspwContextPathBean().getReleaseId());
 		} else if (IspwCommand.RegressRelease.equals(ispwAction)) {
-			
+			TaskResponse taskResp = jsonProcessor.parse(responseJson, TaskResponse.class);
+			logger.println("...set "+taskResp.getSetId()+" created to regress release "+ispwRequestBean.getIspwContextPathBean().getReleaseId());
 		} else if(IspwCommand.GetSetInfoAction.equals(ispwAction)) {
 			SetInfoResponse setInfoResp = jsonProcessor.parse(responseJson, SetInfoResponse.class);
 			logger.println("...setId, state, owner, application/stream, startDate/startTime");
@@ -291,7 +328,7 @@ public class RestApiUtils {
 					+ setInfoResp.getStartTime());
 		}
 		
-		logger.println("...done");
+		logger.println("...ispw api rest request done");
 	}
 	
 	public static IAction createAction(String ispwAction, PrintStream logger) {
@@ -466,6 +503,30 @@ public class RestApiUtils {
 			return masked.toString();
 		}
 		
+	}
+	
+	public static void logMessageIfAny(PrintStream logger, ResponseContentSupplier response,
+			boolean isError) {
+		String jsonContent = StringUtils.trimToEmpty(response.getContent());
+
+		if (jsonContent.startsWith("{") && jsonContent.endsWith("}")) {
+
+			// print ISPW error message if any
+			JsonProcessor jsonProcessor = new JsonProcessor();
+			MessageResponse messageResp = jsonProcessor.parse(jsonContent, MessageResponse.class);
+
+			// tidy the message
+			String message =
+					StringUtils.trimToEmpty(messageResp.getMessage()).replaceAll("(\\s)+", " ")
+							.replaceAll("( \\.)", ".");
+			
+			if (StringUtils.isNotBlank(message)) {
+				if (isError)
+					logger.println("...error - " + message);
+				else
+					logger.println("...message - " + message);
+			}
+		}
 	}
 	
 	public static String getSystemProperty(String key) {
