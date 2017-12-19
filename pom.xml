@@ -24,7 +24,7 @@
 	</parent>
 
 	<groupId>com.compuware.jenkins</groupId>
-	<artifactId>compuware-ispw-operations-plugin</artifactId>
+	<artifactId>compuware-ispw-operations</artifactId>
 	<version>1.0.99-SNAPSHOT</version>
 	<packaging>hpi</packaging>
 	<name>Compuware ISPW Operations Plugin</name>
