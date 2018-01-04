@@ -7,6 +7,12 @@ import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
+/**
+ * Action to generate tasks in the specified release
+ * 
+ * @author Sam Zhou
+ *
+ */
 public class GenerateTasksInReleaseAction extends SetInfoPostAction {
 
 	private static final String[] defaultProps =

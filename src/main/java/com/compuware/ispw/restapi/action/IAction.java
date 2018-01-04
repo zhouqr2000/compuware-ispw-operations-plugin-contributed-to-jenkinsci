@@ -5,6 +5,12 @@ import java.io.PrintStream;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
 
+/**
+ * Common interface for all actions
+ * 
+ * @author Sam Zhou
+ *
+ */
 public interface IAction {
 	
 	public static final String assignmentId = "assignmentId";

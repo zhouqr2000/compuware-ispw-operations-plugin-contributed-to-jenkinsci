@@ -59,6 +59,8 @@ import hudson.util.ListBoxModel.Option;
 import jenkins.model.Jenkins;
 
 /**
+ * ISPW rest API free style builder
+ * 
  * @author Janario Oliveira
  * @author Sam Zhou
  */

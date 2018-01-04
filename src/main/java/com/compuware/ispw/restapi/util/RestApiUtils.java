@@ -71,6 +71,12 @@ import hudson.util.ListBoxModel;
 import hudson.util.ListBoxModel.Option;
 import jenkins.model.Jenkins;
 
+/**
+ * Utilities for ISPW operations plug-in
+ * 
+ * @author Sam Zhou
+ *
+ */
 public class RestApiUtils {
 
 	private static Logger logger = Logger.getLogger(RestApiUtils.class);

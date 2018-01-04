@@ -7,6 +7,12 @@ import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
+/**
+ * Action to regress an assignment
+ * 
+ * @author Sam Zhou
+ *
+ */
 public class RegressAssignmentAction extends SetInfoPostAction {
 
 	private static final String[] defaultProps =

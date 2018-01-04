@@ -1,6 +1,11 @@
 package com.compuware.ispw.restapi.action;
 
-
+/**
+ * All supported ISPW actions
+ * 
+ * @author Sam Zhou
+ *
+ */
 public class IspwCommand {
 	public static final String CreateAssignment = "CreateAssignment"; // POST
 	public static final String GetAssignmentInfo = "GetAssignmentInfo"; // GET

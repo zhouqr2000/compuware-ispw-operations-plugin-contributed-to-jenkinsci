@@ -35,3 +35,4 @@ release.properties
 !.idea/codeStyles/codeStyleConfig.xml
 !.idea/codeStyles/Project.xml
 !.idea/encodings.xml
+/.settings/

@@ -25,12 +25,26 @@
 
 	<groupId>com.compuware.jenkins</groupId>
 	<artifactId>compuware-ispw-operations</artifactId>
-	<version>1.0.99-SNAPSHOT</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>hpi</packaging>
 	<name>Compuware ISPW Operations Plugin</name>
-	<description>This plugin sends an ISPW Rest API action to an CES end point with some parameters.
-		See the release notes for changes and compatibility https://github.com/jenkinsci/http-request-plugin/releases</description>
-	<url>http://wiki.jenkins-ci.org/display/JENKINS/CompuwareISPWRestAPIRequestPlugin</url>
+	<url>https://wiki.jenkins.io/display/JENKINS/Compuware+ISPW+Operations+Plugin</url>
+	<description>The Compuware ISPW Operations plugin allows Jenkins users to execute ISPW operations, such as Generate, Promote, Deploy or Regress on the mainframe. See the release notes for changes and compatibility https://github.com/jenkinsci/compuware-ispw-operations-plugin.</description>
+
+	<contributors>
+		<contributor>
+			<name>Janario Oliveira</name>
+			<email>janario.oliveira@gmail.com</email>
+		</contributor>
+		<contributor>
+			<name>Martin d'Anjou</name>
+			<email>martin.danjou14@gmail.com</email>
+		</contributor>
+		<contributor>
+			<name>Sam Zhou</name>
+			<email>sam.zhou@compuware.com</email>
+		</contributor>
+	</contributors>
 
 	<licenses>
 		<license>
@@ -189,23 +203,9 @@
 		<dependency>
 			<groupId>com.compuware.jenkins</groupId>
 			<artifactId>compuware-common-configuration</artifactId>
-			<version>1.0.3-SNAPSHOT</version>
+			<version>1.0.3</version>
 	    </dependency>
 
 	</dependencies>
 
-	<contributors>
-		<contributor>
-			<name>Janario Oliveira</name>
-			<email>janario.oliveira@gmail.com</email>
-		</contributor>
-		<contributor>
-			<name>Martin d'Anjou</name>
-			<email>martin.danjou14@gmail.com</email>
-		</contributor>
-		<contributor>
-			<name>Sam Zhou</name>
-			<email>sam.zhou@compuware.com</email>
-		</contributor>
-	</contributors>
 </project>

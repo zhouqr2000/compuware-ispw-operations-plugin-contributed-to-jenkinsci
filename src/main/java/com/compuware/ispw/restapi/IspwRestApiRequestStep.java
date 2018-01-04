@@ -40,7 +40,10 @@ import hudson.util.ListBoxModel;
 import jenkins.model.Jenkins;
 
 /**
+ * ISPW rest API pipeline build step
+ * 
  * @author Martin d'Anjou
+ * @author Sam Zhou
  */
 public final class IspwRestApiRequestStep extends AbstractStepImpl {
 

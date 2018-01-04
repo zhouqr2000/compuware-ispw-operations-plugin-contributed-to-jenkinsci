@@ -3,6 +3,12 @@ package com.compuware.ispw.restapi;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+/**
+ * A Java bean that holds any possible context path related parameters
+ * 
+ * @author Sam Zhou
+ *
+ */
 public class IspwContextPathBean {
 	private String srid;
 	private String assignmentId;

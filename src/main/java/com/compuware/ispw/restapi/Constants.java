@@ -1,5 +1,11 @@
 package com.compuware.ispw.restapi;
 
+/**
+ * Constants
+ * 
+ * @author Sam Zhou
+ *
+ */
 public class Constants {
 	public static final String LINE_SEPARATOR = System.getProperty("line.separator");
 	

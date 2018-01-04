@@ -9,6 +9,11 @@ import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.JsonProcessor;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
+/**
+ * A generic rest POST ISPW action
+ * @author Sam Zhou
+ *
+ */
 public abstract class AbstractPostAction implements IAction {
 
 	private PrintStream logger;

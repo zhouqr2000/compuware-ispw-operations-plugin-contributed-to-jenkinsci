@@ -67,6 +67,7 @@ import jenkins.security.MasterToSlaveCallable;
 
 /**
  * @author Janario Oliveira
+ * @author Sam Zhou
  */
 public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentSupplier, RuntimeException> {
 

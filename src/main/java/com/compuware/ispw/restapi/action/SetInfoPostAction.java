@@ -15,6 +15,12 @@ import com.compuware.ispw.restapi.JsonProcessor;
 import com.compuware.ispw.restapi.WebhookToken;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
+/**
+ * A generic set post action
+ * 
+ * @author Sam Zhou
+ *
+ */
 public abstract class SetInfoPostAction implements IAction {
 
 	private PrintStream logger;

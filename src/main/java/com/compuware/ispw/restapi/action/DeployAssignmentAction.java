@@ -7,6 +7,12 @@ import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
+/**
+ * Deploy assignment action
+ * 
+ * @author Sam Zhou
+ *
+ */
 public class DeployAssignmentAction extends SetInfoPostAction {
 
 	private static final String[] defaultProps =

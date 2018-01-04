@@ -4,6 +4,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+/**
+ * ISPW request bean to pass object/JSON back and forth
+ * 
+ * @author Sam Zhou
+ *
+ */
 public class IspwRequestBean {
 	
 	private IspwContextPathBean ispwContextPathBean = null;

@@ -9,6 +9,12 @@ import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
+/**
+ * A generic rest GET ISPW action
+ * 
+ * @author Sam Zhou
+ *
+ */
 public abstract class AbstractGetAction implements IAction {
 
 	private PrintStream logger;
