@@ -1,23 +1,23 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form" xmlns:c="/lib/credentials" xmlns:cc="/lib/compuware">
 
-	<f:entry title="Host connection" field="connectionId" help="/plugin/compuware-ispw-restapi-request-plugin/help-connectionId.html">
+	<f:entry title="Host connection" field="connectionId" help="/plugin/compuware-ispw-operations/help-connectionId.html">
     	<cc:hostSelect default="${descriptor.connectionId}"/>
 	</f:entry>
 
-	<f:entry title="CES secret token" field="credentialsId" help="/plugin/compuware-ispw-restapi-request-plugin/help-credentialsId.html">
+	<f:entry title="CES secret token" field="credentialsId" help="/plugin/compuware-ispw-operations/help-credentialsId.html">
 		<c:select/>
 	</f:entry>
     
-    <f:entry field="ispwAction" title="Action" help="/plugin/compuware-ispw-restapi-request-plugin/help-ispwAction.html">
+    <f:entry field="ispwAction" title="Action" help="/plugin/compuware-ispw-operations/help-ispwAction.html">
         <f:select default="${descriptor.ispwAction}"/>
     </f:entry>
 
-    <f:entry field="ispwRequestBody" title="Request" help="/plugin/compuware-ispw-restapi-request-plugin/help-ispwRequestBody.html">
+    <f:entry field="ispwRequestBody" title="Request" help="/plugin/compuware-ispw-operations/help-ispwRequestBody.html">
         <f:textarea default="${descriptor.ispwRequestBody}"/>
     </f:entry>
 
-    <f:entry field="consoleLogResponseBody" title="Response body in console?" help="/plugin/compuware-ispw-restapi-request-plugin/help-consoleLogResponseBody.html">
+    <f:entry field="consoleLogResponseBody" title="Response body in console?" help="/plugin/compuware-ispw-operations/help-consoleLogResponseBody.html">
         <f:booleanRadio/>
     </f:entry>
 
