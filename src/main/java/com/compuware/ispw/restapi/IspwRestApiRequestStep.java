@@ -415,9 +415,8 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 					int i = 0;
 					for (; i < 60; i++) {
 						Thread.sleep(Constants.POLLING_INTERVAL);
-						HttpRequestExecution poller =
-								HttpRequestExecution.createPoller(setId, webhookToken, step,
-										listener, this);
+						HttpRequestExecution poller = HttpRequestExecution
+								.createPoller(setId, step, listener, this);
 						ResponseContentSupplier pollerSupplier = launcher.getChannel().call(poller);
 						String pollingJson = pollerSupplier.getContent();
 

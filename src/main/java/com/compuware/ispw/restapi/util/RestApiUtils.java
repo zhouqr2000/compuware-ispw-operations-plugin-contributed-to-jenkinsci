@@ -3,6 +3,27 @@ package com.compuware.ispw.restapi.util;
 import static com.cloudbees.plugins.credentials.CredentialsMatchers.filter;
 import static com.cloudbees.plugins.credentials.CredentialsMatchers.withId;
 import static com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials;
+import static com.compuware.ispw.restapi.action.IspwCommand.CreateAssignment;
+import static com.compuware.ispw.restapi.action.IspwCommand.CreateRelease;
+import static com.compuware.ispw.restapi.action.IspwCommand.DeployAssignment;
+import static com.compuware.ispw.restapi.action.IspwCommand.DeployRelease;
+import static com.compuware.ispw.restapi.action.IspwCommand.GenerateTasksInAssignment;
+import static com.compuware.ispw.restapi.action.IspwCommand.GenerateTasksInRelease;
+import static com.compuware.ispw.restapi.action.IspwCommand.GetAssignmentInfo;
+import static com.compuware.ispw.restapi.action.IspwCommand.GetAssignmentTaskList;
+import static com.compuware.ispw.restapi.action.IspwCommand.GetReleaseInfo;
+import static com.compuware.ispw.restapi.action.IspwCommand.GetReleaseTaskGenerateListing;
+import static com.compuware.ispw.restapi.action.IspwCommand.GetReleaseTaskInfo;
+import static com.compuware.ispw.restapi.action.IspwCommand.GetReleaseTaskList;
+import static com.compuware.ispw.restapi.action.IspwCommand.GetSetInfoAction;
+import static com.compuware.ispw.restapi.action.IspwCommand.PromoteAssignment;
+import static com.compuware.ispw.restapi.action.IspwCommand.PromoteRelease;
+import static com.compuware.ispw.restapi.action.IspwCommand.RegressAssignment;
+import static com.compuware.ispw.restapi.action.IspwCommand.RegressRelease;
+import hudson.model.Item;
+import hudson.security.ACL;
+import hudson.util.ListBoxModel;
+import hudson.util.ListBoxModel.Option;
 
 import java.io.PrintStream;
 import java.lang.reflect.Field;
@@ -13,6 +34,8 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
+
+import jenkins.model.Jenkins;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -64,12 +87,6 @@ import com.compuware.ispw.restapi.action.RegressAssignmentAction;
 import com.compuware.ispw.restapi.action.RegressReleaseAction;
 import com.compuware.jenkins.common.configuration.CpwrGlobalConfiguration;
 import com.compuware.jenkins.common.configuration.HostConnection;
-
-import hudson.model.Item;
-import hudson.security.ACL;
-import hudson.util.ListBoxModel;
-import hudson.util.ListBoxModel.Option;
-import jenkins.model.Jenkins;
 
 /**
  * Utilities for ISPW operations plug-in
@@ -485,21 +502,30 @@ public class RestApiUtils {
 		return model;
 	}
 	
-	public static ListBoxModel buildIspwActionItems(@AncestorInPath Jenkins context, @QueryParameter String ispwAction,
+	public static ListBoxModel buildIspwActionItems(
+			@AncestorInPath Jenkins context, @QueryParameter String ispwAction,
 			@AncestorInPath Item project) {
-		
+
+		String[] publishedActions = new String[] { CreateAssignment,
+				GetAssignmentInfo, GetAssignmentTaskList,
+				GenerateTasksInAssignment, PromoteAssignment, DeployAssignment,
+				RegressAssignment, GetReleaseInfo, GetReleaseTaskList,
+				CreateRelease, GenerateTasksInRelease,
+				GetReleaseTaskGenerateListing, GetReleaseTaskInfo,
+				PromoteRelease, DeployRelease, RegressRelease, GetSetInfoAction };
+
 		ListBoxModel model = new ListBoxModel();
-		
+
 		model.add(new Option(StringUtils.EMPTY, StringUtils.EMPTY, false));
 
-		Arrays.sort(IspwCommand.publishedActions);
-		
-		for (String action : IspwCommand.publishedActions) {
+		Arrays.sort(publishedActions);
+
+		for (String action : publishedActions) {
 			boolean isSelected = false;
 
 			if (ispwAction != null) {
 				isSelected = action.matches(ispwAction);
-			}			
+			}
 
 			model.add(new Option(action, action, isSelected));
 		}

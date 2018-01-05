@@ -405,7 +405,7 @@ public class IspwRestApiRequest extends Builder {
 				for (; i < 60; i++) {
 					Thread.sleep(Constants.POLLING_INTERVAL);
 					HttpRequestExecution poller =
-							HttpRequestExecution.createPoller(setId, webhookToken, this, envVars,
+							HttpRequestExecution.createPoller(setId, this, envVars,
 									build, listener);
 					ResponseContentSupplier pollerSupplier = launcher.getChannel().call(poller);
 					String pollingJson = pollerSupplier.getContent();
