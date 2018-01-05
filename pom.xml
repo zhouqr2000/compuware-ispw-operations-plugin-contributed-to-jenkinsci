@@ -31,7 +31,21 @@
 	<url>https://wiki.jenkins.io/display/JENKINS/Compuware+ISPW+Operations+Plugin</url>
 	<description>The Compuware ISPW Operations plugin allows Jenkins users to execute ISPW operations, such as Generate, Promote, Deploy or Regress on the mainframe. See the release notes for changes and compatibility https://github.com/jenkinsci/compuware-ispw-operations-plugin.</description>
 
+	<developers>
+		<developer>
+			<id>zhouqr2000</id>
+			<name>Sam Zhou</name>
+			<email>sam.zhou@compuware.com</email>
+		</developer>
+		<developer>
+			<id>cpwr_jenkins</id>
+			<name>Steve Kansa</name>
+			<email>steve.kansa@compuware.com</email>
+		</developer>
+	</developers>
+
 	<contributors>
+		<!-- http request plugin -->
 		<contributor>
 			<name>Janario Oliveira</name>
 			<email>janario.oliveira@gmail.com</email>
@@ -40,9 +54,10 @@
 			<name>Martin d'Anjou</name>
 			<email>martin.danjou14@gmail.com</email>
 		</contributor>
+		<!-- webhook step plugin -->
 		<contributor>
-			<name>Sam Zhou</name>
-			<email>sam.zhou@compuware.com</email>
+			<name>Chris Pitman</name>
+			<email>cpitman1@gmail.com</email>
 		</contributor>
 	</contributors>
 
@@ -61,6 +76,13 @@
 		<maven.test.skip>false</maven.test.skip>
 		<enforcer.skip>true</enforcer.skip>
 	</properties>
+
+	<scm>
+		<connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
+		<developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
+		<url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
+		<tag>HEAD</tag>
+	</scm>
 
 	<repositories>
 		<repository>
