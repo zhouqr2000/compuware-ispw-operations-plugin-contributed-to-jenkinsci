@@ -33,14 +33,14 @@
 
 	<developers>
 		<developer>
-			<id>zhouqr2000</id>
-			<name>Sam Zhou</name>
-			<email>sam.zhou@compuware.com</email>
-		</developer>
-		<developer>
 			<id>cpwr_jenkins</id>
 			<name>Steve Kansa</name>
 			<email>steve.kansa@compuware.com</email>
+		</developer>
+		<developer>
+			<id>zhouqr2000</id>
+			<name>Sam Zhou</name>
+			<email>sam.zhou@compuware.com</email>
 		</developer>
 	</developers>
 
