@@ -87,11 +87,11 @@
     <distributionManagement>
         <repository>
             <id>maven.jenkins-ci.org</id>
-            <url>https://maven.jenkins-ci.org/releases/</url>
+            <url>http://maven.jenkins-ci.org/releases/</url>
         </repository>
         <snapshotRepository>
             <id>maven.jenkins-ci.org</id>
-            <url>https://maven.jenkins-ci.org/snapshots/</url>
+            <url>http://maven.jenkins-ci.org/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
