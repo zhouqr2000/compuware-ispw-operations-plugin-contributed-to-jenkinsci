@@ -266,7 +266,16 @@ public class RestApiUtils {
 			logger.println("...set "+taskResponse.getSetId()+" created to generate");
 			returnObject = taskResponse;
 		} else if (IspwCommand.GetAssignmentTaskList.equals(ispwAction)) {
-			TaskListResponse listResponse = jsonProcessor.parse(responseJson, TaskListResponse.class);
+			
+			String fixedResponseJson = responseJson;
+			
+			//Fix CES bug - CWE-124094 - Get assignment/release/set task list doesn't return a JSON array ("tasks":[]) if they contains just one task
+			if(responseJson.startsWith("{\"tasks\":{")) {
+				fixedResponseJson = responseJson.replace("{\"tasks\":{", "{\"tasks\":[{");
+				fixedResponseJson = fixedResponseJson.replace("}}", "}]}");
+			}
+			
+			TaskListResponse listResponse = jsonProcessor.parse(fixedResponseJson, TaskListResponse.class);
 			
 			logger.println("...taskId, module, userId, version, status, application/stream/level, release");
 			for(TaskInfo taskInfo: listResponse.getTasks()) {
