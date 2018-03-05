@@ -37,6 +37,11 @@ public abstract class AbstractPostAction implements IAction {
 		String[] lines = ispwRequestBody.split("\n");
 		for (String line : lines) {
 			line = StringUtils.trimToEmpty(line);
+			
+			if(line.startsWith("#")) {
+				continue;
+			}
+			
 			int indexOfEqualSign = line.indexOf("=");
 			if (indexOfEqualSign != -1) {
 				String name = StringUtils.trimToEmpty(line.substring(0, indexOfEqualSign));
