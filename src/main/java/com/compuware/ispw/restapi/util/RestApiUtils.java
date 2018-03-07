@@ -257,6 +257,19 @@ public class RestApiUtils {
 		}
 	}
 	
+	//Fix CES bug - CWE-124094 - Get assignment/release/set task list doesn't return a JSON array ("tasks":[]) if they contains just one task
+	public static String fixCesTaskListResponseJson(String responseJson) {
+		String fixedResponseJson = responseJson;
+		
+		if(responseJson.startsWith("{\"tasks\":{")) {
+			fixedResponseJson = responseJson.replace("{\"tasks\":{", "{\"tasks\":[{");
+			fixedResponseJson = fixedResponseJson.replace("}}", "}]}");
+		}
+		
+		return fixedResponseJson;
+	}
+	
+	
 	public static Object endLog(PrintStream logger, String ispwAction, IspwRequestBean ispwRequestBean, String responseJson, boolean block) {
 		Object returnObject = null;
 		JsonProcessor jsonProcessor = new JsonProcessor();
@@ -267,14 +280,7 @@ public class RestApiUtils {
 			returnObject = taskResponse;
 		} else if (IspwCommand.GetAssignmentTaskList.equals(ispwAction)) {
 			
-			String fixedResponseJson = responseJson;
-			
-			//Fix CES bug - CWE-124094 - Get assignment/release/set task list doesn't return a JSON array ("tasks":[]) if they contains just one task
-			if(responseJson.startsWith("{\"tasks\":{")) {
-				fixedResponseJson = responseJson.replace("{\"tasks\":{", "{\"tasks\":[{");
-				fixedResponseJson = fixedResponseJson.replace("}}", "}]}");
-			}
-			
+			String fixedResponseJson = fixCesTaskListResponseJson(responseJson);
 			TaskListResponse listResponse = jsonProcessor.parse(fixedResponseJson, TaskListResponse.class);
 			
 			logger.println("...taskId, module, userId, version, status, application/stream/level, release");
@@ -326,7 +332,10 @@ public class RestApiUtils {
 			logger.println("...user tag: " + releaseInfo.getUserTag());
 			returnObject = releaseInfo;
 		} else if (IspwCommand.GetReleaseTaskList.equals(ispwAction)) {
-			TaskListResponse listResponse = jsonProcessor.parse(responseJson, TaskListResponse.class);
+			
+			String fixedResponseJson = fixCesTaskListResponseJson(responseJson);
+			TaskListResponse listResponse = jsonProcessor.parse(fixedResponseJson, TaskListResponse.class);
+			
 			logger.println("...taskId, module, userId, version, status, application/stream/level, release");
 			for(TaskInfo taskInfo: listResponse.getTasks()) {
 				logger.println("..." + taskInfo.getTaskId() + ", " + taskInfo.getModuleName() + "."
