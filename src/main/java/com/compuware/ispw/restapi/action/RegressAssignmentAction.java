@@ -19,7 +19,7 @@ public class RegressAssignmentAction extends SetInfoPostAction {
 			new String[] { assignmentId, level, runtimeConfiguration };
 
 	private static final String contextPath =
-			"/ispw/{srid}/assignments/{assignmentId}/tasks/regress?level={level}";
+			"/ispw/{srid}/assignments/{assignmentId}/tasks/regress?level={level}&mname={mname}&mtype={mtype}";
 
 	public static final String getDefaultProps() {
 		return RestApiUtils.join(Constants.LINE_SEPARATOR, defaultProps, true);

@@ -20,9 +20,10 @@ public class Constants {
 	
 	public static final String SET_STATE_DISPATCHED = "Dispatched";
 	public static final String SET_STATE_EXECUTING = "Executing";
+	public static final String SET_STATE_COMPLETE = "Complete";
 	public static final String SET_STATE_CLOSED = "Closed";
 
 	public static final int POLLING_COUNT = 60;
-	public static final int POLLING_INTERVAL = 1500;
+	public static final int POLLING_INTERVAL = 2000;
 
 }

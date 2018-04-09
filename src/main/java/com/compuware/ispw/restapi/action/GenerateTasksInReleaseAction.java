@@ -19,7 +19,7 @@ public class GenerateTasksInReleaseAction extends SetInfoPostAction {
 			new String[] { releaseId, level, runtimeConfiguration };
 
 	private static final String contextPath =
-			"/ispw/{srid}/releases/{releaseId}/tasks/generate?level={level}";
+			"/ispw/{srid}/releases/{releaseId}/tasks/generate?level={level}&mname={mname}&mtype={mtype}";
 
 	public static String getDefaultProps() {
 		return RestApiUtils.join(Constants.LINE_SEPARATOR, defaultProps, true);
