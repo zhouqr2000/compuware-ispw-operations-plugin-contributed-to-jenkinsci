@@ -23,7 +23,7 @@ public class Constants {
 	public static final String SET_STATE_COMPLETE = "Complete";
 	public static final String SET_STATE_CLOSED = "Closed";
 
-	public static final int POLLING_COUNT = 60;
+	public static final int POLLING_COUNT = 120;
 	public static final int POLLING_INTERVAL = 2000;
 
 }
