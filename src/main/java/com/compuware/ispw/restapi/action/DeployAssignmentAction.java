@@ -19,7 +19,7 @@ public class DeployAssignmentAction extends SetInfoPostAction {
 			new String[] { assignmentId, level, runtimeConfiguration };
 
 	private static final String contextPath =
-			"/ispw/{srid}/assignments/{assignmentId}/tasks/deploy?level={level}";
+			"/ispw/{srid}/assignments/{assignmentId}/tasks/deploy?level={level}&mname={mname}&mtype={mtype}";
 
 	public static String getDefaultProps() {
 		return RestApiUtils.join(Constants.LINE_SEPARATOR, defaultProps, true);

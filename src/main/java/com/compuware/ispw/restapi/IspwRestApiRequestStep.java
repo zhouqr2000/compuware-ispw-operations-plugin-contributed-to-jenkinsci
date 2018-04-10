@@ -442,14 +442,14 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 									+ setState);
 							set.add(setState);
 
-							if (setState.equals(Constants.SET_STATE_CLOSED)) {
+							if (setState.equals(Constants.SET_STATE_CLOSED) || setState.equals(Constants.SET_STATE_COMPLETE)) {
 								logger.println("...action " + step.ispwAction + " completed");
 								break;
 							}
 						}
 					}
 
-					if (i == 60) {
+					if (i == Constants.POLLING_COUNT) {
 						logger.println("...warn - max timeout reached");
 					}
 				}

@@ -19,7 +19,7 @@ public class DeployReleaseAction extends SetInfoPostAction {
 			new String[] { releaseId, level };
 
 	private static final String contextPath =
-			"/ispw/{srid}/releases/{releaseId}/tasks/deploy?level={level}";
+			"/ispw/{srid}/releases/{releaseId}/tasks/deploy?level={level}&mname={mname}&mtype={mtype}";
 
 	public static String getDefaultProps() {
 		return RestApiUtils.join(Constants.LINE_SEPARATOR, defaultProps, true);

@@ -16,6 +16,8 @@ public class IspwContextPathBean {
 	private String setId;
 	private String level;
 	private String taskId;
+	private String mname;
+	private String mtype;
 	
 	@Override
 	public String toString() {
@@ -59,6 +61,22 @@ public class IspwContextPathBean {
 
 	public void setTaskId(String taskId) {
 		this.taskId = taskId;
+	}
+
+	public String getMname() {
+		return mname;
+	}
+
+	public void setMname(String mname) {
+		this.mname = mname;
+	}
+
+	public String getMtype() {
+		return mtype;
+	}
+
+	public void setMtype(String mtype) {
+		this.mtype = mtype;
 	}
 	
 }

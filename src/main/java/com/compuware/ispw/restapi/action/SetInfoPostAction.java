@@ -72,6 +72,12 @@ public abstract class SetInfoPostAction implements IAction {
 					} else if (name.equals(level)) {
 						path = path.replace("{" + level + "}", value);
 						ispwContextPathBean.setLevel(value);
+					} else if (name.equals(mname)) {
+						path = path.replace("{" + mname + "}", value);
+						ispwContextPathBean.setMname(value);
+					} else if (name.equals(mtype)) {
+						path = path.replace("{" + mtype + "}", value);
+						ispwContextPathBean.setMtype(value);
 					} else if (name.equals(httpHeaders)) {
 						ArrayList<HttpHeader> httpHeaders = RestApiUtils.toHttpHeaders(value);
 						if (!httpHeaders.isEmpty()) {
@@ -117,7 +123,12 @@ public abstract class SetInfoPostAction implements IAction {
 			event.setUrl(webhookToken.getURL());
 			setInfo.setEventCallbacks(events);
 		}
-
+		
+		//if level/mname/mtype not set, remove them from query string
+		path = path.replace("level={level}", StringUtils.EMPTY);
+		path = path.replace("&mname={mname}", StringUtils.EMPTY);
+		path = path.replace("&mtype={mtype}", StringUtils.EMPTY);
+		
 		bean.setContextPath(path);
 
 		JsonProcessor jsonGenerator = new JsonProcessor();
