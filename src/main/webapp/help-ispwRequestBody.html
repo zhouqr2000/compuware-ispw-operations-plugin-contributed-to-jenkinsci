@@ -41,7 +41,7 @@ actions (Ignore 'events' properties if no webhook callback):</strong>
 Required:
 <table border="1">
 <tbody>
-<tr>
+<tr><td>runtimeConfiguration</td><td>see ISPW administrator for valid values</td></tr><tr>
 <td>assignmentId (GenerateTasksInAssignment) or releaseId
 (GenerateTasksInRelease)</td>
 <td>The container ID for which you intend to generate tasks.</td>
@@ -66,10 +66,7 @@ generated</td>
 <td>component with this type in the container will be
 generated</td>
 </tr>
-<tr>
-<td>runtimeConfiguration</td>
-<td>see ISPW administrator for valid values</td>
-</tr>
+
 <tr>
 <td>autoDeploy</td>
 <td>promotes can be set up to automatically Deploy as well
@@ -86,10 +83,10 @@ Example:
 </tr>
 <tr>
 <td>
-<pre>assignmentId=PLAY000313<br>level=DEV2<br>#optional<br>mname=TPROG08<br>mtype=COB<br>runtimeConfiguration=TPZP<br>events.name=Completed<br>events.body=Generated<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
+<pre>runtimeConfiguration=TPZP<br>assignmentId=PLAY000313<br>level=DEV2<br>#optional<br>mname=TPROG08<br>mtype=COB<br>#optional if use webhook callback in pipeline<br>events.name=Completed<br>events.body=Generated<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
 </td>
 <td>
-<pre>releaseId=JKGENRELID<br>level=DEV2<br>#optional<br>mname=TPROG08<br>mtype=COB<br>runtimeConfiguration=TPZP<br>events.name=Completed<br>events.body=Generated<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
+<pre>runtimeConfiguration=TPZP<br>releaseId=JKGENRELID<br>level=DEV2<br>#optional<br>mname=TPROG08<br>mtype=COB<br>#optional if use webhook callback in pipeline<br>events.name=Completed<br>events.body=Generated<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
 </td>
 </tr>
 </tbody>
@@ -102,7 +99,7 @@ Example:
 Required:
 <table border="1">
 <tbody>
-<tr>
+<tr><td>runtimeConfiguration</td><td>see ISPW administrator for valid values</td></tr><tr>
 <td>assignmentId (PromoteAssignment) or releaseId
 (PromoteRelease)</td>
 <td>The container ID for which you intend to promote tasks.</td>
@@ -127,8 +124,8 @@ promoted</td>
 promoted</td>
 </tr>
 <tr>
-<td>runtimeConfiguration</td>
-<td>see ISPW administrator for valid values</td>
+<td>override<br></td>
+<td>override the higher version if &nbsp;presented in the next level. Default to no override.<br></td>
 </tr>
 <tr>
 <td>changeType</td>
@@ -156,10 +153,10 @@ Example:
 </tr>
 <tr>
 <td>
-<pre>assignmentId=PLAY000313<br>level=DEV2<br>#optional<br>mname=TPROG08<br>mtype=COB<br>runtimeConfiguration=TPZP<br>events.name=Complete<br>events.body=Promoted<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
+<pre>runtimeConfiguration=TPZP<br>assignmentId=PLAY000313<br>level=DEV2<br>#optional<br>mname=TPROG08<br>mtype=COB<br>#optional if use webhook callback in pipeline<br>events.name=Complete<br>events.body=Promoted<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
 </td>
 <td>
-<pre>releaseId=JKGENRELID<br>level=DEV2<br>#optional<br>mname=TPROG08<br>mtype=COB<br>runtimeConfiguration=TPZP<br>events.name=Complete<br>events.body=Promoted<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
+<pre>runtimeConfiguration=TPZP<br>releaseId=JKGENRELID<br>level=DEV2<br>#optional<br>mname=TPROG08<br>mtype=COB<br>#optional if use webhook callback in pipeline<br>events.name=Complete<br>events.body=Promoted<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
 </td>
 </tr>
 </tbody>
@@ -171,7 +168,7 @@ properties if no webhook callback):</strong>
 Required:
 <table border="1">
 <tbody>
-<tr>
+<tr><td>runtimeConfiguration</td><td>see ISPW administrator for valid values</td></tr><tr>
 <td>assignmentId (DeployAsignment) or releaseId
 (DeployRelease)</td>
 <td>The container for which you intend to deploy tasks.</td>
@@ -196,10 +193,7 @@ deployed</td>
 <td>component with this type in the container will be
 deployed</td>
 </tr>
-<tr>
-<td>runtimeConfiguration</td>
-<td>see ISPW administrator for valid values</td>
-</tr>
+
 <tr>
 <td>changeType</td>
 <td>S for standard, I for incidental, or E for emergency.
@@ -229,10 +223,10 @@ Example:
 </tr>
 <tr>
 <td>
-<pre>assignmentId=PLAY000313<br>level=QA<br>#optional<br>mname=TPROG08<br>mtype=COB<br>runtimeConfiguration=TPZP<br>events.name=Completed<br>events.body=Deployed<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
+<pre>runtimeConfiguration=TPZP<br>assignmentId=PLAY000313<br>level=QA<br>#optional<br>mname=TPROG08<br>mtype=COB<br>#optional if use webhook callback in pipeline<br>events.name=Completed<br>events.body=Deployed<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
 </td>
 <td>
-<pre>releaseId=JKGENRELID<br>level=QA<br>#optional<br>mname=TPROG08<br>mtype=COB<br>runtimeConfiguration=TPZP<br>events.name=Completed<br>events.body=Deployed<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
+<pre>runtimeConfiguration=TPZP<br>releaseId=JKGENRELID<br>level=QA<br>#optional<br>mname=TPROG08<br>mtype=COB<br>#optional if use webhook callback in pipeline<br>events.name=Completed<br>events.body=Deployed<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
 </td>
 </tr>
 </tbody>
@@ -245,7 +239,7 @@ Example:
 Required:
 <table border="1">
 <tbody>
-<tr>
+<tr><td>runtimeConfiguration</td><td>see ISPW administrator for valid values</td></tr><tr>
 <td>assignmentId (RegressAsignment) or releaseId
 (RegressRelease)</td>
 <td>The container for which you intend to regress the tasks</td>
@@ -270,10 +264,7 @@ regressed</td>
 <td>component with this type in the container will be
 regressed</td>
 </tr>
-<tr>
-<td>runtimeConfiguration</td>
-<td>see ISPW administrator for valid values</td>
-</tr>
+
 <tr>
 <td>changeType</td>
 <td>S for standard, I for incidental, or E for emergency.
@@ -295,10 +286,10 @@ Example:
 </tr>
 <tr>
 <td>
-<pre>assignmentId=PLAY000313<br>level=STG2<br>#optional<br>mname=TPROG08<br>mtype=COB<br>runtimeConfiguration=TPZP<br>events.name=Completed<br>events.body=Regressed<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
+<pre>runtimeConfiguration=TPZP<br>assignmentId=PLAY000313<br>level=STG2<br>#optional<br>mname=TPROG08<br>mtype=COB<br>#optional, if use webhook callback in pipeline<br>events.name=Completed<br>events.body=Regressed<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
 </td>
 <td>
-<pre>releaseId=JKGENRELID<br>level=STG2<br>#optional<br>mname=TPROG08<br>mtype=COB<br>runtimeConfiguration=TPZP<br>events.name=Completed<br>events.body=Regressed<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
+<pre>runtimeConfiguration=TPZP<br>releaseId=JKGENRELID<br>level=STG2<br>#optional<br>mname=TPROG08<br>mtype=COB<br>#optional, if use webhook callback in pipeline<br>events.name=Completed<br>events.body=Regressed<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
 </td>
 </tr>
 </tbody>

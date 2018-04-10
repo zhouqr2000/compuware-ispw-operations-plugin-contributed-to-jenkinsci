@@ -50,6 +50,9 @@ public class SetInfo
 	@XmlElement(name = "deployImplementationTime")
 	@Default(defaultValue="")
 	private String deployImplementationTime;
+	@XmlElement(name = "override")
+	@Default(defaultValue="false")
+	private String override;
 	
 	public SetInfo()
 	{
@@ -183,5 +186,15 @@ public class SetInfo
 	public void setDeployImplementationTime(String deployImplementationTime)
 	{
 		this.deployImplementationTime = deployImplementationTime;
+	}
+	
+	public String getOverride()
+	{
+		return override;
+	}
+
+	public void setOverride(String override)
+	{
+		this.override = override;
 	}
 }
