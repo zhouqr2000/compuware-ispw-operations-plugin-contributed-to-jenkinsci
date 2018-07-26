@@ -1,0 +1,12 @@
+Version 1.0.3
+* CWE-124457 - Jenkins Operations Plugin - Bad error message when selected host connection doesn't have a CES URL
+* CWE-126841 - ISPW Operations Jenkins Plugin has problems with GetReleaseTaskList
+* CWE-124623 - Jenkins Operations Plugin - Pre-populate help text in Request field
+
+Version 1.0.2
+* The plugin now integrates with the Compuware Common Configuration plugin which allows the Host Connection configurations to be defined centrally for other Compuware Jenkins plugins instead of needing to be specified in each Jenkins project's configuration.  Host Connection configuration is now defined in the Jenkins/Manage Jenkins/Configure System screen. 
+* Jenkins console logs produced by the plugin have been streamlined to improve readability.
+* Support for the Jenkins Pipeline Syntax.
+* Support Credentials secret text to store CES token
+* Support most ISPW build operations.
+* Provide Docker script to build Docker image for CES server and Docker image for Jenkins with Compuware plugins pre-installed.

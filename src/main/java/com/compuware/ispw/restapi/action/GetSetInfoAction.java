@@ -7,6 +7,12 @@ import java.util.List;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
 
+/**
+ * Action to get a set status
+ * 
+ * @author Sam Zhou
+ *
+ */
 public class GetSetInfoAction extends AbstractGetAction {
 
 	private static final String[] defaultProps = new String[] { setId };

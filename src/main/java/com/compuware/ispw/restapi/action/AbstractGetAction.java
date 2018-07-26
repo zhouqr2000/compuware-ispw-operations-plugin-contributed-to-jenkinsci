@@ -9,6 +9,12 @@ import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
+/**
+ * A generic rest GET ISPW action
+ * 
+ * @author Sam Zhou
+ *
+ */
 public abstract class AbstractGetAction implements IAction {
 
 	private PrintStream logger;
@@ -30,6 +36,11 @@ public abstract class AbstractGetAction implements IAction {
 		String[] lines = ispwRequestBody.split("\n");
 		for (String line : lines) {
 			line = StringUtils.trimToEmpty(line);
+			
+			if(line.startsWith("#")) {
+				continue;
+			}
+			
 			int indexOfEqualSign = line.indexOf("=");
 			if (indexOfEqualSign != -1) {
 				String name = StringUtils.trimToEmpty(line.substring(0, indexOfEqualSign));

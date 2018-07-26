@@ -6,6 +6,11 @@ import com.compuware.ispw.model.rest.AssignmentInfo;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
 
+/**
+ * Create assignment action
+ * @author Sam Zhou
+ *
+ */
 public class CreateAssignmentAction extends AbstractPostAction {
 
 	private static final String[] defaultProps = new String[] { stream, application, defaultPath,

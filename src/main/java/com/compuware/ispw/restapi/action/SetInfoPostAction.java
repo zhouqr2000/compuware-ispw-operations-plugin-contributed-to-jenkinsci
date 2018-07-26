@@ -15,6 +15,12 @@ import com.compuware.ispw.restapi.JsonProcessor;
 import com.compuware.ispw.restapi.WebhookToken;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
+/**
+ * A generic set post action
+ * 
+ * @author Sam Zhou
+ *
+ */
 public abstract class SetInfoPostAction implements IAction {
 
 	private PrintStream logger;
@@ -44,6 +50,11 @@ public abstract class SetInfoPostAction implements IAction {
 		String[] lines = ispwRequestBody.split("\n");
 		for (String line : lines) {
 			line = StringUtils.trimToEmpty(line);
+			
+			if(line.startsWith("#")) {
+				continue;
+			}
+			
 			int indexOfEqualSign = line.indexOf("=");
 			if (indexOfEqualSign != -1) {
 				String name = StringUtils.trimToEmpty(line.substring(0, indexOfEqualSign));
@@ -61,6 +72,12 @@ public abstract class SetInfoPostAction implements IAction {
 					} else if (name.equals(level)) {
 						path = path.replace("{" + level + "}", value);
 						ispwContextPathBean.setLevel(value);
+					} else if (name.equals(mname)) {
+						path = path.replace("{" + mname + "}", value);
+						ispwContextPathBean.setMname(value);
+					} else if (name.equals(mtype)) {
+						path = path.replace("{" + mtype + "}", value);
+						ispwContextPathBean.setMtype(value);
 					} else if (name.equals(httpHeaders)) {
 						ArrayList<HttpHeader> httpHeaders = RestApiUtils.toHttpHeaders(value);
 						if (!httpHeaders.isEmpty()) {
@@ -106,7 +123,12 @@ public abstract class SetInfoPostAction implements IAction {
 			event.setUrl(webhookToken.getURL());
 			setInfo.setEventCallbacks(events);
 		}
-
+		
+		//if level/mname/mtype not set, remove them from query string
+		path = path.replace("level={level}", StringUtils.EMPTY);
+		path = path.replace("&mname={mname}", StringUtils.EMPTY);
+		path = path.replace("&mtype={mtype}", StringUtils.EMPTY);
+		
 		bean.setContextPath(path);
 
 		JsonProcessor jsonGenerator = new JsonProcessor();

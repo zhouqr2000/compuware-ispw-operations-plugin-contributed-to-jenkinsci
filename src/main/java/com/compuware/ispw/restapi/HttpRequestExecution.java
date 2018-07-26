@@ -67,6 +67,7 @@ import jenkins.security.MasterToSlaveCallable;
 
 /**
  * @author Janario Oliveira
+ * @author Sam Zhou
  */
 public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentSupplier, RuntimeException> {
 
@@ -91,6 +92,14 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 	private final OutputStream remoteLogger;
 	private transient PrintStream localLogger;
 
+	
+	// create poller for rest api request
+	static HttpRequestExecution createPoller(String setId,
+			IspwRestApiRequest http, EnvVars envVars,
+			AbstractBuild<?, ?> build, TaskListener taskListener) {
+		return createPoller(setId, null, http, envVars, build, taskListener);
+	}
+	
 	//create poller for rest api request
 	static HttpRequestExecution createPoller(String setId, WebhookToken webhookToken, IspwRestApiRequest http, EnvVars envVars,
 			AbstractBuild<?, ?> build, TaskListener taskListener) {
@@ -133,6 +142,13 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 
 				project, taskListener.getLogger());
 
+	}
+	
+	//create poller for rest api request step
+	static HttpRequestExecution createPoller(String setId,
+			IspwRestApiRequestStep step, TaskListener taskListener,
+			Execution execution) {
+		return createPoller(setId, null, step, taskListener, execution);
 	}
 	
 	//create poller for rest api request step
@@ -426,7 +442,11 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 				}
 			}
 		} catch (AbortException x) {
-			RestApiUtils.logMessageIfAny(logger(), response, true);
+			if (RestApiUtils.isIspwDebugMode()) {
+				RestApiUtils.logMessageIfAny(logger(), response, true);
+			} else {
+				logger().println(x.getMessage());
+			}
 
 			throw x;
 		}

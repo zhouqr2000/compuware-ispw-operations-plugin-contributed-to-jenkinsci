@@ -2,6 +2,12 @@ package com.compuware.ispw.restapi;
 
 import java.util.HashMap;
 
+/**
+ * Web hook token manager
+ * 
+ * @author Sam Zhou
+ *
+ */
 public class WebhookTokenManager {
 	
 	private static WebhookTokenManager instance;

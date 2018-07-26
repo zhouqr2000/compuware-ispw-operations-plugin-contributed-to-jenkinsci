@@ -7,13 +7,19 @@ import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
+/**
+ * Action to promote an assignment
+ * 
+ * @author Sam Zhou
+ *
+ */
 public class PromoteReleaseAction extends SetInfoPostAction {
 
 	private static final String[] defaultProps =
 			new String[] { releaseId, level };
 
 	private static final String contextPath =
-			"/ispw/{srid}/releases/{releaseId}/tasks/promote?level={level}";
+			"/ispw/{srid}/releases/{releaseId}/tasks/promote?level={level}&mname={mname}&mtype={mtype}";
 
 	public static final String getDefaultProps() {
 		return RestApiUtils.join(Constants.LINE_SEPARATOR, defaultProps, true);

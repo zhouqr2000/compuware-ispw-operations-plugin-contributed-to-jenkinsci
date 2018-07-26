@@ -7,13 +7,19 @@ import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
+/**
+ * Action to generate tasks in specified assignment
+ * 
+ * @author Sam Zhou
+ *
+ */
 public class GenerateTasksInAssignmentAction extends SetInfoPostAction {
 
 	private static final String[] defaultProps =
 			new String[] { assignmentId, level };
 
 	private static final String contextPath =
-			"/ispw/{srid}/assignments/{assignmentId}/tasks/generate?level={level}";
+			"/ispw/{srid}/assignments/{assignmentId}/tasks/generate?level={level}&mname={mname}&mtype={mtype}";
 
 	public static String getDefaultProps() {
 		return RestApiUtils.join(Constants.LINE_SEPARATOR, defaultProps, true);

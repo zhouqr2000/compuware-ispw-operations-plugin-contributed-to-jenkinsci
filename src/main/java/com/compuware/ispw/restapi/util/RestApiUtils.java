@@ -3,6 +3,27 @@ package com.compuware.ispw.restapi.util;
 import static com.cloudbees.plugins.credentials.CredentialsMatchers.filter;
 import static com.cloudbees.plugins.credentials.CredentialsMatchers.withId;
 import static com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials;
+import static com.compuware.ispw.restapi.action.IspwCommand.CreateAssignment;
+import static com.compuware.ispw.restapi.action.IspwCommand.CreateRelease;
+import static com.compuware.ispw.restapi.action.IspwCommand.DeployAssignment;
+import static com.compuware.ispw.restapi.action.IspwCommand.DeployRelease;
+import static com.compuware.ispw.restapi.action.IspwCommand.GenerateTasksInAssignment;
+import static com.compuware.ispw.restapi.action.IspwCommand.GenerateTasksInRelease;
+import static com.compuware.ispw.restapi.action.IspwCommand.GetAssignmentInfo;
+import static com.compuware.ispw.restapi.action.IspwCommand.GetAssignmentTaskList;
+import static com.compuware.ispw.restapi.action.IspwCommand.GetReleaseInfo;
+import static com.compuware.ispw.restapi.action.IspwCommand.GetReleaseTaskGenerateListing;
+import static com.compuware.ispw.restapi.action.IspwCommand.GetReleaseTaskInfo;
+import static com.compuware.ispw.restapi.action.IspwCommand.GetReleaseTaskList;
+import static com.compuware.ispw.restapi.action.IspwCommand.GetSetInfoAction;
+import static com.compuware.ispw.restapi.action.IspwCommand.PromoteAssignment;
+import static com.compuware.ispw.restapi.action.IspwCommand.PromoteRelease;
+import static com.compuware.ispw.restapi.action.IspwCommand.RegressAssignment;
+import static com.compuware.ispw.restapi.action.IspwCommand.RegressRelease;
+import hudson.model.Item;
+import hudson.security.ACL;
+import hudson.util.ListBoxModel;
+import hudson.util.ListBoxModel.Option;
 
 import java.io.PrintStream;
 import java.lang.reflect.Field;
@@ -13,6 +34,8 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
+
+import jenkins.model.Jenkins;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -65,12 +88,12 @@ import com.compuware.ispw.restapi.action.RegressReleaseAction;
 import com.compuware.jenkins.common.configuration.CpwrGlobalConfiguration;
 import com.compuware.jenkins.common.configuration.HostConnection;
 
-import hudson.model.Item;
-import hudson.security.ACL;
-import hudson.util.ListBoxModel;
-import hudson.util.ListBoxModel.Option;
-import jenkins.model.Jenkins;
-
+/**
+ * Utilities for ISPW operations plug-in
+ * 
+ * @author Sam Zhou
+ *
+ */
 public class RestApiUtils {
 
 	private static Logger logger = Logger.getLogger(RestApiUtils.class);
@@ -234,6 +257,19 @@ public class RestApiUtils {
 		}
 	}
 	
+	//Fix CES bug - CWE-124094 - Get assignment/release/set task list doesn't return a JSON array ("tasks":[]) if they contains just one task
+	public static String fixCesTaskListResponseJson(String responseJson) {
+		String fixedResponseJson = responseJson;
+		
+		if(responseJson.startsWith("{\"tasks\":{")) {
+			fixedResponseJson = responseJson.replace("{\"tasks\":{", "{\"tasks\":[{");
+			fixedResponseJson = fixedResponseJson.replace("}}", "}]}");
+		}
+		
+		return fixedResponseJson;
+	}
+	
+	
 	public static Object endLog(PrintStream logger, String ispwAction, IspwRequestBean ispwRequestBean, String responseJson, boolean block) {
 		Object returnObject = null;
 		JsonProcessor jsonProcessor = new JsonProcessor();
@@ -243,7 +279,9 @@ public class RestApiUtils {
 			logger.println("...set "+taskResponse.getSetId()+" created to generate");
 			returnObject = taskResponse;
 		} else if (IspwCommand.GetAssignmentTaskList.equals(ispwAction)) {
-			TaskListResponse listResponse = jsonProcessor.parse(responseJson, TaskListResponse.class);
+			
+			String fixedResponseJson = fixCesTaskListResponseJson(responseJson);
+			TaskListResponse listResponse = jsonProcessor.parse(fixedResponseJson, TaskListResponse.class);
 			
 			logger.println("...taskId, module, userId, version, status, application/stream/level, release");
 			for(TaskInfo taskInfo: listResponse.getTasks()) {
@@ -294,7 +332,10 @@ public class RestApiUtils {
 			logger.println("...user tag: " + releaseInfo.getUserTag());
 			returnObject = releaseInfo;
 		} else if (IspwCommand.GetReleaseTaskList.equals(ispwAction)) {
-			TaskListResponse listResponse = jsonProcessor.parse(responseJson, TaskListResponse.class);
+			
+			String fixedResponseJson = fixCesTaskListResponseJson(responseJson);
+			TaskListResponse listResponse = jsonProcessor.parse(fixedResponseJson, TaskListResponse.class);
+			
 			logger.println("...taskId, module, userId, version, status, application/stream/level, release");
 			for(TaskInfo taskInfo: listResponse.getTasks()) {
 				logger.println("..." + taskInfo.getTaskId() + ", " + taskInfo.getModuleName() + "."
@@ -479,21 +520,30 @@ public class RestApiUtils {
 		return model;
 	}
 	
-	public static ListBoxModel buildIspwActionItems(@AncestorInPath Jenkins context, @QueryParameter String ispwAction,
+	public static ListBoxModel buildIspwActionItems(
+			@AncestorInPath Jenkins context, @QueryParameter String ispwAction,
 			@AncestorInPath Item project) {
-		
+
+		String[] publishedActions = new String[] { CreateAssignment,
+				GetAssignmentInfo, GetAssignmentTaskList,
+				GenerateTasksInAssignment, PromoteAssignment, DeployAssignment,
+				RegressAssignment, GetReleaseInfo, GetReleaseTaskList,
+				CreateRelease, GenerateTasksInRelease,
+				GetReleaseTaskGenerateListing, GetReleaseTaskInfo,
+				PromoteRelease, DeployRelease, RegressRelease, GetSetInfoAction };
+
 		ListBoxModel model = new ListBoxModel();
-		
+
 		model.add(new Option(StringUtils.EMPTY, StringUtils.EMPTY, false));
 
-		Arrays.sort(IspwCommand.publishedActions);
-		
-		for (String action : IspwCommand.publishedActions) {
+		Arrays.sort(publishedActions);
+
+		for (String action : publishedActions) {
 			boolean isSelected = false;
 
 			if (ispwAction != null) {
 				isSelected = action.matches(ispwAction);
-			}			
+			}
 
 			model.add(new Option(action, action, isSelected));
 		}

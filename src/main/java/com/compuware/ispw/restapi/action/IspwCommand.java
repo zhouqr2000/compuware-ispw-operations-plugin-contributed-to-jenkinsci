@@ -1,6 +1,11 @@
 package com.compuware.ispw.restapi.action;
 
-
+/**
+ * All supported ISPW actions
+ * 
+ * @author Sam Zhou
+ *
+ */
 public class IspwCommand {
 	public static final String CreateAssignment = "CreateAssignment"; // POST
 	public static final String GetAssignmentInfo = "GetAssignmentInfo"; // GET
@@ -19,11 +24,4 @@ public class IspwCommand {
 	public static final String DeployRelease = "DeployRelease"; // POST
 	public static final String RegressRelease = "RegressRelease"; // POST
 	public static final String GetSetInfoAction = "GetSetInfoAction"; //GET
-
-	public static final String[] publishedActions = new String[] { CreateAssignment, GetAssignmentInfo,
-			GetAssignmentTaskList, GenerateTasksInAssignment, PromoteAssignment, DeployAssignment,
-			RegressAssignment, GetReleaseInfo, GetReleaseTaskList, CreateRelease,
-			GenerateTasksInRelease, GetReleaseTaskGenerateListing, GetReleaseTaskInfo,
-			PromoteRelease, DeployRelease, RegressRelease, GetSetInfoAction };
-
 }

@@ -7,6 +7,12 @@ import java.util.List;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
 
+/**
+ * Action to list all tasks in the specified assignment
+ * 
+ * @author Sam Zhou
+ *
+ */
 public class GetAssignmentTaskListAction extends AbstractGetAction {
 
 	private static final String[] defaultProps = new String[] { assignmentId, level };
