@@ -442,7 +442,11 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 				}
 			}
 		} catch (AbortException x) {
-			RestApiUtils.logMessageIfAny(logger(), response, true);
+			if (RestApiUtils.isIspwDebugMode()) {
+				RestApiUtils.logMessageIfAny(logger(), response, true);
+			} else {
+				logger().println(x.getMessage());
+			}
 
 			throw x;
 		}
