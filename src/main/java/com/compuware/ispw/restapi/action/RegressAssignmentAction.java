@@ -7,13 +7,19 @@ import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
+/**
+ * Action to regress an assignment
+ * 
+ * @author Sam Zhou
+ *
+ */
 public class RegressAssignmentAction extends SetInfoPostAction {
 
 	private static final String[] defaultProps =
 			new String[] { assignmentId, level, runtimeConfiguration };
 
 	private static final String contextPath =
-			"/ispw/{srid}/assignments/{assignmentId}/tasks/regress?level={level}";
+			"/ispw/{srid}/assignments/{assignmentId}/tasks/regress?level={level}&mname={mname}&mtype={mtype}";
 
 	public static final String getDefaultProps() {
 		return RestApiUtils.join(Constants.LINE_SEPARATOR, defaultProps, true);

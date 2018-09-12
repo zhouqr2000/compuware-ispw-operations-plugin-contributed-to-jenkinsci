@@ -7,13 +7,19 @@ import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
+/**
+ * Action to regress a release
+ * 
+ * @author Sam Zhou
+ *
+ */
 public class RegressReleaseAction extends SetInfoPostAction {
 
 	private static final String[] defaultProps =
 			new String[] { releaseId, level };
 
 	private static final String contextPath =
-			"/ispw/{srid}/releases/{releaseId}/tasks/regress?level={level}";
+			"/ispw/{srid}/releases/{releaseId}/tasks/regress?level={level}&mname={mname}&mtype={mtype}";
 
 	public static final String getDefaultProps() {
 		return RestApiUtils.join(Constants.LINE_SEPARATOR, defaultProps, true);

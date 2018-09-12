@@ -23,7 +23,6 @@ import org.kohsuke.stapler.QueryParameter;
 import com.compuware.ispw.model.rest.SetInfoResponse;
 import com.compuware.ispw.model.rest.TaskResponse;
 import com.compuware.ispw.restapi.action.IAction;
-import com.compuware.ispw.restapi.action.IspwCommand;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 import com.compuware.jenkins.common.configuration.HostConnection;
@@ -33,14 +32,17 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Item;
-import hudson.model.TaskListener;
 import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import jenkins.model.Jenkins;
 
 /**
+ * ISPW rest API pipeline build step
+ * 
  * @author Martin d'Anjou
+ * @author Sam Zhou
  */
 public final class IspwRestApiRequestStep extends AbstractStepImpl {
 
@@ -232,7 +234,15 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 		public static final String connectionId = StringUtils.EMPTY;
 		public static final String credentialsId = StringUtils.EMPTY;
 		public static final String ispwAction = StringUtils.EMPTY;
-		public static final String ispwRequestBody = StringUtils.EMPTY;
+		public static final String ispwRequestBody = "#The following messages are commented out to show how to use the 'Request' field.\n"
+				+"#Click on the help button to the right of the screen for examples of how to populate this field based on 'Action' type\n"
+				+"#\n"
+				+"#For example, if you select GenerateTasksInAssignment for 'Action' field,\n"
+				+"# you may populate the following properties in 'Request' field.\n"
+				+"# The property value should be based on your own container ID and level.\n"
+				+"#\n"
+				+"#assignmentId=PLAY000313\n"
+				+"#level=STG2\n";
 		public static final Boolean consoleLogResponseBody =
 				IspwRestApiRequest.DescriptorImpl.consoleLogResponseBody;
 		
@@ -343,6 +353,12 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			if (hostConnection != null) {
 				cesUrl = StringUtils.trimToEmpty(hostConnection.getCesUrl());
 
+				if(!cesUrl.startsWith("http")) {
+					String errorMsg = "Host connection does NOT contain a valid CES URL. Please re-configure in 'Manage Jenkins | Configure System | Compuware Configurations' section";
+					logger.println(errorMsg);
+					throw new IllegalStateException(new Exception(errorMsg));
+				}
+				
 				String host = StringUtils.trimToEmpty(hostConnection.getHost());
 				String port = StringUtils.trimToEmpty(hostConnection.getPort());
 				cesIspwHost = host + "-" + port;
@@ -412,9 +428,8 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 					int i = 0;
 					for (; i < 60; i++) {
 						Thread.sleep(Constants.POLLING_INTERVAL);
-						HttpRequestExecution poller =
-								HttpRequestExecution.createPoller(setId, webhookToken, step,
-										listener, this);
+						HttpRequestExecution poller = HttpRequestExecution
+								.createPoller(setId, step, listener, this);
 						ResponseContentSupplier pollerSupplier = launcher.getChannel().call(poller);
 						String pollingJson = pollerSupplier.getContent();
 
@@ -423,19 +438,19 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 								jsonProcessor.parse(pollingJson, SetInfoResponse.class);
 						String setState = StringUtils.trimToEmpty(setInfoResp.getState());
 						if (!set.contains(setState)) {
-							logger.println("...set " + setInfoResp.getSetid() + " status - "
+							logger.println("Set " + setInfoResp.getSetid() + " status - "
 									+ setState);
 							set.add(setState);
 
-							if (setState.equals(Constants.SET_STATE_CLOSED)) {
-								logger.println("...action " + step.ispwAction + " completed");
+							if (setState.equals(Constants.SET_STATE_CLOSED) || setState.equals(Constants.SET_STATE_COMPLETE)) {
+								logger.println("Action " + step.ispwAction + " completed");
 								break;
 							}
 						}
 					}
 
-					if (i == 60) {
-						logger.println("...warn - max timeout reached");
+					if (i == Constants.POLLING_COUNT) {
+						logger.println("Warn - max timeout reached");
 					}
 				}
 			}

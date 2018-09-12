@@ -7,13 +7,19 @@ import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
+/**
+ * Deploy assignment action
+ * 
+ * @author Sam Zhou
+ *
+ */
 public class DeployAssignmentAction extends SetInfoPostAction {
 
 	private static final String[] defaultProps =
 			new String[] { assignmentId, level, runtimeConfiguration };
 
 	private static final String contextPath =
-			"/ispw/{srid}/assignments/{assignmentId}/tasks/deploy?level={level}";
+			"/ispw/{srid}/assignments/{assignmentId}/tasks/deploy?level={level}&mname={mname}&mtype={mtype}";
 
 	public static String getDefaultProps() {
 		return RestApiUtils.join(Constants.LINE_SEPARATOR, defaultProps, true);

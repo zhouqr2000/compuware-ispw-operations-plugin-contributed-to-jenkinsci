@@ -25,9 +25,7 @@ import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredenti
 import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
 import com.compuware.ispw.model.rest.SetInfoResponse;
 import com.compuware.ispw.model.rest.TaskResponse;
-import com.compuware.ispw.restapi.action.GetSetInfoAction;
 import com.compuware.ispw.restapi.action.IAction;
-import com.compuware.ispw.restapi.action.IspwCommand;
 import com.compuware.ispw.restapi.auth.BasicDigestAuthentication;
 import com.compuware.ispw.restapi.auth.FormAuthentication;
 import com.compuware.ispw.restapi.util.HttpClientUtil;
@@ -44,12 +42,12 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.model.Item;
 import hudson.model.Items;
 import hudson.model.TaskListener;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
@@ -59,6 +57,8 @@ import hudson.util.ListBoxModel.Option;
 import jenkins.model.Jenkins;
 
 /**
+ * ISPW rest API free style builder
+ * 
  * @author Janario Oliveira
  * @author Sam Zhou
  */
@@ -333,7 +333,12 @@ public class IspwRestApiRequest extends Builder {
 		HostConnection hostConnection = RestApiUtils.getCesUrl(connectionId);
 		if (hostConnection != null) {
 			cesUrl = StringUtils.trimToEmpty(hostConnection.getCesUrl());
-
+			if(!cesUrl.startsWith("http")) {
+				logger.println("Host connection does NOT contain a valid CES URL. Please re-configure in 'Manage Jenkins | Configure System | Compuware Configurations' section");
+				return false;
+			}
+			
+			
 			String host = StringUtils.trimToEmpty(hostConnection.getHost());
 			String port = StringUtils.trimToEmpty(hostConnection.getPort());
 			cesIspwHost = host + "-" + port;
@@ -342,7 +347,7 @@ public class IspwRestApiRequest extends Builder {
 		String cesIspwToken = RestApiUtils.getCesToken(credentialsId);
 
 		if (RestApiUtils.isIspwDebugMode())
-			logger.println("...ces.url=" + cesUrl + ", ces.ispw.host=" + cesIspwHost
+			logger.println("CES Url=" + cesUrl + ", ces.ispw.host=" + cesIspwHost
 					+ ", ces.ispw.token=" + cesIspwToken);
 
 		IspwRequestBean ispwRequestBean =
@@ -403,7 +408,7 @@ public class IspwRestApiRequest extends Builder {
 				for (; i < 60; i++) {
 					Thread.sleep(Constants.POLLING_INTERVAL);
 					HttpRequestExecution poller =
-							HttpRequestExecution.createPoller(setId, webhookToken, this, envVars,
+							HttpRequestExecution.createPoller(setId, this, envVars,
 									build, listener);
 					ResponseContentSupplier pollerSupplier = launcher.getChannel().call(poller);
 					String pollingJson = pollerSupplier.getContent();
@@ -413,18 +418,18 @@ public class IspwRestApiRequest extends Builder {
 							jsonProcessor.parse(pollingJson, SetInfoResponse.class);
 					String setState = StringUtils.trimToEmpty(setInfoResp.getState());
 					if (!set.contains(setState)) {
-						logger.println("...set " + setInfoResp.getSetid() + " status - " + setState);
+						logger.println("Set " + setInfoResp.getSetid() + " status - " + setState);
 						set.add(setState);
 
-						if (setState.equals(Constants.SET_STATE_CLOSED)) {
-							logger.println("...action " + ispwAction + " completed");
+						if (setState.equals(Constants.SET_STATE_CLOSED) || setState.equals(Constants.SET_STATE_COMPLETE)) {
+							logger.println("Action " + ispwAction + " completed");
 							break;
 						}
 					}
 				}
 
 				if (i == 60) {
-					logger.println("...warn - max timeout reached");
+					logger.println("Warn - max timeout reached");
 				}
 			}
 		}
@@ -453,7 +458,15 @@ public class IspwRestApiRequest extends Builder {
 		public static final String connectionId = StringUtils.EMPTY;
 		public static final String credentialsId = StringUtils.EMPTY;
 		public static final String ispwAction = StringUtils.EMPTY;
-		public static final String ispwRequestBody = StringUtils.EMPTY;
+		public static final String ispwRequestBody = "#The following messages are commented out to show how to use the 'Request' field.\n"
+				+"#Click on the help button to the right of the screen for examples of how to populate this field based on 'Action' type\n"
+				+"#\n"
+				+"#For example, if you select GenerateTasksInAssignment for 'Action' field,\n"
+				+"# you may populate the following properties in 'Request' field.\n"
+				+"# The property value should be based on your own container ID and level.\n"
+				+"#\n"
+				+"#assignmentId=PLAY000313\n"
+				+"#level=STG2\n";
 		public static final Boolean consoleLogResponseBody = false;
 
 		public static final List<HttpRequestNameValuePair> customHeaders = Collections

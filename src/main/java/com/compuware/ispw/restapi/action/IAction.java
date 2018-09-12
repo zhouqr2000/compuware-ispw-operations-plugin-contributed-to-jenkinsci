@@ -5,6 +5,12 @@ import java.io.PrintStream;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
 
+/**
+ * Common interface for all actions
+ * 
+ * @author Sam Zhou
+ *
+ */
 public interface IAction {
 	
 	public static final String assignmentId = "assignmentId";
@@ -12,6 +18,8 @@ public interface IAction {
 	public static final String taskId = "taskId";
 	public static final String releaseId = "releaseId";
 	public static final String setId = "setId";
+	public static final String mname = "mname";
+	public static final String mtype = "mtype";
 	
 	public static final String runtimeConfiguration = "runtimeConfiguration";
 	public static final String autoDeploy = "autoDeploy";

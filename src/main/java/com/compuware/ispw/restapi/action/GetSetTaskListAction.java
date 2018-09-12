@@ -8,17 +8,17 @@ import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
 
 /**
- * Action to get a set status
+ * Action to get task list in the specified Set
  * 
- * @author Sam Zhou
+ * @author Steven Kansa
  *
  */
-public class GetSetInfoAction extends AbstractGetAction {
+public class GetSetTaskListAction extends AbstractGetAction {
 
 	private static final String[] defaultProps = new String[] { setId };
-	private static final String contextPath = "/ispw/{srid}/sets/{setId}";
-	
-	public GetSetInfoAction(PrintStream logger) {
+	private static final String contextPath = "/ispw/{srid}/sets/{setId}/tasks";
+
+	public GetSetTaskListAction(PrintStream logger) {
 		super(logger);
 	}
 	
