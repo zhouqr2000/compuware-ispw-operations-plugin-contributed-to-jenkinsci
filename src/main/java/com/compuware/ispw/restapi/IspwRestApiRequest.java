@@ -347,7 +347,7 @@ public class IspwRestApiRequest extends Builder {
 		String cesIspwToken = RestApiUtils.getCesToken(credentialsId);
 
 		if (RestApiUtils.isIspwDebugMode())
-			logger.println("...ces.url=" + cesUrl + ", ces.ispw.host=" + cesIspwHost
+			logger.println("CES Url=" + cesUrl + ", ces.ispw.host=" + cesIspwHost
 					+ ", ces.ispw.token=" + cesIspwToken);
 
 		IspwRequestBean ispwRequestBean =
@@ -418,18 +418,18 @@ public class IspwRestApiRequest extends Builder {
 							jsonProcessor.parse(pollingJson, SetInfoResponse.class);
 					String setState = StringUtils.trimToEmpty(setInfoResp.getState());
 					if (!set.contains(setState)) {
-						logger.println("...set " + setInfoResp.getSetid() + " status - " + setState);
+						logger.println("Set " + setInfoResp.getSetid() + " status - " + setState);
 						set.add(setState);
 
 						if (setState.equals(Constants.SET_STATE_CLOSED) || setState.equals(Constants.SET_STATE_COMPLETE)) {
-							logger.println("...action " + ispwAction + " completed");
+							logger.println("Action " + ispwAction + " completed");
 							break;
 						}
 					}
 				}
 
 				if (i == 60) {
-					logger.println("...warn - max timeout reached");
+					logger.println("Warn - max timeout reached");
 				}
 			}
 		}

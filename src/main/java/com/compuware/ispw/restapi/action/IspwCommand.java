@@ -24,4 +24,5 @@ public class IspwCommand {
 	public static final String DeployRelease = "DeployRelease"; // POST
 	public static final String RegressRelease = "RegressRelease"; // POST
 	public static final String GetSetInfoAction = "GetSetInfoAction"; //GET
+	public static final String GetSetTaskListAction = "GetSetTaskListAction"; //GET
 }

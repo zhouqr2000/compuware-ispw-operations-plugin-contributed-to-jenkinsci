@@ -1,3 +1,7 @@
+Version 1.0.4
+* Add support for retrieving the list of tasks for a given ISPW Set.
+* Changes to the logging to be more consistent with other plugins logging
+
 Version 1.0.3
 * CWE-124457 - Jenkins Operations Plugin - Bad error message when selected host connection doesn't have a CES URL
 * CWE-126841 - ISPW Operations Jenkins Plugin has problems with GetReleaseTaskList

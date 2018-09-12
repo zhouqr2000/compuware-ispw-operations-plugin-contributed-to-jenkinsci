@@ -438,19 +438,19 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 								jsonProcessor.parse(pollingJson, SetInfoResponse.class);
 						String setState = StringUtils.trimToEmpty(setInfoResp.getState());
 						if (!set.contains(setState)) {
-							logger.println("...set " + setInfoResp.getSetid() + " status - "
+							logger.println("Set " + setInfoResp.getSetid() + " status - "
 									+ setState);
 							set.add(setState);
 
 							if (setState.equals(Constants.SET_STATE_CLOSED) || setState.equals(Constants.SET_STATE_COMPLETE)) {
-								logger.println("...action " + step.ispwAction + " completed");
+								logger.println("Action " + step.ispwAction + " completed");
 								break;
 							}
 						}
 					}
 
 					if (i == Constants.POLLING_COUNT) {
-						logger.println("...warn - max timeout reached");
+						logger.println("Warn - max timeout reached");
 					}
 				}
 			}
