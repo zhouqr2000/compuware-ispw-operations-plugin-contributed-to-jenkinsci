@@ -7,7 +7,7 @@ This plugin sends an ISPW rest API request to a CES rest endpoint.
 The following features are available in both Pipeline and traditional
 project types:
 
-* ISPW Actions: CreateAssignment, GetAssignmentInfo, GetAssignmentTaskList, GenerateTasksInAssignment, PromoteAssignment, DeployAssignment,RegressAssignment, GetReleaseInfo, GetReleaseTaskList, CreateRelease, GenerateTasksInRelease, GetReleaseTaskGenerateListing, GetReleaseTaskInfo, PromoteRelease, DeployRelease, RegressRelease, GetSetInfoAction
+* ISPW Actions: CreateAssignment, GetAssignmentInfo, GetAssignmentTaskList, GenerateTasksInAssignment, PromoteAssignment, DeployAssignment,RegressAssignment, GetReleaseInfo, GetReleaseTaskList, CreateRelease, GenerateTasksInRelease, GetReleaseTaskGenerateListing, GetReleaseTaskInfo, PromoteRelease, DeployRelease, RegressRelease, GetSetInfoAction, GetSetTaskLlist
 
 ### Basic plugin features
 

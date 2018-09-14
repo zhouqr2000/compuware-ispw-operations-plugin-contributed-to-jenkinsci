@@ -133,7 +133,7 @@ public class HttpClientUtil {
         final HttpResponse httpResponse = client.execute(method, context);
         
         if(RestApiUtils.isIspwDebugMode())
-        	logger.println("Response Code: " + httpResponse.getStatusLine());
+        	logger.println("HTTP Response Code: " + httpResponse.getStatusLine());
         
         return httpResponse;
     }
