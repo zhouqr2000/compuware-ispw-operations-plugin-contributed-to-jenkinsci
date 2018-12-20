@@ -1,9 +1,11 @@
 package com.compuware.ispw.restapi.action;
 
 import java.io.PrintStream;
-
+import com.compuware.ispw.model.rest.TaskResponse;
 import com.compuware.ispw.restapi.Constants;
+import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
+import com.compuware.ispw.restapi.JsonProcessor;
 import com.compuware.ispw.restapi.WebhookToken;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
@@ -33,5 +35,22 @@ public class GenerateTasksInAssignmentAction extends SetInfoPostAction {
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody,
 			WebhookToken webhookToken) {
 		return getIspwRequestBean(srid, ispwRequestBody, webhookToken, contextPath);
+	}
+
+	@Override
+	public void startLog(PrintStream logger, IspwContextPathBean ispwContextPathBean, Object jsonObject)
+	{
+		logger.println("Generating tasks in Assignment "
+				+ ispwContextPathBean.getAssignmentId() + " at level "
+				+ ispwContextPathBean.getLevel());
+	}
+
+	@Override
+	public Object endLog(PrintStream logger, IspwRequestBean ispwRequestBean, String responseJson)
+	{
+		TaskResponse taskResponse = new JsonProcessor().parse(responseJson, TaskResponse.class);
+		logger.println("Set "+taskResponse.getSetId()+" created to generate");
+
+		return taskResponse;
 	}
 }
