@@ -21,6 +21,7 @@ import com.compuware.ispw.model.rest.SetInfoResponse;
 import com.compuware.ispw.model.rest.TaskResponse;
 import com.compuware.ispw.restapi.action.IAction;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
+import com.compuware.ispw.restapi.util.ReflectUtils;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 import com.compuware.jenkins.common.configuration.HostConnection;
 import hudson.EnvVars;
@@ -327,7 +328,7 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			if(RestApiUtils.isIspwDebugMode())
 				logger.println("...getting buildTag=" + buildTag + ", webhookToken=" + webhookToken);
 
-			IAction action = RestApiUtils.createAction(step.ispwAction, logger);
+			IAction action = ReflectUtils.createAction(step.ispwAction, logger);
 			step.httpMode = RestApiUtils.resetHttpMode(step.ispwAction);
 
 			if (action == null) {
