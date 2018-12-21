@@ -1,13 +1,11 @@
 package com.compuware.ispw.restapi.action;
 
 import java.io.PrintStream;
-
 import org.apache.commons.lang3.StringUtils;
-
 import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.JsonProcessor;
-import com.compuware.ispw.restapi.util.RestApiUtils;
+import com.compuware.ispw.restapi.util.ReflectUtils;
 
 /**
  * A generic rest POST ISPW action
@@ -50,7 +48,7 @@ public abstract class AbstractPostAction implements IAction {
 								.trimToEmpty(line.substring(indexOfEqualSign + 1, line.length()));
 
 				if (StringUtils.isNotBlank(value)) {
-					RestApiUtils.reflectSetter(jsonObject, name, value);
+					ReflectUtils.reflectSetter(jsonObject, name, value);
 				}
 			}
 		}

@@ -5,6 +5,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlElement;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.reflect.ConstructorUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -23,6 +25,37 @@ public class ReflectUtils
 {
 	private static Logger logger = Logger.getLogger(ReflectUtils.class);
 
+	public static void reflectSetter(Object object, String name, String value) {
+
+		List<Field> fields = FieldUtils.getAllFieldsList(object.getClass());
+		for (Field field : fields) {
+
+			String fieldName = field.getName();
+			String jsonName = fieldName; // default to field name
+			if (field.isAnnotationPresent(XmlElement.class)) {
+				XmlElement xmlElement = field.getAnnotation(XmlElement.class);
+				jsonName = xmlElement.name(); // use annotation name if presented
+			}
+
+			logger.info("json.name=" + jsonName + ", type=" + field.getType().getName()
+					+ ", value=" + value);
+			if (jsonName.equals(name)) {
+				try {
+					if (field.getType().equals(String.class)) {
+						BeanUtils.setProperty(object, fieldName, value);
+					} else if (field.getType().equals(Boolean.class)) {
+						BeanUtils.setProperty(object, fieldName, Boolean.valueOf(value));
+					}
+				} catch (IllegalAccessException | InvocationTargetException e) {
+					logger.warn("Property key " + name + "(" + jsonName
+							+ ") is invalid, cannot be set to class " + object.getClass().getName()
+							+ "as value [" + value + "])");
+				}
+			}
+		}
+
+	}
+	
 	public static String[] listPublishedCommands()
 	{
 		ArrayList<String> commands = new ArrayList<String>();
@@ -34,12 +67,17 @@ public class ReflectUtils
 			{
 				IspwAction ispwAction = field.getAnnotation(IspwAction.class);
 				Class<?> clazz = ispwAction.clazz();
+				boolean isExposed = ispwAction.exposed();
 
 				String command = StringUtils.EMPTY;
 				try
 				{
 					command = (String) FieldUtils.readStaticField(field);
-					commands.add(command);
+					
+					if (isExposed)
+					{
+						commands.add(command);
+					}
 				}
 				catch (IllegalAccessException e)
 				{

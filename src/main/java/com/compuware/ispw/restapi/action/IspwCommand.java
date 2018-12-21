@@ -58,8 +58,8 @@ public class IspwCommand {
 	public static final String RegressRelease = "RegressRelease"; // POST
 	
 	@IspwAction(clazz = GetSetInfoAction.class)
-	public static final String GetSetInfoAction = "GetSetInfo"; //GET
+	public static final String GetSetInfo = "GetSetInfo"; //GET
 	
 	@IspwAction(clazz = GetSetTaskListAction.class)
-	public static final String GetSetTaskListAction = "GetSetTaskList"; //GET
+	public static final String GetSetTaskList = "GetSetTaskList"; //GET
 }

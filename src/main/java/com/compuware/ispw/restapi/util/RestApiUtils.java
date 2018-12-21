@@ -4,16 +4,11 @@ import static com.cloudbees.plugins.credentials.CredentialsMatchers.filter;
 import static com.cloudbees.plugins.credentials.CredentialsMatchers.withId;
 import static com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials;
 import java.io.PrintStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.annotation.XmlElement;
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.log4j.Logger;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import org.kohsuke.stapler.AncestorInPath;
@@ -35,6 +30,7 @@ import com.compuware.ispw.model.rest.TaskListingResponse;
 import com.compuware.ispw.model.rest.TaskResponse;
 import com.compuware.ispw.restapi.Constants;
 import com.compuware.ispw.restapi.HttpMode;
+import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.JsonProcessor;
 import com.compuware.ispw.restapi.ResponseContentSupplier;
@@ -127,36 +123,62 @@ public class RestApiUtils {
 
 		return false;
 	}
-
-	public static void reflectSetter(Object object, String name, String value) {
-
-		List<Field> fields = FieldUtils.getAllFieldsList(object.getClass());
-		for (Field field : fields) {
-
-			String fieldName = field.getName();
-			String jsonName = fieldName; // default to field name
-			if (field.isAnnotationPresent(XmlElement.class)) {
-				XmlElement xmlElement = field.getAnnotation(XmlElement.class);
-				jsonName = xmlElement.name(); // use annotation name if presented
-			}
-
-			logger.info("json.name=" + jsonName + ", type=" + field.getType().getName()
-					+ ", value=" + value);
-			if (jsonName.equals(name)) {
-				try {
-					if (field.getType().equals(String.class)) {
-						BeanUtils.setProperty(object, fieldName, value);
-					} else if (field.getType().equals(Boolean.class)) {
-						BeanUtils.setProperty(object, fieldName, Boolean.valueOf(value));
-					}
-				} catch (IllegalAccessException | InvocationTargetException e) {
-					logger.warn("Property key " + name + "(" + jsonName
-							+ ") is invalid, cannot be set to class " + object.getClass().getName()
-							+ "as value [" + value + "])");
-				}
-			}
+	
+	public static void startLog(PrintStream logger, String ispwAction, IspwContextPathBean ispwContextPathBean, Object jsonObject) {
+		logger.println("Starting ISPW Operations Plugin");
+		if (IspwCommand.GenerateTasksInAssignment.equals(ispwAction)) {
+			logger.println("Generating tasks in Assignment "
+					+ ispwContextPathBean.getAssignmentId() + " at level "
+					+ ispwContextPathBean.getLevel());
+		} else if (IspwCommand.GetAssignmentTaskList.equals(ispwAction)) {
+			logger.println("Listing tasks in Assignment " + ispwContextPathBean.getAssignmentId());
+		} else if (IspwCommand.GetAssignmentInfo.equals(ispwAction)) {
+			logger.println("Getting info on Assignment "+ispwContextPathBean.getAssignmentId());
+		} else if (IspwCommand.CreateAssignment.equals(ispwAction)) {
+			AssignmentInfo assignmentInfo = (AssignmentInfo) jsonObject;
+			logger.println("Creating assignment " + assignmentInfo.getStream() + "/"
+					+ assignmentInfo.getApplication() + "/" + assignmentInfo.getDefaultPath()
+					+ " with description - " + assignmentInfo.getDescription());
+		} else if (IspwCommand.PromoteAssignment.equals(ispwAction)) {
+			logger.println("Promoting Assignment " + ispwContextPathBean.getAssignmentId()
+					+ " at level " + ispwContextPathBean.getLevel());
+		} else if (IspwCommand.DeployAssignment.equals(ispwAction)) {
+			logger.println("Deploying Assignment " + ispwContextPathBean.getAssignmentId()
+					+ " at level " + ispwContextPathBean.getLevel());
+		} else if (IspwCommand.RegressAssignment.equals(ispwAction)) {
+			logger.println("Regressing Assignment " + ispwContextPathBean.getAssignmentId()
+					+ " at level " + ispwContextPathBean.getLevel());
+		} else if (IspwCommand.GetReleaseInfo.equals(ispwAction)) {
+			logger.println("Getting info on Release "+ispwContextPathBean.getReleaseId());
+		} else if (IspwCommand.GetReleaseTaskList.equals(ispwAction)) {
+			logger.println("Listing tasks in Release " + ispwContextPathBean.getReleaseId());
+		} else if (IspwCommand.CreateRelease.equals(ispwAction)) {
+			ReleaseInfo releaseInfo = (ReleaseInfo) jsonObject;
+			logger.println("Creating Release on " + releaseInfo.getStream() + "/"
+					+ releaseInfo.getApplication() + " as " + releaseInfo.getReleaseId() + " - "
+					+ releaseInfo.getDescription());
+		} else if (IspwCommand.GenerateTasksInRelease.equals(ispwAction)) {
+			logger.println("Generating tasks in Release " + ispwContextPathBean.getReleaseId()
+					+ " at level " + ispwContextPathBean.getLevel());
+		} else if (IspwCommand.GetReleaseTaskGenerateListing.equals(ispwAction)) {
+			logger.println("Getting Release task generate listing of task "
+					+ ispwContextPathBean.getTaskId() + " in release "
+					+ ispwContextPathBean.getReleaseId());
+		} else if (IspwCommand.GetReleaseTaskInfo.equals(ispwAction)) {
+			logger.println("Getting task " + ispwContextPathBean.getTaskId() + " in Release "
+					+ ispwContextPathBean.getReleaseId());
+		} else if (IspwCommand.DeployRelease.equals(ispwAction)) {
+			logger.println("Deploying tasks in Release " + ispwContextPathBean.getReleaseId()
+					+ " at level " + ispwContextPathBean.getLevel());
+		} else if (IspwCommand.PromoteRelease.equals(ispwAction)) {
+			logger.println("Promoting tasks in Release " + ispwContextPathBean.getReleaseId()
+					+ " at level " + ispwContextPathBean.getLevel());
+		} else if (IspwCommand.RegressRelease.equals(ispwAction)) {
+			logger.println("Regressing tasks in Release " + ispwContextPathBean.getReleaseId()
+					+ " at level " + ispwContextPathBean.getLevel());
+		} else if(IspwCommand.GetSetInfo.equals(ispwAction)) {
+			logger.println("Getting info on Set "+ispwContextPathBean.getSetId());
 		}
-
 	}
 	
 	//Fix CES bug - CWE-124094 - Get assignment/release/set task list doesn't return a JSON array ("tasks":[]) if they contains just one task
@@ -279,7 +301,7 @@ public class RestApiUtils {
 			TaskResponse taskResp = jsonProcessor.parse(responseJson, TaskResponse.class);
 			logger.println("Set "+taskResp.getSetId()+" created to regress Release "+ispwRequestBean.getIspwContextPathBean().getReleaseId());
 			returnObject = taskResp;
-		} else if(IspwCommand.GetSetInfoAction.equals(ispwAction)) {
+		} else if(IspwCommand.GetSetInfo.equals(ispwAction)) {
 			SetInfoResponse setInfoResp = jsonProcessor.parse(responseJson, SetInfoResponse.class);
 			logger.println("SetId, State, Owner, Application/Stream, Start Date/Start Time");
 			logger.println(" " + setInfoResp.getSetid() + ", " + setInfoResp.getState() + ", "
@@ -287,7 +309,7 @@ public class RestApiUtils {
 					+ setInfoResp.getStreamName() + ", " + setInfoResp.getStartDate() + "/"
 					+ setInfoResp.getStartTime());
 			returnObject = setInfoResp;
-		} else if (IspwCommand.GetSetTaskListAction.equals(ispwAction)) {
+		} else if (IspwCommand.GetSetTaskList.equals(ispwAction)) {
 			
 			String fixedResponseJson = fixCesTaskListResponseJson(responseJson);
 			TaskListResponse listResponse = jsonProcessor.parse(fixedResponseJson, TaskListResponse.class);
@@ -317,8 +339,8 @@ public class RestApiUtils {
 				|| IspwCommand.GetReleaseTaskList.equals(ispwAction)
 				|| IspwCommand.GetReleaseTaskGenerateListing.equals(ispwAction)
 				|| IspwCommand.GetReleaseTaskInfo.equals(ispwAction)
-				|| IspwCommand.GetSetInfoAction.equals(ispwAction)
-				|| IspwCommand.GetSetTaskListAction.equals(ispwAction)) {
+				|| IspwCommand.GetSetInfo.equals(ispwAction)
+				|| IspwCommand.GetSetTaskList.equals(ispwAction)) {
 			httpMode = HttpMode.GET;
 		}
 
