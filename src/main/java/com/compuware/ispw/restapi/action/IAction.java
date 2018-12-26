@@ -1,7 +1,7 @@
 package com.compuware.ispw.restapi.action;
 
 import java.io.PrintStream;
-
+import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
 
@@ -50,4 +50,8 @@ public interface IAction {
 			WebhookToken webhookToken);
 	
 	public PrintStream getLogger();
+	
+	public void startLog(PrintStream logger, IspwContextPathBean ispwContextPathBean, Object jsonObject);
+	
+	public Object endLog(PrintStream logger, IspwRequestBean ispwRequestBean, String responseJson);
 }

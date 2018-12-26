@@ -1,9 +1,11 @@
 package com.compuware.ispw.restapi.action;
 
 import java.io.PrintStream;
-
 import com.compuware.ispw.model.rest.AssignmentInfo;
+import com.compuware.ispw.model.rest.AssignmentResponse;
+import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
+import com.compuware.ispw.restapi.JsonProcessor;
 import com.compuware.ispw.restapi.WebhookToken;
 
 /**
@@ -28,6 +30,23 @@ public class CreateAssignmentAction extends AbstractPostAction {
 
 		AssignmentInfo assignmentInfo = new AssignmentInfo();
 		return super.getIspwRequestBean(srid, ispwRequestBody, contextPath, assignmentInfo);
+	}
+
+	@Override
+	public void startLog(PrintStream logger, IspwContextPathBean ispwContextPathBean, Object jsonObject)
+	{
+		AssignmentInfo assignmentInfo = (AssignmentInfo) jsonObject;
+		logger.println("Creating assignment " + assignmentInfo.getStream() + "/"
+				+ assignmentInfo.getApplication() + "/" + assignmentInfo.getDefaultPath()
+				+ " with description - " + assignmentInfo.getDescription());
+	}
+
+	@Override
+	public Object endLog(PrintStream logger, IspwRequestBean ispwRequestBean, String responseJson)
+	{
+		AssignmentResponse assignResp = new JsonProcessor().parse(responseJson, AssignmentResponse.class);
+		logger.println("Created Assignment " + assignResp.getAssignmentId());
+		return assignResp;
 	}
 
 }

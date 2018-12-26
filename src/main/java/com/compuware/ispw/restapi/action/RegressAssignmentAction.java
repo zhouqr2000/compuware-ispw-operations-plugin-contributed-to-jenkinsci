@@ -1,9 +1,11 @@
 package com.compuware.ispw.restapi.action;
 
 import java.io.PrintStream;
-
+import com.compuware.ispw.model.rest.TaskResponse;
 import com.compuware.ispw.restapi.Constants;
+import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
+import com.compuware.ispw.restapi.JsonProcessor;
 import com.compuware.ispw.restapi.WebhookToken;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
@@ -33,6 +35,22 @@ public class RegressAssignmentAction extends SetInfoPostAction {
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody,
 			WebhookToken webhookToken) {
 		return getIspwRequestBean(srid, ispwRequestBody, webhookToken, contextPath);
+	}
+
+	@Override
+	public void startLog(PrintStream logger, IspwContextPathBean ispwContextPathBean, Object jsonObject)
+	{
+		logger.println("Regressing Assignment " + ispwContextPathBean.getAssignmentId()
+		+ " at level " + ispwContextPathBean.getLevel());
+	}
+
+	@Override
+	public Object endLog(PrintStream logger, IspwRequestBean ispwRequestBean, String responseJson)
+	{
+		TaskResponse taskResp = new JsonProcessor().parse(responseJson, TaskResponse.class);
+		logger.println("Set "+taskResp.getSetId()+" created to regress Assignment "+ispwRequestBean.getIspwContextPathBean().getAssignmentId());
+		
+		return taskResp;
 	}
 
 }

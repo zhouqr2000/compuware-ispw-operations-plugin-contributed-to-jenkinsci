@@ -6,10 +6,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepDescriptorImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepImpl;
@@ -19,14 +17,12 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
-
 import com.compuware.ispw.model.rest.SetInfoResponse;
 import com.compuware.ispw.model.rest.TaskResponse;
 import com.compuware.ispw.restapi.action.IAction;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 import com.compuware.jenkins.common.configuration.HostConnection;
-
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
@@ -398,7 +394,8 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 				logger.println();
 			}
 
-			RestApiUtils.startLog(logger, step.ispwAction, ispwRequestBean.getIspwContextPathBean(), ispwRequestBean.getJsonObject());
+			logger.println("Starting ISPW Operations Plugin");
+			action.startLog(logger, ispwRequestBean.getIspwContextPathBean(), ispwRequestBean.getJsonObject());
 
 			HttpRequestExecution exec =
 					HttpRequestExecution.from(step, listener, this);
@@ -415,7 +412,8 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			if (RestApiUtils.isIspwDebugMode())
 				logger.println("responseJson=" + responseJson);
 
-			Object respObject = RestApiUtils.endLog(logger, step.ispwAction, ispwRequestBean, responseJson, true);
+			Object respObject = action.endLog(logger, ispwRequestBean, responseJson);
+			logger.println("ISPW Operation Complete");
 			
 			// polling status if no webhook
 			if (webhookToken == null) {

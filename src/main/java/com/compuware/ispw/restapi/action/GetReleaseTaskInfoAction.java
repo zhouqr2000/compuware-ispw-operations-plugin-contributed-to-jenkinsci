@@ -3,8 +3,10 @@ package com.compuware.ispw.restapi.action;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
-
+import com.compuware.ispw.model.rest.TaskInfo;
+import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
+import com.compuware.ispw.restapi.JsonProcessor;
 import com.compuware.ispw.restapi.WebhookToken;
 
 /**
@@ -28,6 +30,27 @@ public class GetReleaseTaskInfoAction extends AbstractGetAction {
 
 		List<String> pathTokens = Arrays.asList(defaultProps);
 		return super.getIspwRequestBean(srid, ispwRequestBody, contextPath, pathTokens);
+	}
+
+	@Override
+	public void startLog(PrintStream logger, IspwContextPathBean ispwContextPathBean, Object jsonObject)
+	{
+		logger.println("Getting task " + ispwContextPathBean.getTaskId() + " in Release "
+				+ ispwContextPathBean.getReleaseId());
+	}
+
+	@Override
+	public Object endLog(PrintStream logger, IspwRequestBean ispwRequestBean, String responseJson)
+	{
+		TaskInfo taskInfo = new JsonProcessor().parse(responseJson,  TaskInfo.class);
+		logger.println("TaskId, Module, Type, UserId, Version, Status, Application/Stream/Level, Release");
+		logger.println(" " + taskInfo.getTaskId() + ", " + taskInfo.getModuleName() + ", "
+				+ taskInfo.getModuleType() + ", " + taskInfo.getUserId() + ", "
+				+ taskInfo.getVersion() + ", " + taskInfo.getStatus() + ", "
+				+ taskInfo.getApplication() + "/" + taskInfo.getStream() + "/"
+				+ taskInfo.getLevel() + ", " + taskInfo.getRelease());
+		
+		return taskInfo;
 	}
 
 }

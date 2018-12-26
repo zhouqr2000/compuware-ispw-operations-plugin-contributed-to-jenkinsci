@@ -1,7 +1,6 @@
 package com.compuware.ispw.restapi;
 
 import static com.google.common.base.Preconditions.checkArgument;
-
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -9,15 +8,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.Nonnull;
-
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
-
 import com.cloudbees.plugins.credentials.common.AbstractIdCredentialsListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
@@ -35,7 +31,6 @@ import com.compuware.jenkins.common.configuration.HostConnection;
 import com.google.common.base.Strings;
 import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
-
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
@@ -384,7 +379,8 @@ public class IspwRestApiRequest extends Builder {
 				logger.println("EnvVars: " + e.getKey() + "=" + e.getValue());
 		}
 
-		RestApiUtils.startLog(logger, ispwAction, ispwRequestBean.getIspwContextPathBean(), ispwRequestBean.getJsonObject());
+		logger.println("Starting ISPW Operations Plugin");
+		action.startLog(logger, ispwRequestBean.getIspwContextPathBean(), ispwRequestBean.getJsonObject());
 		HttpRequestExecution exec =
 				HttpRequestExecution.from(this, envVars, build, listener);
 		
@@ -394,7 +390,8 @@ public class IspwRestApiRequest extends Builder {
 		if (RestApiUtils.isIspwDebugMode())
 			logger.println("responseJson=" + responseJson);
 
-		Object respObject = RestApiUtils.endLog(logger, ispwAction, ispwRequestBean, responseJson, true);
+		Object respObject = action.endLog(logger, ispwRequestBean, responseJson);
+		logger.println("ISPW Operation Complete");
 		
 		// polling status if no webhook
 		if (webhookToken == null) {
