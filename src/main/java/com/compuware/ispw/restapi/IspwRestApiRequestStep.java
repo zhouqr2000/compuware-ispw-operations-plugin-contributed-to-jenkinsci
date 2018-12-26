@@ -330,8 +330,9 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 
 			IAction action = ReflectUtils.createAction(step.ispwAction, logger);
 			step.httpMode = RestApiUtils.resetHttpMode(step.ispwAction);
-
-			if (action == null) {
+			
+			if (!ReflectUtils.isActionInstantiated(action))
+			{
 				String errorMsg =
 						"Action:"
 								+ step.ispwAction

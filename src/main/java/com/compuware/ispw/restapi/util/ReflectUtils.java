@@ -153,4 +153,23 @@ public class ReflectUtils
 
 		return action;
 	}
+	
+	/**
+	 * Determines whether the specified <code>IAction</code> is non-null therefore has been instantiated via reflection.
+	 * 
+	 * @param iAction
+	 *            The <code>IAction</code>
+	 * @return whether or not the IAction has been instantiated
+	 */
+	public static boolean isActionInstantiated(IAction iAction)
+	{
+		if (iAction == null)
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
 }

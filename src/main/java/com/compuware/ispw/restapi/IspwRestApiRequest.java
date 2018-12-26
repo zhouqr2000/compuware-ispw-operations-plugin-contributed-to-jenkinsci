@@ -313,8 +313,9 @@ public class IspwRestApiRequest extends Builder {
 
 		IAction action = ReflectUtils.createAction(ispwAction, logger);
 		httpMode = RestApiUtils.resetHttpMode(ispwAction);
-
-		if (action == null) {
+		
+		if (!ReflectUtils.isActionInstantiated(action))
+		{
 			logger.println("Action:" + ispwAction
 					+ " is not implemented, please make sure you have the correct ISPW action name");
 			return false;
