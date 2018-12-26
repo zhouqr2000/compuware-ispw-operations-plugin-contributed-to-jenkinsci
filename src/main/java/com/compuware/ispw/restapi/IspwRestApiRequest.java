@@ -26,6 +26,7 @@ import com.compuware.ispw.restapi.auth.BasicDigestAuthentication;
 import com.compuware.ispw.restapi.auth.FormAuthentication;
 import com.compuware.ispw.restapi.util.HttpClientUtil;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
+import com.compuware.ispw.restapi.util.ReflectUtils;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 import com.compuware.jenkins.common.configuration.HostConnection;
 import com.google.common.base.Strings;
@@ -310,10 +311,11 @@ public class IspwRestApiRequest extends Builder {
 		if (RestApiUtils.isIspwDebugMode())
 			logger.println("...getting buildTag=" + buildTag + ", webhookToken=" + webhookToken);
 
-		IAction action = RestApiUtils.createAction(ispwAction, logger);
+		IAction action = ReflectUtils.createAction(ispwAction, logger);
 		httpMode = RestApiUtils.resetHttpMode(ispwAction);
-
-		if (action == null) {
+		
+		if (!ReflectUtils.isActionInstantiated(action))
+		{
 			logger.println("Action:" + ispwAction
 					+ " is not implemented, please make sure you have the correct ISPW action name");
 			return false;

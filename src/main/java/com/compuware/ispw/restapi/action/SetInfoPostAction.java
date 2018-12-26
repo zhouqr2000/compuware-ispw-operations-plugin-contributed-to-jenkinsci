@@ -2,9 +2,7 @@ package com.compuware.ispw.restapi.action;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-
 import org.apache.commons.lang3.StringUtils;
-
 import com.compuware.ces.communications.service.data.EventCallback;
 import com.compuware.ces.model.BasicAuthentication;
 import com.compuware.ces.model.HttpHeader;
@@ -13,6 +11,7 @@ import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.JsonProcessor;
 import com.compuware.ispw.restapi.WebhookToken;
+import com.compuware.ispw.restapi.util.ReflectUtils;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 
 /**
@@ -110,7 +109,7 @@ public abstract class SetInfoPostAction implements IAction {
 							event.setCredentials(auth);
 						}
 					} else {
-						RestApiUtils.reflectSetter(setInfo, name, value); // set the rest of the
+						ReflectUtils.reflectSetter(setInfo, name, value); // set the rest of the
 																			// SetInfo fields using
 																			// reflection
 					}

@@ -48,6 +48,7 @@ import com.compuware.ispw.restapi.auth.Authenticator;
 import com.compuware.ispw.restapi.auth.CredentialBasicAuthentication;
 import com.compuware.ispw.restapi.util.HttpClientUtil;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
+import com.compuware.ispw.restapi.util.ReflectUtils;
 import com.compuware.ispw.restapi.util.RequestAction;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 import com.compuware.jenkins.common.configuration.HostConnection;
@@ -105,7 +106,7 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 			AbstractBuild<?, ?> build, TaskListener taskListener) {
 
 		PrintStream logger = taskListener.getLogger();
-		IAction action = RestApiUtils.createAction(IspwCommand.GetSetInfoAction, logger);
+		IAction action = ReflectUtils.createAction(IspwCommand.GetSetInfo, logger);
 
 		String cesUrl = StringUtils.EMPTY;
 		String cesIspwHost = StringUtils.EMPTY;
@@ -155,7 +156,7 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 	static HttpRequestExecution createPoller(String setId, WebhookToken webhookToken, IspwRestApiRequestStep step, TaskListener taskListener, Execution execution) {
 		
 		PrintStream logger = taskListener.getLogger();
-		IAction action = RestApiUtils.createAction(IspwCommand.GetSetInfoAction, logger);
+		IAction action = ReflectUtils.createAction(IspwCommand.GetSetInfo, logger);
 
 		String cesUrl = StringUtils.EMPTY;
 		String cesIspwHost = StringUtils.EMPTY;

@@ -2,12 +2,10 @@ package com.compuware.ispw.restapi.action;
 
 import java.io.PrintStream;
 import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
-
 import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
-import com.compuware.ispw.restapi.util.RestApiUtils;
+import com.compuware.ispw.restapi.util.ReflectUtils;
 
 /**
  * A generic rest GET ISPW action
@@ -52,7 +50,7 @@ public abstract class AbstractGetAction implements IAction {
 					if (pathTokens.contains(name)) {
 						path = path.replace("{" + name + "}", value);
 
-						RestApiUtils.reflectSetter(ispwContextPathBean, name, value);
+						ReflectUtils.reflectSetter(ispwContextPathBean, name, value);
 					}
 				}
 			}
