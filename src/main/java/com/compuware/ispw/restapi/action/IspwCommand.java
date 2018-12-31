@@ -62,4 +62,7 @@ public class IspwCommand {
 	
 	@IspwAction(clazz = GetSetTaskListAction.class)
 	public static final String GetSetTaskList = "GetSetTaskList"; //GET
+	
+	@IspwAction(clazz = TransferTaskAction.class)
+	public static final String TransferTask = "TransferTask"; //POST
 }
