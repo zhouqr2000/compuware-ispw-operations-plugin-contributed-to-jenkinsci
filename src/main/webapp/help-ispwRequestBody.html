@@ -1,6 +1,7 @@
     <div><br>
       <strong>Optional common properties for those actions with webhook
-        callback</strong> <br>
+        callback</strong>
+      <br>
       <table border="1">
         <tbody>
           <tr>
@@ -32,9 +33,11 @@
           </tr>
         </tbody>
       </table>
-      <!--GenerateTasksInAssignment/GenerateTasksInRelease--> <br>
-      <strong>GenerateTasksInAssignment / GenerateTasksInRelease actions
-        (Ignore 'events' properties if no webhook callback):</strong> <br>
+      <!--GenerateTasksInAssignment/GenerateTasksInRelease-->
+      <br>
+      <strong>GenerateTasksInAssignment / GenerateTasksInRelease
+        actions (Ignore 'events' properties if no webhook callback):</strong>
+      <br>
       Required:
       <table border="1">
         <tbody>
@@ -92,9 +95,11 @@
           </tr>
         </tbody>
       </table>
-      <!--PromoteAssignment/PromoteRelease--> <br>
+      <!--PromoteAssignment/PromoteRelease-->
+      <br>
       <strong>PromoteAssignment / PromoteRelease actions (Ignore
-        'events' properties if no webhook callback):</strong> <br>
+        'events' properties if no webhook callback):</strong>
+      <br>
       Required:
       <table border="1">
         <tbody>
@@ -168,9 +173,10 @@
           </tr>
         </tbody>
       </table>
-      <!--DeployAssignment/DeployRelease--><br>
-      <strong>DeployAssignment / DeployRelease actions (Ignore 'events'
-        properties if no webhook callback):</strong> <br>
+      <!--DeployAsignment/DeployRelease--><br>
+      <strong>DeployAsignment / DeployRelease actions (Ignore 'events'
+        properties if no webhook callback):</strong>
+      <br>
       Required:
       <table border="1">
         <tbody>
@@ -179,7 +185,7 @@
             <td>see ISPW administrator for valid values</td>
           </tr>
           <tr>
-            <td>assignmentId (DeployAssignment) or releaseId
+            <td>assignmentId (DeployAsignment) or releaseId
               (DeployRelease)</td>
             <td>The container for which you intend to deploy tasks.</td>
           </tr>
@@ -227,22 +233,25 @@
       <table border="1">
         <tbody>
           <tr>
-            <td>DeployAssignment</td>
-            <td> DeployRelease</td>
+            <td>DeployAsignment</td>
+            <td> <br>
+            </td>
           </tr>
           <tr>
             <td>
-              <pre>runtimeConfiguration=TPZP<br>assignmentId=PLAY000313<br>level=QA<br>#optional<br>mname=TPROG08<br>mtype=COB<br>deployActiveDate=2018-12-17<br>deployActiveTime=10:00:00<br>deployImplementationDate=2018-12-17<br>deployImplementationTime=10:00:00<br>#optional if use webhook callback in pipeline<br>events.name=Completed<br>events.body=Deployed<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library<br></pre>
+              <pre>runtimeConfiguration=TPZP<br>assignmentId=PLAY000313<br>level=QA<br>#optional<br>mname=TPROG08<br>mtype=COB<br>#optional if use webhook callback in pipeline<br>events.name=Completed<br>events.body=Deployed<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
             </td>
             <td>
-              <pre>runtimeConfiguration=TPZP<br>releaseId=JKGENRELID<br>level=QA<br>#optional<br>mname=TPROG08<br>mtype=COB<br>deployActiveDate=2018-12-17<br>deployActiveTime=10:00:00<br>deployImplementationDate=2018-12-17<br>deployImplementationTime=10:00:00<br>#optional if use webhook callback in pipeline<br>events.name=Completed<br>events.body=Deployed<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
+              <pre>runtimeConfiguration=TPZP<br>releaseId=JKGENRELID<br>level=QA<br>#optional<br>mname=TPROG08<br>mtype=COB<br>#optional if use webhook callback in pipeline<br>events.name=Completed<br>events.body=Deployed<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
             </td>
           </tr>
         </tbody>
       </table>
-      <!--RegressAssignment/RegressRelease--> <br>
-      <strong>RegressAssignment / RegressRelease actions (Ignore 'events'
-        properties if no webhook callback):</strong> <br>
+      <!--RegressAsignment/RegressRelease-->
+      <br>
+      <strong>RegressAsignment / RegressRelease actions (Ignore
+        'events' properties if no webhook callback):</strong>
+      <br>
       Required:
       <table border="1">
         <tbody>
@@ -251,7 +260,7 @@
             <td>see ISPW administrator for valid values</td>
           </tr>
           <tr>
-            <td>assignmentId (RegressAssignment) or releaseId
+            <td>assignmentId (RegressAsignment) or releaseId
               (RegressRelease)</td>
             <td>The container for which you intend to regress the tasks</td>
           </tr>
@@ -291,7 +300,7 @@
       <table border="1">
         <tbody>
           <tr>
-            <td>RegressAssignment</td>
+            <td>RegressAsignment</td>
             <td>RegressRelease</td>
           </tr>
           <tr>
@@ -304,13 +313,15 @@
           </tr>
         </tbody>
       </table>
-      <!--CreateAssignment/CreateRelease--> <br>
+      <!--CreateAssignment/CreateRelease-->
+      <br>
       <table border="0">
         <tbody>
           <tr>
-            <td align="left"> <strong>CreateAssignment action:</strong>
-            </td>
-            <td align="left"> <strong>CreateRelease action:</strong> </td>
+            <td align="left"> <strong>CreateAssignment
+                action:</strong> </td>
+            <td align="left"> <strong>CreateRelease
+                action:</strong> </td>
           </tr>
           <tr>
             <td align="left"> Required:
@@ -428,7 +439,8 @@
           </tr>
         </tbody>
       </table>
-      <!--GetReleaseTaskInfo/GetReleaseTaskGenerateListing--> <br>
+      <!--GetReleaseTaskInfo/GetReleaseTaskGenerateListing-->
+      <br>
       <strong>GetAssignmentInfo / GetAssignmentTaskList actions:</strong>
       <br>
       Required:
@@ -462,9 +474,11 @@
           </tr>
         </tbody>
       </table>
-      <!--GetReleaseTaskInfo/GetReleaseTaskGenerateListing--> <br>
+      <!--GetReleaseTaskInfo/GetReleaseTaskGenerateListing-->
+      <br>
       <strong>GetReleaseTaskInfo / GetReleaseTaskGenerateListing /
-        GetReleaseTaskList actions:</strong> <br>
+        GetReleaseTaskList actions:</strong>
+      <br>
       Required:
       <table border="1">
         <tbody>
@@ -504,8 +518,85 @@
           </tr>
         </tbody>
       </table>
-      <!--GetSetInfoAction--> <br>
-      <strong>GetSetInfo action:</strong> <br>
+      <!--GetSetInfoAction-->
+      <br>
+      <strong>TransferTask action:</strong>
+      <br>
+      Required:
+      <table border="1">
+        <tbody>
+          <tr>
+            <td>assignmentId<br>
+            </td>
+            <td>The assignment ID to move task from<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">containerId<br>
+            </td>
+            <td valign="top">The target container ID to move to<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">containerType<br>
+            </td>
+            <td valign="top">'A' or 'R'. A for assignment and R for
+              release<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      Optional:<br>
+      <table border="1">
+        <tbody>
+          <tr>
+            <td valign="top">runtimeConfiguration<br>
+            </td>
+            <td valign="top">The runtime configuration<br>
+            </td>
+          </tr>
+          <tr>
+            <td>level<br>
+            </td>
+            <td>All tasks at this level will be transferred<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">mname<br>
+            </td>
+            <td valign="top">The component name to be transferred<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">mtype<br>
+            </td>
+            <td valign="top">The component type to be transferred<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">taskId<br>
+            </td>
+            <td valign="top">The task ID to be transferred<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      Example:
+      <table border="1">
+        <tbody>
+          <tr>
+            <td>TransferTask</td>
+          </tr>
+          <tr>
+            <td>
+              <pre>runtimeConfiguration=TPZP<br>assignmentId=PLAY001386<br>level=DEV1<br>containerId=PLAY001387<br>containerType=A<br></pre>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      <strong></strong><strong>GetSetInfo action:</strong>
+      <br>
       Required:
       <table border="1">
         <tbody>
@@ -528,29 +619,32 @@
           </tr>
         </tbody>
       </table>
-      <!--GetSetTaskList--> <br>
-      <strong>GetSetTaskList action:</strong> <br>
-      Required:
-      <table border="1">
-        <tbody>
-          <tr>
-            <td>setId</td>
-            <td>The set ID you want info on</td>
-          </tr>
-        </tbody>
-      </table>
-      Example:
-      <table border="1">
-        <tbody>
-          <tr>
-            <td>GetSetTaskList</td>
-          </tr>
-          <tr>
-            <td>
-              <pre>setId=S000015218</pre>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
 
+    <!--GetSetTaskList-->
+    <br>
+    <strong>GetSetTaskList action:</strong>
+    <br>
+    Required:
+    <table border="1">
+      <tbody>
+        <tr>
+          <td>setId</td>
+          <td>The set ID you want info on</td>
+        </tr>
+      </tbody>
+    </table>
+    Example:
+    <table border="1">
+      <tbody>
+        <tr>
+          <td>GetSetTaskList</td>
+        </tr>
+        <tr>
+          <td>
+            <pre>setId=S000015218</pre>
+          </td>
+        </tr>
+      </tbody>
+    </table>      
+
+  </div>
