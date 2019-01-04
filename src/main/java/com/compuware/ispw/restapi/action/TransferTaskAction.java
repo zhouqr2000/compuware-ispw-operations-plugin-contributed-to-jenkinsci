@@ -4,6 +4,7 @@ import java.io.PrintStream;
 import org.apache.commons.lang3.StringUtils;
 import com.compuware.ispw.model.rest.MultiTaskInfoResponse;
 import com.compuware.ispw.model.rest.TransferTaskInfo;
+import com.compuware.ispw.restapi.HttpMode;
 import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.JsonProcessor;
@@ -128,5 +129,11 @@ public class TransferTaskAction implements IAction
 		logger.println("Transfer task response message: " + taskResp.getMessage());
 
 		return taskResp;
+	}
+	
+	@Override
+	public HttpMode getHttpMode()
+	{
+		return HttpMode.POST;
 	}
 }
