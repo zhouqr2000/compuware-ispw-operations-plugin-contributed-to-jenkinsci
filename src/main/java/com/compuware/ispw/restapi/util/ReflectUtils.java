@@ -25,7 +25,7 @@ public class ReflectUtils
 {
 	private static Logger logger = Logger.getLogger(ReflectUtils.class);
 
-	public static void reflectSetter(Object object, String name, String value) {
+	public static void reflectSetter(Object object, String name, Object value) {
 
 		List<Field> fields = FieldUtils.getAllFieldsList(object.getClass());
 		for (Field field : fields) {
@@ -41,11 +41,7 @@ public class ReflectUtils
 					+ ", value=" + value);
 			if (jsonName.equals(name)) {
 				try {
-					if (field.getType().equals(String.class)) {
-						BeanUtils.setProperty(object, fieldName, value);
-					} else if (field.getType().equals(Boolean.class)) {
-						BeanUtils.setProperty(object, fieldName, Boolean.valueOf(value));
-					}
+					BeanUtils.setProperty(object, fieldName, value);
 				} catch (IllegalAccessException | InvocationTargetException e) {
 					logger.warn("Property key " + name + "(" + jsonName
 							+ ") is invalid, cannot be set to class " + object.getClass().getName()
@@ -55,7 +51,7 @@ public class ReflectUtils
 		}
 
 	}
-	
+		
 	public static String[] listPublishedCommands()
 	{
 		ArrayList<String> commands = new ArrayList<String>();
@@ -172,4 +168,27 @@ public class ReflectUtils
 			return true;
 		}
 	}
+	
+	/**
+	 * Instance a generic type, must contains a default constructor
+	 * 
+	 * @param clazz the class to be instantiated
+	 * @return an instance of type T
+	 */
+	public static <T> T newInstance(Class<T> clazz)
+	{
+		T t = null;
+
+		try
+		{
+			return clazz.newInstance();
+		}
+		catch (InstantiationException | IllegalAccessException e)
+		{
+			logger.error(e.getMessage(), e);
+		}
+
+		return t;
+	}
+	
 }
