@@ -65,4 +65,7 @@ public class IspwCommand {
 	
 	@IspwAction(clazz = TransferTaskAction.class)
 	public static final String TransferTask = "TransferTask"; //POST
+	
+	@IspwAction(clazz = CancelDeployment.class)
+	public static final String CancelDeployment = "CancelDeployment"; //POST
 }

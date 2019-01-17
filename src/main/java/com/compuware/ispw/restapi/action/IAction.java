@@ -22,6 +22,8 @@ public interface IAction {
 	public static final String mname = "mname";
 	public static final String mtype = "mtype";
 	
+	public static final String requestId = "requestId";
+	
 	public static final String runtimeConfiguration = "runtimeConfiguration";
 	public static final String autoDeploy = "autoDeploy";
 	public static final String changeType = "changeType";
