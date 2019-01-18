@@ -6,8 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.compuware.ces.communications.service.data.EventCallback;
 import com.compuware.ces.model.BasicAuthentication;
 import com.compuware.ces.model.HttpHeader;
-import com.compuware.ispw.model.rest.SetInfo;
-import com.compuware.ispw.restapi.HttpMode;
 import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.JsonProcessor;
@@ -21,12 +19,10 @@ import com.compuware.ispw.restapi.util.RestApiUtils;
  * @author Sam Zhou
  *
  */
-public abstract class GenericPostAction<T> implements IAction {
-
-	private PrintStream logger;
+public abstract class GenericPostAction<T> extends AbstractPostAction {
 
 	public GenericPostAction(PrintStream logger) {
-		this.logger = logger;
+		super(logger);
 	}
 	
 	public IspwRequestBean getIspwRequestBean(Class<T> postClazz, String srid, String ispwRequestBody,
@@ -136,17 +132,6 @@ public abstract class GenericPostAction<T> implements IAction {
 		String jsonRequest = jsonGenerator.generate(postObject);
 		bean.setJsonRequest(jsonRequest);
 		return bean;
-
 	}
 
-	public PrintStream getLogger() {
-		return logger;
-	}
-
-	@Override
-	public HttpMode getHttpMode()
-	{
-		return HttpMode.POST;
-	}
-	
 }
