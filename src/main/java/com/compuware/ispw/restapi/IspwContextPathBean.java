@@ -54,27 +54,21 @@ public class IspwContextPathBean {
 	public void setLevel(String level) {
 		this.level = level;
 	}
-
 	public String getTaskId() {
 		return taskId;
 	}
-
 	public void setTaskId(String taskId) {
 		this.taskId = taskId;
 	}
-
 	public String getMname() {
 		return mname;
 	}
-
 	public void setMname(String mname) {
 		this.mname = mname;
 	}
-
 	public String getMtype() {
 		return mtype;
 	}
-
 	public void setMtype(String mtype) {
 		this.mtype = mtype;
 	}
