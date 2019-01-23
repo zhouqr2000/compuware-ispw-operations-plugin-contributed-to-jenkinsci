@@ -18,7 +18,8 @@ public class IspwContextPathBean {
 	private String taskId;
 	private String mname;
 	private String mtype;
-	
+	private String checkout = Constants.FALSE;
+
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
@@ -73,4 +74,11 @@ public class IspwContextPathBean {
 		this.mtype = mtype;
 	}
 	
+	public String getCheckout() {
+		return checkout;
+	}
+
+	public void setCheckout(String checkout) {
+		this.checkout = checkout;
+	}
 }

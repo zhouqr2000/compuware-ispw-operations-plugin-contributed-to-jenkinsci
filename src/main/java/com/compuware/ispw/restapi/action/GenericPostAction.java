@@ -75,6 +75,9 @@ public abstract class GenericPostAction<T> extends AbstractPostAction {
 					} else if (name.equals(mtype)) {
 						path = path.replace("{" + mtype + "}", value);
 						ispwContextPathBean.setMtype(value);
+					} else if (name.equals(checkout)) {
+						path = path.replace("{" + checkout + "}", value);
+						ispwContextPathBean.setMtype(value);
 					} else if (name.equals(httpHeaders)) {
 						ArrayList<HttpHeader> httpHeaders = RestApiUtils.toHttpHeaders(value);
 						if (!httpHeaders.isEmpty()) {
@@ -121,10 +124,23 @@ public abstract class GenericPostAction<T> extends AbstractPostAction {
 			ReflectUtils.reflectSetter(postObject, "eventCallbacks", events);
 		}
 		
-		//if level/mname/mtype not set, remove them from query string
+		//if query parms are not set, remove them from query string
 		path = path.replace("level={level}", StringUtils.EMPTY);
-		path = path.replace("&mname={mname}", StringUtils.EMPTY);
-		path = path.replace("&mtype={mtype}", StringUtils.EMPTY);
+		path = path.replace("mname={mname}", StringUtils.EMPTY);
+		path = path.replace("mtype={mtype}", StringUtils.EMPTY);
+		path = path.replace("checkout={checkout}", StringUtils.EMPTY);
+		
+		int index = path.indexOf("?");
+		if (index != -1) {
+			String s1 = path.substring(0, index);
+			String s2 = path.substring(index);
+			s2 = s2.replaceAll("[&]+", "&");
+			path = s1 + s2;
+			
+			if (path.endsWith("&")) {
+				path = path.substring(0, path.length() - 1);
+			}
+		}
 		
 		bean.setContextPath(path);
 
