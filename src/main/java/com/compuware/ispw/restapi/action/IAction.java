@@ -14,6 +14,7 @@ import com.compuware.ispw.restapi.WebhookToken;
  */
 @SuppressWarnings("nls")
 public interface IAction {
+	
 	public static final String application = "application";
 	public static final String assignmentId = "assignmentId";
 	public static final String assignmentPrefix = "assignmentPrefix";
@@ -33,14 +34,14 @@ public interface IAction {
 	public static final String eventsUrl = "events.url";
 	public static final String executionStatus = "executionStatus";
 	public static final String httpHeaders = "httpHeaders";
-	public static final String level = "level";
 	public static final String includeClosedContainers = "includeClosedContainers";
+	public static final String level = "level";
 	public static final String mname = "mname";
 	public static final String mtype = "mtype";
 	public static final String owner = "owner";
 	public static final String path = "path";
-	public static final String refNumber = "refNumber";
 	public static final String referenceNumber = "referenceNumber";
+	public static final String refNumber = "refNumber";
 	public static final String releaseId = "releaseId";
 	public static final String releasePrefix = "releasePrefix";
 	public static final String runtimeConfiguration = "runtimeConfiguration";
