@@ -65,4 +65,7 @@ public class IspwCommand {
 	
 	@IspwAction(clazz = TransferTaskAction.class)
 	public static final String TransferTask = "TransferTask"; //POST
+	
+	@IspwAction(clazz = GetContainerListAction.class)
+	public static final String GetContainerList = "GetContainerList"; //GET //$NON-NLS-1$
 }
