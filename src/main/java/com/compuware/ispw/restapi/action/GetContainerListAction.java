@@ -32,32 +32,25 @@ public class GetContainerListAction extends AbstractGetAction {
 		List<String> pathTokens = Arrays.asList(defaultProps);
 		IspwRequestBean ispwRequestBean =  super.getIspwRequestBean(srid, ispwRequestBody, contextPath, pathTokens);
 		String path = ispwRequestBean.getContextPath();
+		
 		//if parameters not set, remove them from query string
-		path = path.replace("?userId={userId}", StringUtils.EMPTY); //$NON-NLS-1$
-		path = path.replace("?containerId={containerId}", StringUtils.EMPTY); //$NON-NLS-1$
-		path = path.replace("?containerType={containerType}", StringUtils.EMPTY); //$NON-NLS-1$
-		path = path.replace("?application={application}", StringUtils.EMPTY); //$NON-NLS-1$
-		path = path.replace("?owner={owner}", StringUtils.EMPTY); //$NON-NLS-1$
-		path = path.replace("?description={description}", StringUtils.EMPTY); //$NON-NLS-1$
-		path = path.replace("?refNumber={refNumber}", StringUtils.EMPTY); //$NON-NLS-1$
-		path = path.replace("?releaseId={releaseId}", StringUtils.EMPTY); //$NON-NLS-1$
-		path = path.replace("?stream={stream}", StringUtils.EMPTY); //$NON-NLS-1$
-		path = path.replace("?path={path}", StringUtils.EMPTY); //$NON-NLS-1$
-		path = path.replace("?tag={tag}", StringUtils.EMPTY); //$NON-NLS-1$
-		path = path.replace("?includeClosedContainers={includeClosedContainers}", StringUtils.EMPTY); //$NON-NLS-1$
+		path = path.replace("userId={userId}", StringUtils.EMPTY); //$NON-NLS-1$
+		path = path.replace("containerId={containerId}", StringUtils.EMPTY); //$NON-NLS-1$
+		path = path.replace("containerType={containerType}", StringUtils.EMPTY); //$NON-NLS-1$
+		path = path.replace("application={application}", StringUtils.EMPTY); //$NON-NLS-1$
+		path = path.replace("owner={owner}", StringUtils.EMPTY); //$NON-NLS-1$
+		path = path.replace("description={description}", StringUtils.EMPTY); //$NON-NLS-1$
+		path = path.replace("refNumber={refNumber}", StringUtils.EMPTY); //$NON-NLS-1$
+		path = path.replace("releaseId={releaseId}", StringUtils.EMPTY); //$NON-NLS-1$
+		path = path.replace("stream={stream}", StringUtils.EMPTY); //$NON-NLS-1$
+		path = path.replace("path={path}", StringUtils.EMPTY); //$NON-NLS-1$
+		path = path.replace("tag={tag}", StringUtils.EMPTY); //$NON-NLS-1$
+		path = path.replace("includeClosedContainers={includeClosedContainers}", StringUtils.EMPTY); //$NON-NLS-1$
 
-		path = path.replace("&userId={userId}", StringUtils.EMPTY); //$NON-NLS-1$
-		path = path.replace("&containerId={containerId}", StringUtils.EMPTY); //$NON-NLS-1$
-		path = path.replace("&containerType={containerType}", StringUtils.EMPTY); //$NON-NLS-1$
-		path = path.replace("&application={application}", StringUtils.EMPTY); //$NON-NLS-1$
-		path = path.replace("&owner={owner}", StringUtils.EMPTY); //$NON-NLS-1$
-		path = path.replace("&description={description}", StringUtils.EMPTY); //$NON-NLS-1$
-		path = path.replace("&refNumber={refNumber}", StringUtils.EMPTY); //$NON-NLS-1$
-		path = path.replace("&releaseId={releaseId}", StringUtils.EMPTY); //$NON-NLS-1$
-		path = path.replace("&stream={stream}", StringUtils.EMPTY); //$NON-NLS-1$
-		path = path.replace("&path={path}", StringUtils.EMPTY); //$NON-NLS-1$
-		path = path.replace("&tag={tag}", StringUtils.EMPTY); //$NON-NLS-1$
-		path = path.replace("&includeClosedContainers={includeClosedContainers}", StringUtils.EMPTY); //$NON-NLS-1$
+		path = path.replaceAll("[&]+", StringUtils.EMPTY);
+		if (path.endsWith("&")) {
+			path = path.substring(0, path.length() - 1);
+		}
 		
 		ispwRequestBean.setContextPath(path);
 		
