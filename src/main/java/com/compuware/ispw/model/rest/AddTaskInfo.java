@@ -37,14 +37,14 @@ public class AddTaskInfo
 	@XmlElement(name="releaseId")
 	private String releaseId;
 
-	public String getRuntimeConfig()
+	public String getRuntimeConfiguration()
 	{
 		return runtimeConfiguration;
 	}
 
-	public void setRuntimeConfig(String runtimeConfig)
+	public void setRuntimeConfiguration(String runtimeConfiguration)
 	{
-		this.runtimeConfiguration = runtimeConfig;
+		this.runtimeConfiguration = runtimeConfiguration;
 	}
 	
 	public String getTaskName()
@@ -127,12 +127,12 @@ public class AddTaskInfo
 		this.checkoutFromLevel = checkoutFromLevel;
 	}
 
-	public String getRelease()
+	public String getReleaseId()
 	{
 		return releaseId;
 	}
 
-	public void setRelease(String releaseId)
+	public void setReleaseId(String releaseId)
 	{
 		this.releaseId = releaseId;
 	}

@@ -2,7 +2,10 @@ package com.compuware.ispw.restapi.action;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
+
 import com.compuware.ces.communications.service.data.EventCallback;
 import com.compuware.ces.model.BasicAuthentication;
 import com.compuware.ces.model.HttpHeader;
@@ -35,6 +38,8 @@ public abstract class GenericPostAction<T> extends AbstractPostAction {
 		bean.setIspwContextPathBean(ispwContextPathBean);
 		
 		String path = contextPath.replace("{srid}", srid);
+		List<String> allParams = RestApiUtils.listAllParams(path);
+		
 		T postObject = ReflectUtils.newInstance(postClazz);
 		
 		bean.setJsonObject(postObject);
@@ -60,25 +65,7 @@ public abstract class GenericPostAction<T> extends AbstractPostAction {
 								.trimToEmpty(line.substring(indexOfEqualSign + 1, line.length()));
 
 				if (StringUtils.isNotBlank(value)) {
-					if (name.equals(assignmentId)) {
-						path = path.replace("{" + assignmentId + "}", value);
-						ispwContextPathBean.setAssignmentId(value);
-					} else if(name.equals(releaseId)) {
-						path = path.replace("{" + releaseId + "}", value);
-						ispwContextPathBean.setReleaseId(value);
-					} else if (name.equals(level)) {
-						path = path.replace("{" + level + "}", value);
-						ispwContextPathBean.setLevel(value);
-					} else if (name.equals(mname)) {
-						path = path.replace("{" + mname + "}", value);
-						ispwContextPathBean.setMname(value);
-					} else if (name.equals(mtype)) {
-						path = path.replace("{" + mtype + "}", value);
-						ispwContextPathBean.setMtype(value);
-					} else if (name.equals(checkout)) {
-						path = path.replace("{" + checkout + "}", value);
-						ispwContextPathBean.setMtype(value);
-					} else if (name.equals(httpHeaders)) {
+					if (name.equals(httpHeaders)) {
 						ArrayList<HttpHeader> httpHeaders = RestApiUtils.toHttpHeaders(value);
 						if (!httpHeaders.isEmpty()) {
 							ReflectUtils.reflectSetter(postObject, "httpHeaders", value);
@@ -110,6 +97,12 @@ public abstract class GenericPostAction<T> extends AbstractPostAction {
 							event.setCredentials(auth);
 						}
 					} else {
+
+						//if the context path contains the name, replace the {name} with the true value
+						if(allParams.contains(name)) {
+							path = path.replace("{" + name + "}", value);
+						}
+						
 						ReflectUtils.reflectSetter(postObject, name, value); // set the rest of the
 																				// SetInfo fields using
 																				// reflection
@@ -123,26 +116,8 @@ public abstract class GenericPostAction<T> extends AbstractPostAction {
 			event.setUrl(webhookToken.getURL());
 			ReflectUtils.reflectSetter(postObject, "eventCallbacks", events);
 		}
-		
-		//if query parms are not set, remove them from query string
-		path = path.replace("level={level}", StringUtils.EMPTY);
-		path = path.replace("mname={mname}", StringUtils.EMPTY);
-		path = path.replace("mtype={mtype}", StringUtils.EMPTY);
-		path = path.replace("checkout={checkout}", StringUtils.EMPTY);
-		
-		int index = path.indexOf("?");
-		if (index != -1) {
-			String s1 = path.substring(0, index);
-			String s2 = path.substring(index);
-			s2 = s2.replaceAll("[&]+", "&");
-			path = s1 + s2;
-			
-			if (path.endsWith("&")) {
-				path = path.substring(0, path.length() - 1);
-			}
-		}
-		
-		bean.setContextPath(path);
+
+		bean.setContextPath(RestApiUtils.cleanContextPath(path));
 
 		JsonProcessor jsonGenerator = new JsonProcessor();
 		String jsonRequest = jsonGenerator.generate(postObject);
