@@ -69,6 +69,9 @@ public abstract class SetInfoPostAction implements IAction {
 					} else if(name.equals(releaseId)) {
 						path = path.replace("{" + releaseId + "}", value);
 						ispwContextPathBean.setReleaseId(value);
+					} else if(name.equals(requestId)) {
+						path = path.replace("{" + requestId + "}", value);
+						ispwContextPathBean.setRequestId(value);
 					} else if (name.equals(level)) {
 						path = path.replace("{" + level + "}", value);
 						ispwContextPathBean.setLevel(value);

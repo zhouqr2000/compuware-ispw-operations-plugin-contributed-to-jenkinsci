@@ -44,6 +44,7 @@ public interface IAction {
 	public static final String refNumber = "refNumber";
 	public static final String releaseId = "releaseId";
 	public static final String releasePrefix = "releasePrefix";
+	public static final String requestId = "requestId";
 	public static final String runtimeConfiguration = "runtimeConfiguration";
 	public static final String setId = "setId";
 	public static final String stream = "stream";
@@ -52,7 +53,7 @@ public interface IAction {
 	public static final String taskId = "taskId";
 	public static final String userId = "userId";
 	public static final String userTag = "userTag";
-
+	
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody,
 			WebhookToken webhookToken);
 	
