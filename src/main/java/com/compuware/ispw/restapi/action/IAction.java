@@ -12,6 +12,7 @@ import com.compuware.ispw.restapi.WebhookToken;
  * @author Sam Zhou
  *
  */
+@SuppressWarnings("nls")
 public interface IAction {
 	
 	public static final String application = "application";
@@ -19,6 +20,8 @@ public interface IAction {
 	public static final String assignmentPrefix = "assignmentPrefix";
 	public static final String autoDeploy = "autoDeploy";
 	public static final String changeType = "changeType";
+	public static final String containerId = "containerId";
+	public static final String containerType = "containerType";
 	public static final String credentials = "credentials";
 	public static final String defaultPath = "defaultPath";
 	public static final String description = "description";
@@ -31,11 +34,14 @@ public interface IAction {
 	public static final String eventsUrl = "events.url";
 	public static final String executionStatus = "executionStatus";
 	public static final String httpHeaders = "httpHeaders";
+	public static final String includeClosedContainers = "includeClosedContainers";
 	public static final String level = "level";
 	public static final String mname = "mname";
 	public static final String mtype = "mtype";
 	public static final String owner = "owner";
+	public static final String path = "path";
 	public static final String referenceNumber = "referenceNumber";
+	public static final String refNumber = "refNumber";
 	public static final String releaseId = "releaseId";
 	public static final String releasePrefix = "releasePrefix";
 	public static final String requestId = "requestId";
@@ -43,7 +49,9 @@ public interface IAction {
 	public static final String setId = "setId";
 	public static final String stream = "stream";
 	public static final String system = "system";
+	public static final String tag = "tag";
 	public static final String taskId = "taskId";
+	public static final String userId = "userId";
 	public static final String userTag = "userTag";
 	
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody,
