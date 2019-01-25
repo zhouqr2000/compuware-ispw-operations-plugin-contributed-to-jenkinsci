@@ -21,11 +21,10 @@ import com.compuware.ispw.restapi.action.IspwCommand;
  * @author Sam Zhou
  *
  */
-public class ReflectUtils
-{
+public class ReflectUtils {
 	private static Logger logger = Logger.getLogger(ReflectUtils.class);
 
-	public static void reflectSetter(Object object, String name, String value) {
+	public static void reflectSetter(Object object, String name, Object value) {
 
 		List<Field> fields = FieldUtils.getAllFieldsList(object.getClass());
 		for (Field field : fields) {
@@ -37,50 +36,37 @@ public class ReflectUtils
 				jsonName = xmlElement.name(); // use annotation name if presented
 			}
 
-			logger.info("json.name=" + jsonName + ", type=" + field.getType().getName()
-					+ ", value=" + value);
+			logger.info("json.name=" + jsonName + ", type=" + field.getType().getName() + ", value=" + value);
 			if (jsonName.equals(name)) {
 				try {
-					if (field.getType().equals(String.class)) {
-						BeanUtils.setProperty(object, fieldName, value);
-					} else if (field.getType().equals(Boolean.class)) {
-						BeanUtils.setProperty(object, fieldName, Boolean.valueOf(value));
-					}
+					BeanUtils.setProperty(object, fieldName, value);
 				} catch (IllegalAccessException | InvocationTargetException e) {
-					logger.warn("Property key " + name + "(" + jsonName
-							+ ") is invalid, cannot be set to class " + object.getClass().getName()
-							+ "as value [" + value + "])");
+					logger.warn("Property key " + name + "(" + jsonName + ") is invalid, cannot be set to class "
+							+ object.getClass().getName() + "as value [" + value + "])");
 				}
 			}
 		}
 
 	}
-	
-	public static String[] listPublishedCommands()
-	{
+
+	public static String[] listPublishedCommands() {
 		ArrayList<String> commands = new ArrayList<String>();
 		List<Field> fields = FieldUtils.getAllFieldsList(IspwCommand.class);
 
-		for (Field field : fields)
-		{
-			if (field.isAnnotationPresent(IspwAction.class))
-			{
+		for (Field field : fields) {
+			if (field.isAnnotationPresent(IspwAction.class)) {
 				IspwAction ispwAction = field.getAnnotation(IspwAction.class);
 				Class<?> clazz = ispwAction.clazz();
 				boolean isExposed = ispwAction.exposed();
 
 				String command = StringUtils.EMPTY;
-				try
-				{
+				try {
 					command = (String) FieldUtils.readStaticField(field);
-					
-					if (isExposed)
-					{
+
+					if (isExposed) {
 						commands.add(command);
 					}
-				}
-				catch (IllegalAccessException e)
-				{
+				} catch (IllegalAccessException e) {
 					String message = String.format("Failed to read command value in field: %s, clazz: %s", command,
 							clazz.getName());
 					logger.error(message, e);
@@ -91,29 +77,22 @@ public class ReflectUtils
 		return commands.toArray(new String[commands.size()]);
 	}
 
-	public static Class<?> getCommandClass(String command)
-	{
+	public static Class<?> getCommandClass(String command) {
 		Class<?> clazz = null;
 
 		List<Field> fields = FieldUtils.getAllFieldsList(IspwCommand.class);
 
-		for (Field field : fields)
-		{
-			if (field.isAnnotationPresent(IspwAction.class))
-			{
+		for (Field field : fields) {
+			if (field.isAnnotationPresent(IspwAction.class)) {
 				String definedCommand = StringUtils.EMPTY;
-				try
-				{
+				try {
 					definedCommand = (String) FieldUtils.readStaticField(field);
-				}
-				catch (IllegalAccessException e)
-				{
+				} catch (IllegalAccessException e) {
 					String message = String.format("Failed to read command value in field: %s", command);
 					logger.error(message, e);
 				}
 
-				if (definedCommand.equals(command))
-				{
+				if (definedCommand.equals(command)) {
 					IspwAction ispwAction = field.getAnnotation(IspwAction.class);
 					clazz = ispwAction.clazz();
 				}
@@ -126,19 +105,15 @@ public class ReflectUtils
 		return clazz;
 	}
 
-	public static IAction createAction(String command, PrintStream log)
-	{
+	public static IAction createAction(String command, PrintStream log) {
 		IAction action = null;
 		Class<?> clazz = getCommandClass(command);
 
-		if (clazz != null)
-		{
-			try
-			{
+		if (clazz != null) {
+			try {
 				action = (IAction) ConstructorUtils.invokeConstructor(clazz, log);
-			}
-			catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e)
-			{
+			} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException
+					| InstantiationException e) {
 				String message = String.format("Failed to instantiate command: %s from action class: %s", command,
 						clazz.getName());
 				log.println(message);
@@ -147,29 +122,46 @@ public class ReflectUtils
 			}
 		}
 
-		String message = String.format("Reflect to instantiate command %s -> Class %s -> instance %s", command, clazz.getName(),
-				action.toString());
+		String message = String.format("Reflect to instantiate command %s -> Class %s -> instance %s", command,
+				clazz.getName(), action.toString());
 		logger.info(message);
 
 		return action;
 	}
-	
+
 	/**
-	 * Determines whether the specified <code>IAction</code> is non-null therefore has been instantiated via reflection.
+	 * Determines whether the specified <code>IAction</code> is non-null therefore
+	 * has been instantiated via reflection.
 	 * 
 	 * @param iAction
 	 *            The <code>IAction</code>
 	 * @return whether or not the IAction has been instantiated
 	 */
-	public static boolean isActionInstantiated(IAction iAction)
-	{
-		if (iAction == null)
-		{
+	public static boolean isActionInstantiated(IAction iAction) {
+		if (iAction == null) {
 			return false;
-		}
-		else
-		{
+		} else {
 			return true;
 		}
 	}
+
+	/**
+	 * Instance a generic type, must contains a default constructor
+	 * 
+	 * @param clazz
+	 *            the class to be instantiated
+	 * @return an instance of type T
+	 */
+	public static <T> T newInstance(Class<T> clazz) {
+		T t = null;
+
+		try {
+			return clazz.newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
+			logger.error(e.getMessage(), e);
+		}
+
+		return t;
+	}
+
 }

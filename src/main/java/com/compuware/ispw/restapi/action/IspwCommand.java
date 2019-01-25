@@ -65,10 +65,13 @@ public class IspwCommand {
 	
 	@IspwAction(clazz = TransferTaskAction.class)
 	public static final String TransferTask = "TransferTask"; //POST
-
+	
 	@IspwAction(clazz = GetContainerListAction.class)
-	public static final String GetContainerList = "GetContainerList"; //GET //$NON-NLS-1$
-		
+	public static final String GetContainerList = "GetContainerList"; //GET
+
 	@IspwAction(clazz = CancelDeployment.class)
 	public static final String CancelDeployment = "CancelDeployment"; //POST
+
+	@IspwAction(clazz = AddTaskAction.class)
+	public static final String AddTask = "AddTask"; //POST
 }

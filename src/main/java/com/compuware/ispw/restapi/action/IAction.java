@@ -53,6 +53,11 @@ public interface IAction {
 	public static final String taskId = "taskId";
 	public static final String userId = "userId";
 	public static final String userTag = "userTag";
+	public static final String action = "action";
+	public static final String checkoutFromLevel = "checkoutFromLevel";
+	public static final String checkout = "checkout";
+	public static final String taskName = "taskName"; //TODO: need to update to mname/mtype to be consistent on CES side
+	public static final String type = "type";
 	
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody,
 			WebhookToken webhookToken);

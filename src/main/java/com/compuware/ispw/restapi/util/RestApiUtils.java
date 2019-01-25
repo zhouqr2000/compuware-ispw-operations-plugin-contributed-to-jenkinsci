@@ -3,16 +3,21 @@ package com.compuware.ispw.restapi.util;
 import static com.cloudbees.plugins.credentials.CredentialsMatchers.filter;
 import static com.cloudbees.plugins.credentials.CredentialsMatchers.withId;
 import static com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials;
+
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
+
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
@@ -24,6 +29,7 @@ import com.compuware.ispw.restapi.JsonProcessor;
 import com.compuware.ispw.restapi.ResponseContentSupplier;
 import com.compuware.jenkins.common.configuration.CpwrGlobalConfiguration;
 import com.compuware.jenkins.common.configuration.HostConnection;
+
 import hudson.model.Item;
 import hudson.security.ACL;
 import hudson.util.ListBoxModel;
@@ -287,4 +293,75 @@ public class RestApiUtils {
 		return Constants.TRUE.equalsIgnoreCase(debugMode);
 	}
 
+	/**
+	 * List all parameters in the contextPath based on pairs of {}
+	 * 
+	 * @param contextPath the context path
+	 * @return array of all parameters
+	 */
+	public static List<String> listAllParams(String contextPath) {
+		List<String> queryParms = new ArrayList<String>();
+		
+		Pattern pattern = Pattern.compile("\\{(\\w+)\\}");
+		Matcher matcher = pattern.matcher(contextPath);
+		while (matcher.find()) {
+			for (int i = 0; i < matcher.groupCount(); i++) {
+				String key = matcher.group(i);
+				String key2 = key.substring(1, key.length()-1);
+				queryParms.add(key2);
+			}
+		}			
+		
+		return queryParms;
+	}
+	
+	
+	/**
+	 * Found out what is the query parameter names based on pairs of {}
+	 * @param contextPath the context path
+	 * @return array of query parameter names
+	 */
+	public static List<String> listQueryParams(String contextPath) {
+		List<String> queryParams = new ArrayList<String>();
+		
+		int index = contextPath.indexOf("?");
+		if (index != -1) {
+			
+			String s2 = contextPath.substring(index);
+			queryParams = listAllParams(s2);		
+		}
+		
+		return queryParams;
+	}
+	
+	/**
+	 * Clean up the context path and replace unused query parameters
+	 * @param contextPath the context path
+	 * @return context path that is ready for submit
+	 */
+	public static String cleanContextPath(String contextPath) {
+		String resultPath = contextPath;
+		
+		List<String> queryParams = listQueryParams(contextPath);
+		
+		int index = contextPath.indexOf("?");
+		if (index != -1) {
+			String s1 = contextPath.substring(0, index);
+			String s2 = contextPath.substring(index);
+			
+			for(String queryParam : queryParams) {
+				s2 = s2.replace(queryParam+"={"+queryParam+"}", StringUtils.EMPTY);
+			}
+			
+			s2 = s2.replaceAll("[&]+", "&");
+			if(s2.endsWith("&")) {
+				s2 = s2.substring(0, s2.length()-1);
+			}
+
+			resultPath = s1 + s2;
+		}
+		
+		return resultPath;
+	}
+	
 }
