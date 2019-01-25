@@ -13,6 +13,7 @@ public class IspwContextPathBean {
 	private String srid;
 	private String assignmentId;
 	private String releaseId;
+	private String requestId;
 	private String setId;
 	private String level;
 	private String taskId;
@@ -43,6 +44,15 @@ public class IspwContextPathBean {
 	public void setReleaseId(String releaseId) {
 		this.releaseId = releaseId;
 	}
+
+	public String getRequestId() {
+		return requestId;
+	}
+
+	public void setRequestId(String requestId) {
+		this.requestId = requestId;
+	}
+
 	public String getSetId() {
 		return setId;
 	}

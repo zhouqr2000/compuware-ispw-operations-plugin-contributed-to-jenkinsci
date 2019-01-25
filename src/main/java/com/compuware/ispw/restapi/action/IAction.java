@@ -44,6 +44,7 @@ public interface IAction {
 	public static final String refNumber = "refNumber";
 	public static final String releaseId = "releaseId";
 	public static final String releasePrefix = "releasePrefix";
+	public static final String requestId = "requestId";
 	public static final String runtimeConfiguration = "runtimeConfiguration";
 	public static final String setId = "setId";
 	public static final String stream = "stream";
