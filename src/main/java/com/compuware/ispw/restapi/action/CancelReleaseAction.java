@@ -4,7 +4,6 @@ import java.io.PrintStream;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.compuware.ispw.model.rest.DeploymentResponse;
 import com.compuware.ispw.model.rest.ReleaseResponse;
 import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;

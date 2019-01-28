@@ -4,23 +4,23 @@ import java.io.PrintStream;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.compuware.ispw.model.rest.ReleaseResponse;
+import com.compuware.ispw.model.rest.AssignmentResponse;
 import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.JsonProcessor;
 import com.compuware.ispw.restapi.WebhookToken;
 
-public class CloseReleaseAction extends SetInfoPostAction {
+public class CancelAssignmentAction extends SetInfoPostAction {
 
-	private static final String[] defaultProps = new String[] { releaseId, runtimeConfiguration };
-	private static final String contextPath = "/ispw/{srid}/releases/{releaseId}/close";
+	private static final String[] defaultProps = new String[] { assignmentId, runtimeConfiguration };
+	private static final String contextPath = "/ispw/{srid}/assignments/{assignmentId}/cancel";
 
 	/**
 	 * Constructor
 	 * 
 	 * @param logger
 	 */
-	public CloseReleaseAction(PrintStream logger) {
+	public CancelAssignmentAction(PrintStream logger) {
 		super(logger);
 	}
 
@@ -43,7 +43,7 @@ public class CloseReleaseAction extends SetInfoPostAction {
 	 */
 	@Override
 	public void startLog(PrintStream logger, IspwContextPathBean ispwContextPathBean, Object jsonObject) {
-		String msg = String.format("Close release %s", ispwContextPathBean.getReleaseId());
+		String msg = String.format("Cancel assignment %s", ispwContextPathBean.getAssignmentId());
 		logger.println(msg);
 	}
 
@@ -55,11 +55,11 @@ public class CloseReleaseAction extends SetInfoPostAction {
 	 */
 	@Override
 	public Object endLog(PrintStream logger, IspwRequestBean ispwRequestBean, String responseJson) {
-		ReleaseResponse releaseResp = new JsonProcessor().parse(responseJson, ReleaseResponse.class);
-		logger.println("Close release " + ispwRequestBean.getIspwContextPathBean().getReleaseId() + " is submitted. "
-				+ StringUtils.trimToEmpty(releaseResp.getMessage()));
+		AssignmentResponse assignResp = new JsonProcessor().parse(responseJson, AssignmentResponse.class);
+		logger.println("Cancel assignment " + ispwRequestBean.getIspwContextPathBean().getAssignmentId()
+				+ " is submitted. " + StringUtils.trimToEmpty(assignResp.getMessage()));
 
-		return releaseResp;
+		return assignResp;
 	}
 
 }

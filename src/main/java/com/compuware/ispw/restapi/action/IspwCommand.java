@@ -80,4 +80,11 @@ public class IspwCommand {
 	
 	@IspwAction(clazz = CloseReleaseAction.class)
 	public static final String CloseRelease = "CloseRelease"; //POST
+	
+	@IspwAction(clazz = CancelAssignmentAction.class)
+	public static final String CancelAssignment = "CancelAssignment"; //POST
+	
+	@IspwAction(clazz = CloseAssignmentAction.class)
+	public static final String CloseAssignment = "CloseAssignment"; //POST
+	
 }
