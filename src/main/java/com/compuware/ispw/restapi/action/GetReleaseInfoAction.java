@@ -48,7 +48,7 @@ public class GetReleaseInfoAction extends AbstractGetAction {
 				+ releaseInfo.getDescription());
 		logger.println("Owner: " + releaseInfo.getOwner());
 		logger.println("Work reference #: " + releaseInfo.getWorkRefNumber());
-		logger.println("Release reference: " + releaseInfo.getReleasePreference());
+		logger.println("Release prefix: " + releaseInfo.getReleasePrefix());
 		logger.println("User tag: " + releaseInfo.getUserTag());
 		
 		return releaseInfo;
