@@ -2,6 +2,8 @@ package com.compuware.ispw.restapi.action;
 
 import java.io.PrintStream;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.compuware.ispw.model.rest.ReleaseInfo;
 import com.compuware.ispw.model.rest.ReleaseResponse;
 import com.compuware.ispw.restapi.IspwContextPathBean;
@@ -38,9 +40,13 @@ public class CreateReleaseAction extends AbstractPostAction {
 	public void startLog(PrintStream logger, IspwContextPathBean ispwContextPathBean, Object jsonObject)
 	{
 		ReleaseInfo releaseInfo = (ReleaseInfo) jsonObject;
-		logger.println("Creating Release on " + releaseInfo.getStream() + "/"
-				+ releaseInfo.getApplication() + " as " + releaseInfo.getReleaseId() + " - "
-				+ releaseInfo.getDescription());
+
+		String releaseMsg = StringUtils.trimToEmpty(
+				StringUtils.isBlank(releaseInfo.getReleaseId()) ? "releasePrefix:" + releaseInfo.getReleasePrefix()
+						: "releaseId:" + releaseInfo.getReleaseId());
+
+		logger.println("Creating Release on " + releaseInfo.getStream() + "/" + releaseInfo.getApplication() + " as "
+				+ releaseMsg + " - " + releaseInfo.getDescription());
 	}
 
 	@Override
