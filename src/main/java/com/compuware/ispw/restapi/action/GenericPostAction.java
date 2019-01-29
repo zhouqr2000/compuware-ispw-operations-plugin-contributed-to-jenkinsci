@@ -101,6 +101,8 @@ public abstract class GenericPostAction<T> extends AbstractPostAction {
 						//if the context path contains the name, replace the {name} with the true value
 						if(allParams.contains(name)) {
 							path = path.replace("{" + name + "}", value);
+							
+							ReflectUtils.reflectSetter(ispwContextPathBean, name, value);
 						}
 						
 						ReflectUtils.reflectSetter(postObject, name, value); // set the rest of the

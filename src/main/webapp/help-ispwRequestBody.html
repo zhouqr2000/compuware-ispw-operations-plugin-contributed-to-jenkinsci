@@ -3,6 +3,7 @@
   <head>
     <meta http-equiv="content-type" content="text/html;
       charset=windows-1252">
+    <title></title>
   </head>
   <body>
     <div><br>
@@ -40,6 +41,219 @@
         </tbody>
       </table>
       <!--GenerateTasksInAssignment/GenerateTasksInRelease--> <br>
+      <strong>AddTask action:</strong> <br>
+      Required:
+      <table border="1">
+        <tbody>
+          <tr>
+            <td>assignmentId<br>
+            </td>
+            <td>The assignment ID to add task to<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">taskName<br>
+            </td>
+            <td valign="top">The name of the task to be added<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">type<br>
+            </td>
+            <td valign="top">The type of the task<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">stream<br>
+            </td>
+            <td valign="top">The stream<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">application<br>
+            </td>
+            <td valign="top">The application name<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">path<br>
+            </td>
+            <td valign="top">the path to checkout to<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">checkoutFromLevel<br>
+            </td>
+            <td valign="top">the level to checkout from<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">owner<br>
+            </td>
+            <td valign="top">The user<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">releaseId<br>
+            </td>
+            <td valign="top">The default release<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      Optional:<br>
+      <table border="1">
+        <tbody>
+          <tr>
+            <td valign="top">runtimeConfiguration<br>
+            </td>
+            <td valign="top">The runtime configuration<br>
+            </td>
+          </tr>
+          <tr>
+            <td>checkout<br>
+            </td>
+            <td>default to only add, if true, also checkout the task<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      Example:
+      <table border="1">
+        <tbody>
+          <tr>
+            <td>AddTask</td>
+          </tr>
+          <tr>
+            <td>
+              <pre>runtimeConfiguration=TPZP<br>assignmentId=PLAY001386<br>taskName=TREXX23<br>stream=PLAY<br>application=PLAY<br>type=CLST<br>path=DEV1<br>owner=Foobar<br>checkoutFromLevel=PRD<br>releaseId=R1<br></pre>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      <br>
+      <strong>CancelDeployment action:</strong> <br>
+      Required: <br>
+      <table border="1">
+        <tbody>
+          <tr>
+            <td>requestId</td>
+            <td>The deployment with the request ID to be cancelled<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      Optional:<br>
+      <table border="1">
+        <tbody>
+          <tr>
+            <td valign="top">runtimeConfiguration<br>
+            </td>
+            <td valign="top">The runtime configuration<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      Example:
+      <table border="1">
+        <tbody>
+          <tr>
+            <td>TransferTask</td>
+          </tr>
+          <tr>
+            <td>
+              <pre>runtimeConfiguration=TPZP<br>requestId=46158<br></pre>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      <b>CancelAssignment / CloseAssignment</b><br>
+      Required:<br>
+      <table border="1">
+        <tbody>
+          <tr>
+            <td>assignmentId</td>
+            <td>The assignment ID to be cancelled or closed<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      Optional:<br>
+      <table border="1">
+        <tbody>
+          <tr>
+            <td valign="top">runtimeConfiguration<br>
+            </td>
+            <td valign="top">The runtime configuration<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      Example:<br>
+      <table border="1">
+        <tbody>
+          <tr>
+            <td>CancelAssignment action<br>
+            </td>
+            <td>
+              <pre>runtimeConfiguration=TPZP<br>assignmentId=PLAY001437<br></pre>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">CloseAssignment action<br>
+            </td>
+            <td valign="top">
+              <pre>runtimeConfiguration=TPZP<br>assignmentId=PLAY001438</pre>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      <b>CancelRelease / CloseRelease</b><br>
+      Required:<br>
+      <table border="1">
+        <tbody>
+          <tr>
+            <td>releaseId</td>
+            <td>The releaseID to be cancelled or closed<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      Optional:<br>
+      <table border="1">
+        <tbody>
+          <tr>
+            <td valign="top">runtimeConfiguration<br>
+            </td>
+            <td valign="top">The runtime configuration<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      Example:<br>
+      <table border="1">
+        <tbody>
+          <tr>
+            <td>CancelRelease action<br>
+            </td>
+            <td>
+              <pre>runtimeConfiguration=TPZP<br>releaseId=REL01<br></pre>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">CloseRelease action<br>
+            </td>
+            <td valign="top">
+              <pre>runtimeConfiguration=TPZP<br>releaseId=REL02</pre>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      <br>
       <table border="0">
         <tbody>
           <tr>
@@ -410,8 +624,9 @@
           <tr>
             <td valign="top">tag<br>
             </td>
-            <td valign="top">User-definable four-character field. Trailing
-              wildcards are supported, i.e. TAG* (Case sensitive)<br>
+            <td valign="top">User-definable four-character field.
+              Trailing wildcards are supported, i.e. TAG* (Case
+              sensitive)<br>
             </td>
           </tr>
           <tr>
@@ -742,185 +957,9 @@
         </tbody>
       </table>
       <br>
-
-      <strong>CancelDeployment action:</strong> <br>
-      Required: <br>
-      <table border="1">
-        <tbody>
-          <tr>
-            <td>requestId</td>
-            <td>The deployment with the request ID to be cancelled<br>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      Optional:<br>
-      <table border="1">
-        <tbody>
-          <tr>
-            <td valign="top">runtimeConfiguration<br>
-            </td>
-            <td valign="top">The runtime configuration<br>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      Example:
-      <table border="1">
-        <tbody>
-          <tr>
-            <td>TransferTask</td>
-          </tr>
-          <tr>
-            <td>
-              <pre>runtimeConfiguration=TPZP<br>requestId=46158<br></pre>
-            </td>
-          </tr>
-        </tbody>
-      </table>
       <br>
-
-      
-      <strong>AddTask action:</strong> <br>
-      Required:
-      <table border="1">
-        <tbody>
-          <tr>
-            <td>assignmentId<br>
-            </td>
-            <td>The assignment ID to add task to<br>
-            </td>
-          </tr>
-          <tr>
-            <td valign="top">taskName<br>
-            </td>
-            <td valign="top">The name of the task to be added<br>
-            </td>
-          </tr>
-          <tr>
-            <td valign="top">type<br>
-            </td>
-            <td valign="top">The type of the task<br>
-            </td>
-          </tr>
-          <tr>
-            <td valign="top">stream<br>
-            </td>
-            <td valign="top">The stream<br>
-            </td>
-          </tr>
-          <tr>
-            <td valign="top">application<br>
-            </td>
-            <td valign="top">The application name<br>
-            </td>
-          </tr>
-          <tr>
-            <td valign="top">path<br>
-            </td>
-            <td valign="top">the path to checkout to<br>
-            </td>
-          </tr>
-          <tr>
-            <td valign="top">checkoutFromLevel<br>
-            </td>
-            <td valign="top">the level to checkout from<br>
-            </td>
-          </tr>
-          <tr>
-            <td valign="top">owner<br>
-            </td>
-            <td valign="top">The user<br>
-            </td>
-          </tr>
-          <tr>
-            <td valign="top">releaseId<br>
-            </td>
-            <td valign="top">The default release<br>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      Optional:<br>
-      <table border="1">
-        <tbody>
-          <tr>
-            <td valign="top">runtimeConfiguration<br>
-            </td>
-            <td valign="top">The runtime configuration<br>
-            </td>
-          </tr>
-          <tr>
-            <td>checkout<br>
-            </td>
-            <td>default to only add, if true, also checkout the task<br>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      Example:
-      <table border="1">
-        <tbody>
-          <tr>
-            <td>AddTask</td>
-          </tr>
-          <tr>
-            <td>
-              <pre>runtimeConfiguration=TPZP<br>assignmentId=PLAY001386<br>taskName=TREXX23<br>stream=PLAY<br>application=PLAY<br>type=CLST<br>path=DEV1<br>owner=Foobar<br>checkoutFromLevel=PRD<br>releaseId=R1<br></pre>
-            </td>
-          </tr>
-        </tbody>
-      </table>
       <br>
-      <strong></strong><br>
-      <strong></strong><strong>GetSetInfo action:</strong> <br>
-      Required:
-      <table border="1">
-        <tbody>
-          <tr>
-            <td>setId</td>
-            <td>The set ID you want info on</td>
-          </tr>
-        </tbody>
-      </table>
-      Example:
-      <table border="1">
-        <tbody>
-          <tr>
-            <td>GetSetInfoAction</td>
-          </tr>
-          <tr>
-            <td>
-              <pre>setId=S000015218</pre>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <!--GetSetTaskList--> <br>
-      <strong>GetSetTaskList action:</strong> <br>
-      Required:
-      <table border="1">
-        <tbody>
-          <tr>
-            <td>setId</td>
-            <td>The set ID you want info on</td>
-          </tr>
-        </tbody>
-      </table>
-      Example:
-      <table border="1">
-        <tbody>
-          <tr>
-            <td>GetSetTaskList</td>
-          </tr>
-          <tr>
-            <td>
-              <pre>setId=S000015218<br></pre>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
     </div>
+    <br>
   </body>
 </html>

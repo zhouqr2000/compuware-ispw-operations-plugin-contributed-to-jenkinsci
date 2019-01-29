@@ -74,4 +74,17 @@ public class IspwCommand {
 
 	@IspwAction(clazz = AddTaskAction.class)
 	public static final String AddTask = "AddTask"; //POST
+	
+	@IspwAction(clazz = CancelReleaseAction.class)
+	public static final String CancelRelease = "CancelRelease"; //POST
+	
+	@IspwAction(clazz = CloseReleaseAction.class)
+	public static final String CloseRelease = "CloseRelease"; //POST
+	
+	@IspwAction(clazz = CancelAssignmentAction.class)
+	public static final String CancelAssignment = "CancelAssignment"; //POST
+	
+	@IspwAction(clazz = CloseAssignmentAction.class)
+	public static final String CloseAssignment = "CloseAssignment"; //POST
+	
 }
