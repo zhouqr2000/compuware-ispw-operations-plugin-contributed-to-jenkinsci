@@ -46,8 +46,9 @@ public class GetContainerListAction extends AbstractGetAction {
 		path = path.replace("path={path}", StringUtils.EMPTY); //$NON-NLS-1$
 		path = path.replace("tag={tag}", StringUtils.EMPTY); //$NON-NLS-1$
 		path = path.replace("includeClosedContainers={includeClosedContainers}", StringUtils.EMPTY); //$NON-NLS-1$
-
-		path = path.replaceAll("[&]+", StringUtils.EMPTY);
+		
+		path = path.replaceAll("[&]+", "&");
+		
 		if (path.endsWith("&")) {
 			path = path.substring(0, path.length() - 1);
 		}
