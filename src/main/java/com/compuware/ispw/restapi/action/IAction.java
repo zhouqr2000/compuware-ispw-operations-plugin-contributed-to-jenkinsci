@@ -26,6 +26,8 @@ public interface IAction {
 	public static final String defaultPath = "defaultPath";
 	public static final String description = "description";
 	public static final String dpenvlst = "dpenvlst";
+	public static final String endDate = "endDate";
+	public static final String environment = "environment";
 	public static final String eventsBody = "events.body";
 	public static final String eventsCredentials = "events.credentials";
 	public static final String eventsHttpHeaders = "events.httpHeaders";
@@ -33,13 +35,20 @@ public interface IAction {
 	public static final String eventsName = "events.name";
 	public static final String eventsUrl = "events.url";
 	public static final String executionStatus = "executionStatus";
+	public static final String group = "group";
+	public static final String historical = "historical";
 	public static final String httpHeaders = "httpHeaders";
 	public static final String includeClosedContainers = "includeClosedContainers";
+	public static final String inProgress = "inProgress";
+	public static final String lastUpdatedBy = "lastUpdatedBy";
 	public static final String level = "level";
 	public static final String mname = "mname";
 	public static final String mtype = "mtype";
+	public static final String name = "name";
+	public static final String operation = "operation";
 	public static final String owner = "owner";
 	public static final String path = "path";
+	public static final String production = "production";
 	public static final String referenceNumber = "referenceNumber";
 	public static final String refNumber = "refNumber";
 	public static final String releaseId = "releaseId";
@@ -47,6 +56,7 @@ public interface IAction {
 	public static final String requestId = "requestId";
 	public static final String runtimeConfiguration = "runtimeConfiguration";
 	public static final String setId = "setId";
+	public static final String startDate = "startDate";
 	public static final String stream = "stream";
 	public static final String system = "system";
 	public static final String tag = "tag";

@@ -87,4 +87,7 @@ public class IspwCommand {
 	@IspwAction(clazz = CloseAssignmentAction.class)
 	public static final String CloseAssignment = "CloseAssignment"; //POST
 	
+	@IspwAction(clazz = GetWorkListAction.class)
+	public static final String GetWorkList = "GetWorkList"; //GET
+	
 }
