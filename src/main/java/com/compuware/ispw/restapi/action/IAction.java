@@ -23,6 +23,7 @@ public interface IAction {
 	public static final String containerId = "containerId";
 	public static final String containerType = "containerType";
 	public static final String credentials = "credentials";
+	public static final String currentLevel = "currentLevel";
 	public static final String defaultPath = "defaultPath";
 	public static final String description = "description";
 	public static final String dpenvlst = "dpenvlst";
@@ -43,6 +44,8 @@ public interface IAction {
 	public static final String lastUpdatedBy = "lastUpdatedBy";
 	public static final String level = "level";
 	public static final String mname = "mname";
+	public static final String moduleName = "moduleName";
+	public static final String moduleType = "moduleType";
 	public static final String mtype = "mtype";
 	public static final String name = "name";
 	public static final String operation = "operation";
@@ -57,6 +60,7 @@ public interface IAction {
 	public static final String runtimeConfiguration = "runtimeConfiguration";
 	public static final String setId = "setId";
 	public static final String startDate = "startDate";
+	public static final String startingLevel = "startingLevel";
 	public static final String stream = "stream";
 	public static final String system = "system";
 	public static final String tag = "tag";
