@@ -7,6 +7,7 @@ package com.compuware.ispw.restapi.action;
  * @author Sam Zhou
  *
  */
+@SuppressWarnings("nls")
 public class IspwCommand {
 	
 	@IspwAction(clazz = CreateAssignmentAction.class)
@@ -65,6 +66,9 @@ public class IspwCommand {
 	
 	@IspwAction(clazz = TransferTaskAction.class)
 	public static final String TransferTask = "TransferTask"; //POST
+	
+	@IspwAction(clazz = RemoveFromReleaseAction.class)
+	public static final String RemoveFromRelease = "RemoveFromRelease"; //POST
 	
 	@IspwAction(clazz = GetContainerListAction.class)
 	public static final String GetContainerList = "GetContainerList"; //GET
