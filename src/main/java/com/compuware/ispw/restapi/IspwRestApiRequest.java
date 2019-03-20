@@ -426,6 +426,12 @@ public class IspwRestApiRequest extends Builder {
 							logger.println("Action " + ispwAction + " completed");
 							break;
 						}
+						else if (Constants.SET_STATE_FAILED.equalsIgnoreCase(setState))
+						{
+							logger.println("Set ID " + setId + " Failed for action "
+									+ ispwRequestBean.getIspwContextPathBean().getAction());
+							return false;
+						}
 					}
 				}
 
