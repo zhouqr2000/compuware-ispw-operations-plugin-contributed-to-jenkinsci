@@ -159,9 +159,6 @@
       <table border="1">
         <tbody>
           <tr>
-            <td>TransferTask</td>
-          </tr>
-          <tr>
             <td>
               <pre>runtimeConfiguration=TPZP<br>requestId=46158<br></pre>
             </td>
@@ -955,6 +952,7 @@
         </tbody>
       </table>
       <br>
+
       <strong>GetWorkList action:</strong> <br>
       Required: none<br>
       Optional:<br>
@@ -1078,6 +1076,51 @@
       </table>
       <br>
       <br>
+
+      <strong></strong><strong>RemoveFromRelease action:</strong> <br>
+      Optional:<br>
+      <table border="1">
+        <tbody>
+          <tr>
+            <td>level<br>
+            </td>
+            <td>All tasks at this level will be removed<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">mname<br>
+            </td>
+            <td valign="top">The component name to be removed<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">mtype<br>
+            </td>
+            <td valign="top">The component type to be removed<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">taskId<br>
+            </td>
+            <td valign="top">The task ID to be removed<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      Example:
+      <table border="1">
+        <tbody>
+          <tr>
+            <td>RemoveFromRelease</td>
+          </tr>
+          <tr>
+            <td>
+              <pre>releaseId=RLS123<br>level=DEV1<br>mname=TPROG01<br>mtype=COB<br>taskId=7E2BACADE42C<br></pre>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
       <br>
       <br>
     </div>
