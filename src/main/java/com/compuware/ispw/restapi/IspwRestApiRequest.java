@@ -22,6 +22,7 @@ import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
 import com.compuware.ispw.model.rest.SetInfoResponse;
 import com.compuware.ispw.model.rest.TaskResponse;
 import com.compuware.ispw.restapi.action.IAction;
+import com.compuware.ispw.restapi.action.SetOperationAction;
 import com.compuware.ispw.restapi.auth.BasicDigestAuthentication;
 import com.compuware.ispw.restapi.auth.FormAuthentication;
 import com.compuware.ispw.restapi.util.HttpClientUtil;
@@ -431,6 +432,31 @@ public class IspwRestApiRequest extends Builder {
 							logger.println("Set ID " + setId + " Failed for action "
 									+ ispwRequestBean.getIspwContextPathBean().getAction());
 							return false;
+						}
+						else if (Constants.SET_STATE_TERMINATED.equalsIgnoreCase(setState)
+								&& SetOperationAction.SET_ACTION_TERMINATE.equalsIgnoreCase(ispwRequestBean.getIspwContextPathBean().getAction()))
+						{
+							logger.println("Set " + setId + " successfully terminated");
+							break;
+						}
+						else if (Constants.SET_STATE_HELD.equalsIgnoreCase(setState)
+								&& SetOperationAction.SET_ACTION_HOLD.equalsIgnoreCase(ispwRequestBean.getIspwContextPathBean().getAction()))
+						{
+							logger.println("Set " + setId + " successfully held");
+							break;
+						}
+						else if (Constants.SET_STATE_HELD.equalsIgnoreCase(setState)
+								&& SetOperationAction.SET_ACTION_UNLOCK.equalsIgnoreCase(ispwRequestBean.getIspwContextPathBean().getAction()))
+						{
+							logger.println("Set " + setId + " successfully unlocked.  Set is currently held.");
+							break;
+						}
+						else if ((Constants.SET_STATE_RELEASED.equalsIgnoreCase(setState)
+								|| Constants.SET_STATE_WAITING_LOCK.equalsIgnoreCase(setState))
+								&& SetOperationAction.SET_ACTION_RELEASE.equalsIgnoreCase(ispwRequestBean.getIspwContextPathBean().getAction()))
+						{
+							logger.println("Set " + setId + " successfully released");
+							break;
 						}
 					}
 				}

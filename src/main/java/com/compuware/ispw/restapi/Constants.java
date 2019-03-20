@@ -23,7 +23,11 @@ public class Constants {
 	public static final String SET_STATE_COMPLETE = "Complete";
 	public static final String SET_STATE_CLOSED = "Closed";
 	public static final String SET_STATE_FAILED = "Failed";
+	public static final String SET_STATE_HELD = "Held";
+	public static final String SET_STATE_RELEASED = "Released";
+	public static final String SET_STATE_TERMINATED = "Terminated";
 	public static final String SET_STATE_WAITING_APPROVAL = "Waiting-Approval";
+	public static final String SET_STATE_WAITING_LOCK = "Waiting-Lock";
 
 	public static final int POLLING_COUNT = 120;
 	public static final int POLLING_INTERVAL = 2000;
