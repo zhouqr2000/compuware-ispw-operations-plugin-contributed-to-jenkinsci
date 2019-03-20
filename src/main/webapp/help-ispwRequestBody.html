@@ -132,6 +132,91 @@
         </tbody>
       </table>
       <br>
+      <strong>TaskLoad action:</strong> <br>
+      Required:
+      <table border="1">
+        <tbody>
+          <tr>
+            <td>assignmentId<br>
+            </td>
+            <td>The assignment ID to add task to<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">stream<br>
+            </td>
+            <td valign="top">The stream<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">application<br>
+            </td>
+            <td valign="top">The application name<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">moduleName<br>
+            </td>
+            <td valign="top">The name of the task to be loaded<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">moduleType<br>
+            </td>
+            <td valign="top">The type of the task<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">currentLevel<br>
+            </td>
+            <td valign="top">the current level of the task<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">startingLevel<br>
+            </td>
+            <td valign="top">the starting level for the task<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">userId<br>
+            </td>
+            <td valign="top">The user ID<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      Optional:<br>
+      <table border="1">
+        <tbody>
+          <tr>
+            <td valign="top">runtimeConfiguration<br>
+            </td>
+            <td valign="top">The runtime configuration<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">release<br>
+            </td>
+            <td valign="top">The release<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      Example:
+      <table border="1">
+        <tbody>
+          <tr>
+            <td>TaskLoad</td>
+          </tr>
+          <tr>
+            <td>
+              <pre>runtimeConfiguration=TPZP<br>assignmentId=PLAY001386<br>stream=PLAY<br>application=PLAY<br>moduleName=TREXX23<br>moduleType=CLST<br>currentLevel=DEV1<br>startingLevel=DEV1<br>userId=Foobar<br></pre>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
       <br>
       <strong>CancelDeployment action:</strong> <br>
       Required: <br>

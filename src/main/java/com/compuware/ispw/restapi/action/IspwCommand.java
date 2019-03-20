@@ -93,6 +93,9 @@ public class IspwCommand {
 	
 	@IspwAction(clazz = GetWorkListAction.class)
 	public static final String GetWorkList = "GetWorkList"; //GET
+
+	@IspwAction(clazz = TaskLoadAction.class)
+	public static final String TaskLoad = "TaskLoad"; //POST
 	
 	@IspwAction(clazz = FallbackAssignmentAction.class)
 	public static final String FallbackAssignment = "FallbackAssignment"; // POST
