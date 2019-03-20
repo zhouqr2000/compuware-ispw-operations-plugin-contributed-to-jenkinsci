@@ -102,4 +102,8 @@ public class IspwCommand {
 	
 	@IspwAction(clazz = FallbackReleaseAction.class)
 	public static final String FallbackRelease = "FallbackRelease"; // POST
+	
+	@IspwAction(clazz = SetOperationAction.class)
+	public static final String SetOperation = "SetOperation"; // POST
+
 }
