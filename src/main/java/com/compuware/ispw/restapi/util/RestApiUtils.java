@@ -140,6 +140,19 @@ public class RestApiUtils {
 		return fixedResponseJson;
 	}
 	
+	public static String fixWorkListResponseJson(String responseJson)
+	{
+		String fixedResponseJson = responseJson;
+
+		if (responseJson.startsWith("{\"workList\":{")) //$NON-NLS-1$
+		{
+			fixedResponseJson = responseJson.replace("{\"workList\":{", "{\"workList\":[{"); //$NON-NLS-1$ //$NON-NLS-2$
+			fixedResponseJson = fixedResponseJson.replace("}}", "}]}"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		return fixedResponseJson;
+	}
+	
 	public static ListBoxModel buildConnectionIdItems(@AncestorInPath Jenkins context, @QueryParameter String connectionId,
 			@AncestorInPath Item project) {
 		CpwrGlobalConfiguration globalConfig = CpwrGlobalConfiguration.get();
