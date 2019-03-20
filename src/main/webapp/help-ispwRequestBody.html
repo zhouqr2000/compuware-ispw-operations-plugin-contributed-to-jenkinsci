@@ -812,6 +812,57 @@
           </tr>
         </tbody>
       </table>
+      <strong><br>
+        FallbackAssignment / FallbackRelease actions (Ignore 'events'
+        properties if no webhook callback):</strong> <br>
+      Required:
+      <table border="1">
+        <tbody>
+          <tr>
+            <td>runtimeConfiguration</td>
+            <td>see ISPW administrator for valid values</td>
+          </tr>
+          <tr>
+            <td>assignmentId (FallbackAssignment) or releaseId
+              (FallbackRelease)</td>
+            <td>The container ID for which you intend to fallback tasks.</td>
+          </tr>
+          <tr>
+            <td>level</td>
+            <td>All tasks in the container at this level will fallback</td>
+          </tr>
+        </tbody>
+      </table>
+      Optional:
+      <table border="1">
+        <tbody>
+          <tr>
+            <td>mname</td>
+            <td>component with this name in the container will fallback</td>
+          </tr>
+          <tr>
+            <td>mtype</td>
+            <td>component with this type in the container will fallback</td>
+          </tr>
+        </tbody>
+      </table>
+      Example:
+      <table border="1">
+        <tbody>
+          <tr>
+            <td align="left">FallbackAssignment</td>
+            <td align="left">FallbackRelease</td>
+          </tr>
+          <tr>
+            <td>
+              <pre>runtimeConfiguration=TPZP<br>assignmentId=PLAY000313<br>level=DEV2<br>#optional<br>mname=TPROG08<br>mtype=COB<br>#optional if use webhook callback in pipeline<br>events.name=Complete<br>events.body=Fallback<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
+            </td>
+            <td>
+              <pre>runtimeConfiguration=TPZP<br>releaseId=JKGENRELID<br>level=DEV2<br>#optional<br>mname=TPROG08<br>mtype=COB<br>#optional if use webhook callback in pipeline<br>events.name=Complete<br>events.body=Fallback<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
+            </td>
+          </tr>
+        </tbody>
+      </table>
       <!--DeployAsignment/DeployRelease--><br>
       <strong></strong><strong>RegressAssignment / RegressRelease
         actions (Ignore 'events' properties if no webhook callback):</strong>
