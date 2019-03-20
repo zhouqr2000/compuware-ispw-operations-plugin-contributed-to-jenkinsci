@@ -46,9 +46,35 @@ public class ReflectUtils {
 				}
 			}
 		}
-
 	}
 
+	public static String reflectGetter(Object object, String name) {
+		String value = StringUtils.EMPTY;
+		List<Field> fields = FieldUtils.getAllFieldsList(object.getClass());
+		
+		for (Field field : fields) {
+
+			String fieldName = field.getName();
+			String jsonName = fieldName; // default to field name
+			if (field.isAnnotationPresent(XmlElement.class)) {
+				XmlElement xmlElement = field.getAnnotation(XmlElement.class);
+				jsonName = xmlElement.name(); // use annotation name if presented
+			}
+
+			if (jsonName.equals(name)) {
+				try {
+					value = BeanUtils.getProperty(object, fieldName);
+					logger.info("json.name=" + jsonName + ", type=" + field.getType().getName() + ", value=" + value);
+				} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+					logger.warn("Property key " + name + "(" + jsonName + ") is invalid, cannot get value for class "
+							+ object.getClass().getName());
+				}
+			}
+		}
+		
+		return value;
+	}
+	
 	public static String[] listPublishedCommands() {
 		ArrayList<String> commands = new ArrayList<String>();
 		List<Field> fields = FieldUtils.getAllFieldsList(IspwCommand.class);

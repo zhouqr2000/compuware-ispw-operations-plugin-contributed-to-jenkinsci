@@ -421,7 +421,8 @@ public class IspwRestApiRequest extends Builder {
 						logger.println("...set " + setInfoResp.getSetid() + " status - " + setState);
 						set.add(setState);
 
-						if (setState.equals(Constants.SET_STATE_CLOSED) || setState.equals(Constants.SET_STATE_COMPLETE)) {
+						if (setState.equals(Constants.SET_STATE_CLOSED) || setState.equals(Constants.SET_STATE_COMPLETE)
+								|| setState.equals(Constants.SET_STATE_WAITING_APPROVAL)) {
 							logger.println("Action " + ispwAction + " completed");
 							break;
 						}

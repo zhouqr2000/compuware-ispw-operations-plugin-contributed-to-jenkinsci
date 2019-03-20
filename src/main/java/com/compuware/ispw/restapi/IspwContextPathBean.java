@@ -1,10 +1,13 @@
 package com.compuware.ispw.restapi;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 /**
  * A Java bean that holds any possible context path related parameters
+ * Note: this method is using reflection to set object properties, so if you need some transformation
+ * 		you need do it in get() method instead of set() method.
  * 
  * @author Sam Zhou
  *
@@ -19,6 +22,8 @@ public class IspwContextPathBean {
 	private String taskId;
 	private String mname;
 	private String mtype;
+	private String action;
+	private String approver;
 	private String checkout = Constants.FALSE;
 
 	@Override
@@ -57,7 +62,7 @@ public class IspwContextPathBean {
 		return setId;
 	}
 	public void setSetId(String setId) {
-		this.setId = setId;
+		this.setId = StringUtils.trimToEmpty(setId).toUpperCase();
 	}
 	public String getLevel() {
 		return level;
@@ -90,5 +95,25 @@ public class IspwContextPathBean {
 
 	public void setCheckout(String checkout) {
 		this.checkout = checkout;
+	}
+
+	public String getAction()
+	{
+		return action;
+	}
+
+	public void setAction(String action)
+	{
+		this.action = StringUtils.trimToEmpty(action).toLowerCase();
+	}
+
+	public String getApprover()
+	{
+		return approver;
+	}
+
+	public void setApprover(String approver)
+	{
+		this.approver = StringUtils.trimToEmpty(approver).toUpperCase();
 	}
 }

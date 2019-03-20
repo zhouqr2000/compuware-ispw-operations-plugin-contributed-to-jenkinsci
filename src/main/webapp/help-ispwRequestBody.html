@@ -1088,7 +1088,6 @@
         </tbody>
       </table>
       <br>
-
       <strong>GetWorkList action:</strong> <br>
       Required: none<br>
       Optional:<br>
@@ -1256,8 +1255,46 @@
           </tr>
         </tbody>
       </table>
-
       <br>
+      <b>SetOperation action:</b><br>
+      Required:<br>
+      <table border="1">
+        <tbody>
+          <tr>
+            <td>setId<br>
+            </td>
+            <td>the set ID<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">action<br>
+            </td>
+            <td valign="top">the action to be operated on the set, <br>
+              supported action: hold, release, lock, unlock, delete,
+              restart, terminate;<br>
+              or approve, deny, reset (approver must be provided)<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      Optional:<br>
+      <table border="1">
+        <tbody>
+          <tr>
+            <td>runtimeConfiguration<br>
+            </td>
+            <td>the runtime configuration<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">approver<br>
+            </td>
+            <td valign="top">the approver name, must be provided if use
+              action -&nbsp; approve, deny, reset<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
       <br>
     </div>
     <br>
