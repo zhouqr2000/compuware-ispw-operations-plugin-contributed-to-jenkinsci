@@ -84,6 +84,7 @@ public class IspwRestApiRequest extends Builder {
 	private String ispwAction = DescriptorImpl.ispwAction;
 	private String ispwRequestBody = DescriptorImpl.ispwRequestBody;
 	private Boolean consoleLogResponseBody = DescriptorImpl.consoleLogResponseBody;
+	private Boolean skipWaitingForSet = DescriptorImpl.skipWaitingForSet;
 
 	@DataBoundConstructor
 	public IspwRestApiRequest() {
@@ -176,6 +177,15 @@ public class IspwRestApiRequest extends Builder {
 		return timeout;
 	}
 
+	public Boolean getSkipWaitingForSet() {
+		return skipWaitingForSet;
+	}
+
+	@DataBoundSetter
+	public void setSkipWaitingForSet(Boolean skipWaitingForSet) {
+		this.skipWaitingForSet = skipWaitingForSet;
+	}
+
 	public Boolean getConsoleLogResponseBody() {
 		return consoleLogResponseBody;
 	}
@@ -203,7 +213,11 @@ public class IspwRestApiRequest extends Builder {
 				"consoleLogResponseBody");
 		Items.XSTREAM2.aliasField("consoleLogResponseBody", IspwRestApiRequest.class,
 				"consoleLogResponseBody");
+		
+		Items.XSTREAM2.aliasField("skipWaitingForSet", IspwRestApiRequest.class, "skipWaitingForSet");
+		
 		Items.XSTREAM2.alias("pair", HttpRequestNameValuePair.class);
+		
 	}
 
 	protected Object readResolve() {
@@ -397,8 +411,12 @@ public class IspwRestApiRequest extends Builder {
 		Object respObject = action.endLog(logger, ispwRequestBean, responseJson);
 		logger.println("ISPW Operation Complete");
 		
+		if(skipWaitingForSet) {
+			logger.println("Skip waiting for the completion of the set for this job...");
+		}
+		
 		// polling status if no webhook
-		if (webhookToken == null) {
+		if (webhookToken == null && !skipWaitingForSet) {
 			if (respObject != null && respObject instanceof TaskResponse) {
 				TaskResponse taskResp = (TaskResponse) respObject;
 				String setId = taskResp.getSetId();
@@ -501,6 +519,7 @@ public class IspwRestApiRequest extends Builder {
 				+"#assignmentId=PLAY000313\n"
 				+"#level=STG2\n";
 		public static final Boolean consoleLogResponseBody = false;
+		public static final Boolean skipWaitingForSet = false;
 
 		public static final List<HttpRequestNameValuePair> customHeaders = Collections
 				.<HttpRequestNameValuePair> emptyList();

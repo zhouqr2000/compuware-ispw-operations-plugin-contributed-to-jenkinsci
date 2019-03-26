@@ -1096,101 +1096,117 @@
           <tr>
             <td valign="top">inProgress<br>
             </td>
-            <td valign="top">True/false value indicating whether or not to include active tasks that are not in Production. The default value is true.<br>
+            <td valign="top">True/false value indicating whether or not
+              to include active tasks that are not in Production. The
+              default value is true.<br>
             </td>
           </tr>
           <tr>
             <td valign="top">production<br>
             </td>
-            <td valign="top">True/false value indicating whether or not to include current Production tasks. The default value is false.
-            </td>
+            <td valign="top">True/false value indicating whether or not
+              to include current Production tasks. The default value is
+              false. </td>
           </tr>
           <tr>
             <td>historical<br>
             </td>
-            <td>True/false value indicating whether or not to include tasks that were once in Production. The default value is false.
-            </td>
+            <td>True/false value indicating whether or not to include
+              tasks that were once in Production. The default value is
+              false. </td>
           </tr>
           <tr>
             <td valign="top">startDate</td>
-            <td valign="top">Specify the start date in yyyy-mm-dd format to filter a range based on last update.
-            </td>
+            <td valign="top">Specify the start date in yyyy-mm-dd format
+              to filter a range based on last update. </td>
           </tr>
           <tr>
             <td valign="top">endDate<br>
             </td>
-            <td valign="top">Specify the end date in yyyy-mm-dd format to filter a range based on last update.
-            </td>
+            <td valign="top">Specify the end date in yyyy-mm-dd format
+              to filter a range based on last update. </td>
           </tr>
           <tr>
             <td valign="top">application</td>
-            <td valign="top">Container's primary application code. Containers may include components from multiple applications. Trailing wildcards are supported, i.e. FOO*
+            <td valign="top">Container's primary application code.
+              Containers may include components from multiple
+              applications. Trailing wildcards are supported, i.e. FOO*
             </td>
           </tr>
           <tr>
             <td valign="top">environment<br>
             </td>
-            <td valign="top">ISPW environment for this version (such as OUTS, TEST, HOLD, or PROD). Trailing wildcards are supported, i.e. PRO*
-            </td>
+            <td valign="top">ISPW environment for this version (such as
+              OUTS, TEST, HOLD, or PROD). Trailing wildcards are
+              supported, i.e. PRO* </td>
           </tr>
           <tr>
             <td valign="top">group<br>
             </td>
-            <td valign="top">Component or task belonging to this application owner group. Trailing wildcards are supported, i.e. FOO*
-            </td>
+            <td valign="top">Component or task belonging to this
+              application owner group. Trailing wildcards are supported,
+              i.e. FOO* </td>
           </tr>
           <tr>
             <td valign="top">lastUpdatedBy<br>
             </td>
-            <td valign="top">User ID that requested the last significant operation (see Operation).
-            </td>
+            <td valign="top">User ID that requested the last significant
+              operation (see Operation). </td>
           </tr>
           <tr>
             <td valign="top">level<br>
             </td>
-            <td valign="top">Level of this component when the last operation was requested. Trailing wildcards are supported, i.e. DEV*
-            </td>
+            <td valign="top">Level of this component when the last
+              operation was requested. Trailing wildcards are supported,
+              i.e. DEV* </td>
           </tr>
           <tr>
             <td valign="top">name<br>
             </td>
-            <td valign="top">A component name (case sensitive). Trailing wildcards are supported, i.e. TPROG*
-            </td>
+            <td valign="top">A component name (case sensitive). Trailing
+              wildcards are supported, i.e. TPROG* </td>
           </tr>
           <tr>
             <td valign="top">operation<br>
             </td>
-            <td valign="top">Last operation performed on this component. Valid operation values include Browse, Checkout, Delete, Edit, Fallback, Generate, Implement, Loaded, Promote, Regress, Transfer, and Update Replace Version
-            </td>
+            <td valign="top">Last operation performed on this component.
+              Valid operation values include Browse, Checkout, Delete,
+              Edit, Fallback, Generate, Implement, Loaded, Promote,
+              Regress, Transfer, and Update Replace Version </td>
           </tr>
           <tr>
             <td valign="top">owner<br>
             </td>
-            <td valign="top">User who performed the checkout of the component.
-            </td>
+            <td valign="top">User who performed the checkout of the
+              component. </td>
           </tr>
           <tr>
             <td valign="top">refNumber<br>
             </td>
-            <td valign="top">Optional, site-definable field typically used to associate the assignment with a problem ticket number or change request number. Trailing wildcards are supported, i.e. MYISSUE*
-            </td>
+            <td valign="top">Optional, site-definable field typically
+              used to associate the assignment with a problem ticket
+              number or change request number. Trailing wildcards are
+              supported, i.e. MYISSUE* </td>
           </tr>
           <tr>
             <td valign="top">releaseId<br>
             </td>
-            <td valign="top">Release a component belongs to. Trailing wildcards are supported, i.e. RELEASE1*
-            </td>
+            <td valign="top">Release a component belongs to. Trailing
+              wildcards are supported, i.e. RELEASE1* </td>
           </tr>
           <tr>
             <td valign="top">stream<br>
             </td>
-            <td valign="top">2- to 8-character code defines the application structure with which the application is associated. Trailing wildcards are supported, i.e. BAR*
-            </td>
+            <td valign="top">2- to 8-character code defines the
+              application structure with which the application is
+              associated. Trailing wildcards are supported, i.e. BAR* </td>
           </tr>
           <tr>
             <td valign="top">type<br>
             </td>
-            <td valign="top">The one-to four-character acronym for the type of component, such as COB for a Cobol program or COPY for a copybook. Trailing wildcards are supported, i.e. C*
+            <td valign="top">The one-to four-character acronym for the
+              type of component, such as COB for a Cobol program or COPY
+              for a copybook. Trailing wildcards are supported, i.e. C*
             </td>
           </tr>
         </tbody>
@@ -1211,7 +1227,6 @@
       </table>
       <br>
       <br>
-
       <strong></strong><strong>RemoveFromRelease action:</strong> <br>
       Optional:<br>
       <table border="1">
@@ -1270,7 +1285,7 @@
             <td valign="top">action<br>
             </td>
             <td valign="top">the action to be operated on the set, <br>
-              supported action: hold, release, lock, unlock, delete,
+              supported actions: hold, release, lock, unlock, delete,
               restart, terminate;<br>
               or approve, deny, reset (approver must be provided)<br>
             </td>
@@ -1291,6 +1306,21 @@
             </td>
             <td valign="top">the approver name, must be provided if use
               action -&nbsp; approve, deny, reset<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      Example:<br>
+      <table border="1">
+        <tbody>
+          <tr>
+            <td>SetOperation</td>
+          </tr>
+          <tr>
+            <td valign="top">runtimeConfiguration=TPZP<br>
+              action=deny<br>
+              approver=dummy<br>
+              setId=S000143423<br>
             </td>
           </tr>
         </tbody>
