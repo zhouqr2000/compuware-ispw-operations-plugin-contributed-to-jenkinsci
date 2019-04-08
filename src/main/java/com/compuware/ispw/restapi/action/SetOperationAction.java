@@ -16,17 +16,17 @@ import com.compuware.ispw.restapi.WebhookToken;
  */
 public class SetOperationAction extends SetInfoPostAction
 {
-	public static String SET_ACTION_HOLD = "hold";
-	public static String SET_ACTION_RELEASE = "release";
-	public static String SET_ACTION_LOCK = "lock";
-	public static String SET_ACTION_UNLOCK = "unlock";
-	public static String SET_ACTION_DELETE = "delete";
-	public static String SET_ACTION_RESTART = "restart";
-	public static String SET_ACTION_TERMINATE = "terminate";
+	public static final String SET_ACTION_HOLD = "hold";
+	public static final String SET_ACTION_RELEASE = "release";
+	public static final String SET_ACTION_LOCK = "lock";
+	public static final String SET_ACTION_UNLOCK = "unlock";
+	public static final String SET_ACTION_DELETE = "delete";
+	public static final String SET_ACTION_RESTART = "restart";
+	public static final String SET_ACTION_TERMINATE = "terminate";
 
-	public static String SET_ACTION_APPROVE = "approve";
-	public static String SET_ACTION_DENY = "deny";
-	public static String SET_ACTION_RESET = "reset";
+	public static final String SET_ACTION_APPROVE = "approve";
+	public static final String SET_ACTION_DENY = "deny";
+	public static final String SET_ACTION_RESET = "reset";
 
 	private static final String[] defaultProps = new String[]{runtimeConfiguration};
 
