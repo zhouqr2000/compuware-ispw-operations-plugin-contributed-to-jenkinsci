@@ -6,8 +6,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepDescriptorImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepImpl;
@@ -17,13 +19,16 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
+
 import com.compuware.ispw.model.rest.SetInfoResponse;
 import com.compuware.ispw.model.rest.TaskResponse;
 import com.compuware.ispw.restapi.action.IAction;
+import com.compuware.ispw.restapi.action.SetOperationAction;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
 import com.compuware.ispw.restapi.util.ReflectUtils;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 import com.compuware.jenkins.common.configuration.HostConnection;
+
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
@@ -65,6 +70,7 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 	private String ispwAction = DescriptorImpl.ispwAction;
 	private String ispwRequestBody = DescriptorImpl.ispwRequestBody;
 	private Boolean consoleLogResponseBody = DescriptorImpl.consoleLogResponseBody;
+	private Boolean skipWaitingForSet = DescriptorImpl.skipWaitingForSet;
 	
     @DataBoundConstructor
     public IspwRestApiRequestStep() {
@@ -149,6 +155,15 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
         return timeout;
     }
 
+	public Boolean getSkipWaitingForSet() {
+		return skipWaitingForSet;
+	}
+
+	@DataBoundSetter
+	public void setSkipWaitingForSet(Boolean skipWaitingForSet) {
+		this.skipWaitingForSet = skipWaitingForSet;
+	}
+    
     @DataBoundSetter
     public void setConsoleLogResponseBody(Boolean consoleLogResponseBody) {
         this.consoleLogResponseBody = consoleLogResponseBody;
@@ -242,6 +257,7 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 				+"#level=STG2\n";
 		public static final Boolean consoleLogResponseBody =
 				IspwRestApiRequest.DescriptorImpl.consoleLogResponseBody;
+		public static final Boolean skipWaitingForSet = false;
 		
         public DescriptorImpl() {
             super(Execution.class);
@@ -423,8 +439,12 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			Object respObject = action.endLog(logger, ispwRequestBean, responseJson);
 			logger.println("ISPW Operation Complete");
 			
+			if(step.skipWaitingForSet) {
+				logger.println("Skip waiting for the completion of the set for this job...");
+			}
+			
 			// polling status if no webhook
-			if (webhookToken == null) {
+			if (webhookToken == null && !step.skipWaitingForSet) {
 				if (respObject != null && respObject instanceof TaskResponse) {
 					TaskResponse taskResp = (TaskResponse) respObject;
 					String setId = taskResp.getSetId();
@@ -452,6 +472,38 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 								logger.println("Action " + step.ispwAction + " completed");
 								break;
 							}
+							else if (Constants.SET_STATE_FAILED.equalsIgnoreCase(setState))
+							{
+								logger.println("Set ID " + setId + " Failed for action "
+										+ ispwRequestBean.getIspwContextPathBean().getAction());
+								break;
+							}
+							else if (Constants.SET_STATE_TERMINATED.equalsIgnoreCase(setState)
+									&& SetOperationAction.SET_ACTION_TERMINATE.equalsIgnoreCase(ispwRequestBean.getIspwContextPathBean().getAction()))
+							{
+								logger.println("Set " + setId + " successfully terminated");
+								break;
+							}
+							else if (Constants.SET_STATE_HELD.equalsIgnoreCase(setState)
+									&& SetOperationAction.SET_ACTION_HOLD.equalsIgnoreCase(ispwRequestBean.getIspwContextPathBean().getAction()))
+							{
+								logger.println("Set " + setId + " successfully held");
+								break;
+							}
+							else if (Constants.SET_STATE_HELD.equalsIgnoreCase(setState)
+									&& SetOperationAction.SET_ACTION_UNLOCK.equalsIgnoreCase(ispwRequestBean.getIspwContextPathBean().getAction()))
+							{
+								logger.println("Set " + setId + " successfully unlocked.  Set is currently held.");
+								break;
+							}
+							else if ((Constants.SET_STATE_RELEASED.equalsIgnoreCase(setState)
+									|| Constants.SET_STATE_WAITING_LOCK.equalsIgnoreCase(setState))
+									&& SetOperationAction.SET_ACTION_RELEASE.equalsIgnoreCase(ispwRequestBean.getIspwContextPathBean().getAction()))
+							{
+								logger.println("Set " + setId + " successfully released");
+								break;
+							}
+							
 						}
 					}
 
@@ -461,7 +513,6 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 				}
 			}
 
-			
 			return supplier;
 		}
 
