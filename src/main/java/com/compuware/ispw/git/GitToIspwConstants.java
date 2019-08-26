@@ -2,11 +2,12 @@ package com.compuware.ispw.git;
 
 public class GitToIspwConstants
 {
-	public static final String FILE_QUEUE = "file_queue.txt";
+	public static final String FAILED_COMMIT_FILE_NAME = "commitsFailedToSync.txt"; //$NON-NLS-1$
 	
 	public static final String VAR_REF_ID = "refId"; //$NON-NLS-1$
 	public static final String VAR_REF = "ref"; //$NON-NLS-1$
-	public static final String VAR_HASH = "hash"; //$NON-NLS-1$
+	public static final String VAR_TO_HASH = "toHash"; //$NON-NLS-1$
+	public static final String VAR_FROM_HASH = "fromHash"; //$NON-NLS-1$
 
 	public static final String CONTAINER_PREF_PER_COMMIT = "per-commit"; //$NON-NLS-1$
 	public static final String CONTAINER_PREF_PER_BRANCH = "per-branch"; //$NON-NLS-1$
@@ -27,6 +28,8 @@ public class GitToIspwConstants
 	public static final String GIT_PW_PARAM = "-gitPassword"; //$NON-NLS-1$
 	public static final String GIT_REF_PARAM = "-gitBranch"; //$NON-NLS-1$
 	public static final String GIT_HASH_PARAM = "-gitCommit"; //$NON-NLS-1$
+	public static final String GIT_FROM_HASH_PARAM = "-gitFromHash"; //$NON-NLS-1$
+	public static final String JENKINS_WORKSPACE_PATH_PARAM = "-jenkinsWorkspacePath"; //$NON-NLS-1$
 
 	public static final String CONTAINER_CREATION_PREF_ARG_PARAM = "-ispwContainerCreation"; //$NON-NLS-1$
 	public static final String CONTAINER_DESCRIPTION_ARG_PARAM = "-ispwContainerDescription"; //$NON-NLS-1$

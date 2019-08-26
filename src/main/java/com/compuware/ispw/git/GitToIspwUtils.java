@@ -1,19 +1,42 @@
 package com.compuware.ispw.git;
 
+import java.io.IOException;
+import java.io.PrintStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
+import org.jenkinsci.plugins.stashNotifier.BitbucketNotifier;
+import org.jenkinsci.plugins.stashNotifier.StashBuildState;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
+import org.mapdb.DB;
+import org.mapdb.IndexTreeList;
+import org.mapdb.Serializer;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
+import com.compuware.ispw.cli.model.GitPushInfo;
+import com.compuware.ispw.cli.model.IGitToIspwPublish;
+import com.compuware.ispw.restapi.util.RestApiUtils;
+import com.compuware.jenkins.common.configuration.CpwrGlobalConfiguration;
+import com.compuware.jenkins.common.utils.CommonConstants;
+import hudson.AbortException;
+import hudson.EnvVars;
+import hudson.FilePath;
+import hudson.Launcher;
 import hudson.Util;
 import hudson.model.Item;
+import hudson.model.Run;
+import hudson.model.TaskListener;
+import hudson.remoting.VirtualChannel;
 import hudson.security.ACL;
 import hudson.util.ListBoxModel;
 import hudson.util.ListBoxModel.Option;
@@ -65,17 +88,17 @@ public class GitToIspwUtils
 	{
 		Map<String, RefMap> map = new HashMap<String, RefMap>();
 
-		String[] lines = branchMapping.split("\n");
+		String[] lines = branchMapping.split("\n"); //$NON-NLS-1$
 		for (String line : lines)
 		{
 			line = StringUtils.trimToEmpty(line);
 
-			if (line.startsWith("#"))
+			if (line.startsWith("#")) //$NON-NLS-1$
 			{
 				continue;
 			}
 
-			int indexOfArrow = line.indexOf("=>");
+			int indexOfArrow = line.indexOf("=>"); //$NON-NLS-1$
 			if (indexOfArrow != -1)
 			{
 				String pattern = StringUtils.trimToEmpty(line.substring(0, indexOfArrow));
@@ -105,5 +128,189 @@ public class GitToIspwUtils
 		}
 
 		return map;
+	}
+	
+	public static void addNewPushToDb(PrintStream logger, EnvVars envVars, DB mapDb, IndexTreeList<GitPushInfo> gitPushList, String branchMapping)
+	{
+		String toHash = envVars.get(GitToIspwConstants.VAR_TO_HASH, GitToIspwConstants.VAR_TO_HASH);
+		String fromHash = envVars.get(GitToIspwConstants.VAR_FROM_HASH, GitToIspwConstants.VAR_FROM_HASH);
+		String ref = envVars.get(GitToIspwConstants.VAR_REF, GitToIspwConstants.VAR_REF);
+		String refId = envVars.get(GitToIspwConstants.VAR_REF_ID, GitToIspwConstants.VAR_REF_ID);
+
+		Map<String, RefMap> map = GitToIspwUtils.parse(branchMapping);
+		logger.println("Branch mapping =" + map);
+
+		BranchPatternMatcher matcher = new BranchPatternMatcher(map, logger);
+		logger.println("refid=" + refId);
+		RefMap refMap = matcher.match(refId);
+		
+		if (refMap != null && mapDb != null)
+		{
+			String ispwLevel = refMap.getIspwLevel();        
+			String containerPref = refMap.getContainerPref();
+			String containerDesc = refMap.getContainerDesc();
+			logger.println("Mapping refId " + refId + " to refMap " + refMap.toString());
+			GitPushInfo newPush = new GitPushInfo(ref, fromHash, toHash, ispwLevel, containerPref, containerDesc);
+			if (gitPushList != null)
+			{
+				if (!gitPushList.contains(newPush))
+				{
+					logger.println("Adding new push to the queue");
+					gitPushList.add(newPush);
+				}
+
+				logger.println("Length of push queue: " + gitPushList.size());
+			}
+			mapDb.commit();
+		}
+	}
+	
+	public static boolean callCli(Launcher launcher, Run<?, ?> build, PrintStream logger, DB mapDb,
+			IndexTreeList<GitPushInfo> gitPushList, EnvVars envVars, IGitToIspwPublish publishStep, String targetFolder)
+			throws InterruptedException, IOException
+	{
+		CpwrGlobalConfiguration globalConfig = CpwrGlobalConfiguration.get();
+		assert launcher != null;
+		VirtualChannel vChannel = launcher.getChannel();
+
+		assert vChannel != null;
+		Properties remoteProperties = vChannel.call(new RemoteSystemProperties());
+		String remoteFileSeparator = remoteProperties.getProperty(CommonConstants.FILE_SEPARATOR_PROPERTY_KEY);
+		String osFile = launcher.isUnix()
+				? GitToIspwConstants.SCM_DOWNLOADER_CLI_SH
+				: GitToIspwConstants.SCM_DOWNLOADER_CLI_BAT;
+		logger.println("Target Folder: " + targetFolder);
+		String cliScriptFile = globalConfig.getTopazCLILocation(launcher) + remoteFileSeparator + osFile;
+		logger.println("CLI Script File: " + cliScriptFile); //$NON-NLS-1$
+		String cliScriptFileRemote = new FilePath(vChannel, cliScriptFile).getRemote();
+		logger.println("CLI Script File Remote: " + cliScriptFileRemote); //$NON-NLS-1$
+
+		String topazCliWorkspace = targetFolder + CommonConstants.TOPAZ_CLI_WORKSPACE;
+		logger.println("TopazCliWorkspace: " + topazCliWorkspace); //$NON-NLS-1$
+
+		FilePath workDir = new FilePath(vChannel, build.getRootDir().toString());
+		workDir.mkdirs();
+
+		if (RestApiUtils.isIspwDebugMode())
+		{
+			String buildTag = envVars.get("BUILD_TAG"); //$NON-NLS-1$
+			logger.println("Getting buildTag =" + buildTag);
+		}
+		List<GitPushInfo> pushListCopy = new ArrayList<>();
+		if (mapDb != null && gitPushList != null)
+		{
+			pushListCopy.addAll(gitPushList);
+			mapDb.close(); // db needs to be closed so that the CLI can use it.
+		}
+		boolean success = true;
+		logger.println(pushListCopy);
+		for (GitPushInfo currentPush : pushListCopy)
+		{
+			logger.println("Calling IspwCLI for push " + pushListCopy.indexOf(currentPush) + " starting at commit "
+					+ currentPush.getFromHash() + " and ending with commit " + currentPush.getToHash());
+			CliExecutor cliExecutor = new CliExecutor(logger, build, launcher, envVars, targetFolder, topazCliWorkspace,
+					globalConfig, cliScriptFileRemote, workDir);
+			try
+			{
+				success = cliExecutor.execute(true, publishStep.getConnectionId(), publishStep.getCredentialsId(),
+						publishStep.getRuntimeConfig(), publishStep.getStream(), publishStep.getApp(),
+						publishStep.getGitRepoUrl(), publishStep.getGitCredentialsId(), currentPush);
+			}
+			catch (AbortException e)
+			{
+				success = false;
+			}
+
+			if (!success)
+			{
+				logger.println("Synchronization for push ending with commit " + currentPush.getToHash()
+						+ " failed. Remaining pushes will be marked as failures.");
+				break;
+			}
+			else
+			{
+				logger.println("Synchronization for push ending with commit " + currentPush.getToHash() + " was successful.");
+			}
+		}
+		return success;
+	}
+	
+	public static void logResultsAndNotifyBitbucket(PrintStream logger, Run<?, ?> build, TaskListener listener, DB mapDb, String gitRepoUrl, StandardUsernamePasswordCredentials gitCredentials) throws MalformedURLException
+	{
+		BitbucketNotifier notifier = new BitbucketNotifier(logger, build, listener);
+		URL url = new URL(gitRepoUrl);
+		String baseUrl = url.getProtocol() + "://" + url.getHost() + ":" + url.getPort(); //$NON-NLS-1$ //$NON-NLS-2$
+		if (gitRepoUrl.contains("/bitbucket/")) //$NON-NLS-1$
+		{ // handle test environment
+			baseUrl += "/bitbucket"; //$NON-NLS-1$
+		}
+	
+		if (mapDb != null)
+		{
+			IndexTreeList<GitPushInfo> gitPushList = (IndexTreeList<GitPushInfo>) mapDb.indexTreeList("pushList", Serializer.JAVA).createOrOpen();
+			if (gitPushList != null)
+			{
+				List<GitPushInfo> pushListCopy = new ArrayList<>(gitPushList);
+				for (GitPushInfo currentPush : pushListCopy)
+				{
+					logResults(logger, currentPush);
+					notifyBitbucket(gitRepoUrl, currentPush, gitCredentials, logger, notifier, baseUrl);
+					if (currentPush.getSuccessfulCommits().size() > 0 && currentPush.getFailedCommits().size() == 0)
+					{
+						gitPushList.remove(currentPush);
+					}
+				}
+			}
+			mapDb.commit();
+			mapDb.close();
+		}
+	}
+
+	private static void notifyBitbucket(String gitRepoUrl, GitPushInfo currentPush, StandardUsernamePasswordCredentials gitCredentials, PrintStream logger, BitbucketNotifier notifier, String baseUrl) throws MalformedURLException
+	{
+		if (gitRepoUrl.contains("/bitbucket/")) //$NON-NLS-1$
+		{
+			try
+			{
+				// pushes where a sync has not been attempted will have empty lists
+				for (String hash : currentPush.getFailedCommits())
+				{
+					logger.println("Notifying Bitbucket of failure at: " + baseUrl);
+					notifier.notifyStash(baseUrl, gitCredentials, hash, StashBuildState.FAILED, null);
+				}
+
+				for (String hash : currentPush.getSuccessfulCommits())
+				{
+					logger.println("Notifying Bitbucket of success at: " + baseUrl);
+					notifier.notifyStash(baseUrl, gitCredentials, hash, StashBuildState.SUCCESSFUL, null);
+				}
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace(logger);
+			}
+		}
+	}
+	
+	public static void logResults(PrintStream logger, GitPushInfo currentPush)
+	{
+		logger.println("***********************************************************");
+		logger.println("*  Synchronization report for Git push                    *");
+		logger.println("*  From hash " + currentPush.getFromHash() + "     *");
+		logger.println("*  To hash " + currentPush.getToHash() + "       *");
+		logger.println("*                                                         *");
+		for (String commitId : currentPush.getSuccessfulCommits())
+		{
+			logger.println("*  " + commitId + "--- SUCCESSFUL *");
+		}
+		for (String commitId : currentPush.getFailedCommits())
+		{
+			logger.println("*  " + commitId + "------ FAILURE *");
+		}
+		
+		if (currentPush.getFailedCommits().size() == 0 && currentPush.getSuccessfulCommits().size() == 0)
+		{
+			logger.println("*  SYNCHRONIZATION NOT ATTEMPTED                          *");
+		}
 	}
 }
