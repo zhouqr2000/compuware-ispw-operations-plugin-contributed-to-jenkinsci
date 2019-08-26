@@ -2,7 +2,6 @@ package com.compuware.ispw.git;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.compuware.ispw.restapi.util.RestApiUtils;
@@ -10,7 +9,6 @@ import com.compuware.jenkins.common.configuration.CpwrGlobalConfiguration;
 import com.compuware.jenkins.common.configuration.HostConnection;
 import com.compuware.jenkins.common.utils.ArgumentUtils;
 import com.compuware.jenkins.common.utils.CommonConstants;
-import com.squareup.tape2.ObjectQueue;
 import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.FilePath;
@@ -36,38 +34,34 @@ public class CliExecutor
 
 	private String targetFolder;
 	private String topazCliWorkspace;
-
+	private String jenkinsJobWorkspacePath;
 	private String cliScriptFileRemote;
 	private FilePath workDir;
 
-	private ObjectQueue<GitInfo> objectQueue;
+	public CliExecutor(PrintStream logger, Run<?, ?> run, Launcher launcher, EnvVars envVars, String jenkinsJobWorkspacePath,
+			String topazCliWorkspace, CpwrGlobalConfiguration globalConfig, String cliScriptFileRemote, FilePath workDir)
 
-	public CliExecutor(PrintStream logger, Run<?, ?> run, Launcher launcher, EnvVars envVars,
-			String targetFolder, String topazCliWorkspace, CpwrGlobalConfiguration globalConfig, String cliScriptFileRemote,
-			FilePath workDir, ObjectQueue<GitInfo> objectQueue)
 	{
 		this.logger = logger;
 		this.run = run;
 		this.envVars = envVars;
 		this.launcher = launcher;
-
+		this.targetFolder = run.getRootDir().getAbsolutePath();
 		this.globalConfig = globalConfig;
 
-		this.targetFolder = targetFolder;
+		this.jenkinsJobWorkspacePath = jenkinsJobWorkspacePath;
 		this.topazCliWorkspace = topazCliWorkspace;
 
 		this.cliScriptFileRemote = cliScriptFileRemote;
 
 		this.workDir = workDir;
-
-		this.objectQueue = objectQueue;
-
 	}
+
 
 	public boolean execute(String connectionId, String credentialsId, String runtimeConfig,
 			String stream, String app, String ispwLevel, String containerPref, String containerDesc, 
 			String gitRepoUrl, String gitCredentialsId, String ref, String refId,
-			String hash) throws InterruptedException, IOException
+			String fromHash, String toHash) throws InterruptedException, IOException
 	{
 		
 		String host;
@@ -106,8 +100,6 @@ public class CliExecutor
 		{
 			logger.println("gitRepoUrl=" + gitRepoUrl + ", gitUserId=" + gitUserId + ", gitPassword=" + gitPassword);
 		}
-		
-		String workspacePath = envVars.get("WORKSPACE"); //$NON-NLS-1$
 
 		ArgumentListBuilder args = new ArgumentListBuilder();
 		// build the list of arguments to pass to the CLI
@@ -160,8 +152,9 @@ public class CliExecutor
 		args.add(gitPassword, true);
 		args.add(GitToIspwConstants.GIT_REPO_URL_PARAM, ArgumentUtils.escapeForScript(gitRepoUrl));
 		args.add(GitToIspwConstants.GIT_REF_PARAM, ref);
-		args.add(GitToIspwConstants.GIT_HASH_PARAM, hash);
-		args.add(GitToIspwConstants.JENKINS_WORKSPACE_PATH_ARG_PARAM, workspacePath);
+		args.add(GitToIspwConstants.GIT_FROM_HASH_PARAM, fromHash);
+		args.add(GitToIspwConstants.GIT_HASH_PARAM, toHash);
+		args.add(GitToIspwConstants.JENKINS_WORKSPACE_PATH_ARG_PARAM, jenkinsJobWorkspacePath);
 
 		workDir.mkdirs();
 		logger.println("Shell script: " + args.toString());
@@ -175,19 +168,6 @@ public class CliExecutor
 
 		if (exitValue != 0)
 		{
-			GitInfo newGitInfo = new GitInfo(ref, refId, hash);
-			if (objectQueue != null)
-			{
-				if (!objectQueue.asList().contains(newGitInfo))
-				{
-					objectQueue.add(newGitInfo);
-				}
-
-				List<GitInfo> gitInfos = objectQueue.asList();
-
-				logger.println("Current queue - gitInfos = " + gitInfos);
-			}
-
 			throw new AbortException("Call " + osFile + " exited with value = " + exitValue); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else
