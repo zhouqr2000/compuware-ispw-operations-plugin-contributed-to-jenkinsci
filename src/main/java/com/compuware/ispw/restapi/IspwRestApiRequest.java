@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nonnull;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.AncestorInPath;
@@ -19,7 +20,10 @@ import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
+import com.compuware.ispw.model.rest.BuildResponse;
 import com.compuware.ispw.model.rest.SetInfoResponse;
+import com.compuware.ispw.model.rest.TaskInfo;
+import com.compuware.ispw.model.rest.TaskListResponse;
 import com.compuware.ispw.model.rest.TaskResponse;
 import com.compuware.ispw.restapi.action.IAction;
 import com.compuware.ispw.restapi.action.SetOperationAction;
@@ -369,6 +373,13 @@ public class IspwRestApiRequest extends Builder {
 			logger.println("...ispwRequestBean=" + ispwRequestBean);
 
 		this.url = cesUrl + ispwRequestBean.getContextPath(); // CES URL
+		
+		// Added for the case within BuildTaskAction where some parameters are not required if other parameters are inputed
+		if (this.url.contains("/build?&")) //$NON-NLS-1$
+		{
+			this.url = this.url.replace("/build?&", "/build?"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		
 		this.requestBody = ispwRequestBean.getJsonRequest();
 		this.token = cesIspwToken; // CES TOKEN
 
@@ -416,13 +427,23 @@ public class IspwRestApiRequest extends Builder {
 		
 		// polling status if no webhook
 		if (webhookToken == null && !skipWaitingForSet) {
-			if (respObject != null && respObject instanceof TaskResponse) {
+			String setId = StringUtils.EMPTY;
+			if (respObject instanceof TaskResponse)
+			{
 				TaskResponse taskResp = (TaskResponse) respObject;
-				String setId = taskResp.getSetId();
-
+				setId = taskResp.getSetId();
+			}
+			else if (respObject instanceof BuildResponse)
+			{
+				BuildResponse buildResp = (BuildResponse) respObject;
+				setId = buildResp.getSetId();
+			}
+			if (!setId.equals(StringUtils.EMPTY) && (respObject instanceof TaskResponse || respObject instanceof BuildResponse))
+			{
 				HashSet<String> set = new HashSet<String>();
 
 				int i = 0;
+				boolean isSetHeld = false;
 				for (; i < 60; i++) {
 					Thread.sleep(Constants.POLLING_INTERVAL);
 					HttpRequestExecution poller =
@@ -436,7 +457,7 @@ public class IspwRestApiRequest extends Builder {
 							jsonProcessor.parse(pollingJson, SetInfoResponse.class);
 					String setState = StringUtils.trimToEmpty(setInfoResp.getState());
 					if (!set.contains(setState)) {
-						logger.println("...set " + setInfoResp.getSetid() + " status - " + setState);
+						logger.println("Set " + setInfoResp.getSetid() + " status - " + setState);
 						set.add(setState);
 
 						if (setState.equals(Constants.SET_STATE_CLOSED) || setState.equals(Constants.SET_STATE_COMPLETE)
@@ -448,7 +469,7 @@ public class IspwRestApiRequest extends Builder {
 						{
 							logger.println("Set ID " + setId + " Failed for action "
 									+ ispwRequestBean.getIspwContextPathBean().getAction());
-							return false;
+							break;
 						}
 						else if (Constants.SET_STATE_TERMINATED.equalsIgnoreCase(setState)
 								&& SetOperationAction.SET_ACTION_TERMINATE.equalsIgnoreCase(ispwRequestBean.getIspwContextPathBean().getAction()))
@@ -460,6 +481,7 @@ public class IspwRestApiRequest extends Builder {
 								&& SetOperationAction.SET_ACTION_HOLD.equalsIgnoreCase(ispwRequestBean.getIspwContextPathBean().getAction()))
 						{
 							logger.println("Set " + setId + " successfully held");
+							isSetHeld = true;
 							break;
 						}
 						else if (Constants.SET_STATE_HELD.equalsIgnoreCase(setState)
@@ -477,14 +499,89 @@ public class IspwRestApiRequest extends Builder {
 						}
 					}
 				}
-
+				
 				if (i == 60) {
 					logger.println("Warn - max timeout reached");
+					return true;
+				}
+
+				// Follow with post set execution logging for the tasks within the BuildResponse model
+				if (respObject instanceof BuildResponse && !isSetHeld)
+				{
+					return buildActionTaskInfoLogger(setId, launcher, envVars, build, listener, logger, respObject);
 				}
 			}
 		}
 		
 		return true;
+	}
+
+	private boolean buildActionTaskInfoLogger(String setId, Launcher launcher, EnvVars envVars, AbstractBuild<?, ?> build,
+			BuildListener listener, PrintStream logger, Object respObject) throws InterruptedException, IOException
+	{
+		Thread.sleep(Constants.POLLING_INTERVAL);
+		HttpRequestExecution poller = HttpRequestExecution.createTaskInfoPoller(setId, this, envVars, build, listener);
+		boolean isSuccessful = false;
+		if (launcher.getChannel() != null)
+		{
+			ResponseContentSupplier pollerSupplier = launcher.getChannel().call(poller);
+			String pollingJson = pollerSupplier.getContent();
+
+			JsonProcessor jsonProcessor = new JsonProcessor();
+			TaskListResponse taskListResp = jsonProcessor.parse(pollingJson, TaskListResponse.class);
+			BuildResponse buildResponse = (BuildResponse) respObject;
+
+			if (buildResponse.getTasksBuilt().size() == 1)
+			{
+				logger.println(buildResponse.getTasksBuilt().size() + " task will be built as part of " + setId);
+			}
+			else
+			{
+				logger.println(buildResponse.getTasksBuilt().size() + " tasks will be built as part of " + setId);
+			}
+
+			List<TaskInfo> tasksBuilt = buildResponse.getTasksBuilt();
+			// Used to hold the difference between tasks built and tasks within a closed set
+			List<TaskInfo> tasksNotBuilt = tasksBuilt;
+			// Get the tasks that were successfully generated (anything leftover in a set is successful)
+			List<TaskInfo> tasksInSet = taskListResp.getTasks();
+			int numTasksToBeBuilt = tasksBuilt.size();
+			Set<String> uniqueTasksInSet = new HashSet<>();
+
+			for (TaskInfo task : tasksInSet)
+			{
+				if (task.getOperation().equals("G")) //$NON-NLS-1$
+				{
+					logger.println(task.getModuleName() + " has been compiled successfully");
+				}
+				// Remove all successfully built tasks
+				uniqueTasksInSet.add(task.getTaskId());
+				tasksNotBuilt.removeIf(x -> x.getTaskId().equals(task.getTaskId()));
+			}
+
+			for (TaskInfo task : tasksNotBuilt)
+			{
+				logger.println(task.getModuleName() + " did not compile successfully");
+			}
+			
+			StringBuilder sb = new StringBuilder();
+			sb.append(uniqueTasksInSet.size() + " of " + numTasksToBeBuilt + " generated successfully. " + tasksNotBuilt.size()
+					+ " of " + numTasksToBeBuilt + " generated with errors.\n");
+			
+			if (!tasksNotBuilt.isEmpty())
+			{
+				isSuccessful = false;
+				sb.append("The build process completed with errors. ");
+			}
+			else
+			{
+				isSuccessful = true;
+				sb.append("The build process was successfully completed. ");
+			}
+			
+			logger.println(sb);
+		}
+		return isSuccessful;
 	}
 
 	@Extension

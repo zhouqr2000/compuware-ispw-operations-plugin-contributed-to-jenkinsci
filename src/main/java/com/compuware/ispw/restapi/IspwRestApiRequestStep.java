@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-
+import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
@@ -19,8 +19,10 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
-
+import com.compuware.ispw.model.rest.BuildResponse;
 import com.compuware.ispw.model.rest.SetInfoResponse;
+import com.compuware.ispw.model.rest.TaskInfo;
+import com.compuware.ispw.model.rest.TaskListResponse;
 import com.compuware.ispw.model.rest.TaskResponse;
 import com.compuware.ispw.restapi.action.IAction;
 import com.compuware.ispw.restapi.action.SetOperationAction;
@@ -445,13 +447,24 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			
 			// polling status if no webhook
 			if (webhookToken == null && !step.skipWaitingForSet) {
-				if (respObject != null && respObject instanceof TaskResponse) {
+				String setId = StringUtils.EMPTY;
+				if (respObject instanceof TaskResponse)
+				{
 					TaskResponse taskResp = (TaskResponse) respObject;
-					String setId = taskResp.getSetId();
-
+					setId = taskResp.getSetId();
+				}
+				else if (respObject instanceof BuildResponse)
+				{
+					BuildResponse buildResp = (BuildResponse) respObject;
+					setId = buildResp.getSetId();
+				}
+				if (!setId.equals(StringUtils.EMPTY)
+						&& (respObject instanceof TaskResponse || respObject instanceof BuildResponse))
+				{
 					HashSet<String> set = new HashSet<String>();
 
 					int i = 0;
+					boolean isSetHeld = false;
 					for (; i < 60; i++) {
 						Thread.sleep(Constants.POLLING_INTERVAL);
 						HttpRequestExecution poller = HttpRequestExecution
@@ -488,6 +501,7 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 									&& SetOperationAction.SET_ACTION_HOLD.equalsIgnoreCase(ispwRequestBean.getIspwContextPathBean().getAction()))
 							{
 								logger.println("Set " + setId + " successfully held");
+								isSetHeld = true;
 								break;
 							}
 							else if (Constants.SET_STATE_HELD.equalsIgnoreCase(setState)
@@ -509,6 +523,13 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 
 					if (i == Constants.POLLING_COUNT) {
 						logger.println("Warn - max timeout reached");
+						return supplier;
+					}
+
+					// Follow with post set execution logging for the task within the BuildResponse model
+					if (respObject instanceof BuildResponse && !isSetHeld)
+					{
+						buildActionTaskInfoLogger(setId, logger, respObject);
 					}
 				}
 			}
@@ -516,29 +537,97 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			return supplier;
 		}
 
-        private static final long serialVersionUID = 1L;
+		private void buildActionTaskInfoLogger(String setId, PrintStream logger, Object respObject)
+				throws InterruptedException, IOException, RuntimeException
+		{
+			Thread.sleep(Constants.POLLING_INTERVAL);
+			HttpRequestExecution poller = HttpRequestExecution.createTaskInfoPoller(setId, step, listener, this);
 
-		FilePath resolveOutputFile() {
+			ResponseContentSupplier pollerSupplier = runExec(poller);
+			String pollingJson = pollerSupplier.getContent();
+
+			JsonProcessor jsonProcessor = new JsonProcessor();
+			TaskListResponse taskListResp = jsonProcessor.parse(pollingJson, TaskListResponse.class);
+			BuildResponse buildResponse = (BuildResponse) respObject;
+
+			if (buildResponse.getTasksBuilt().size() == 1)
+			{
+				logger.println(buildResponse.getTasksBuilt().size() + " task will be built as part of " + setId);
+			}
+			else
+			{
+				logger.println(buildResponse.getTasksBuilt().size() + " tasks will be built as part of " + setId);
+			}
+
+			List<TaskInfo> tasksBuilt = buildResponse.getTasksBuilt();
+			// Used to hold the difference between tasks built and tasks within a closed set
+			List<TaskInfo> tasksNotBuilt = tasksBuilt;
+			// Get the tasks that were successfully generated (anything leftover in a set is successful)
+			List<TaskInfo> tasksInSet = taskListResp.getTasks();
+			int numTasksToBeBuilt = tasksBuilt.size();
+			Set<String> uniqueTasksInSet = new HashSet<>();
+
+			for (TaskInfo task : tasksInSet)
+			{
+				if (task.getOperation().equals("G")) //$NON-NLS-1$
+				{
+					logger.println(task.getModuleName() + " has been compiled successfully");
+				}
+				// Remove all successfully built tasks
+				uniqueTasksInSet.add(task.getTaskId());
+				tasksNotBuilt.removeIf(x -> x.getTaskId().equals(task.getTaskId())); // remove all successfully built
+			}
+
+			for (TaskInfo task : tasksNotBuilt)
+			{
+				logger.println(task.getModuleName() + " did not compile successfully");
+			}
+
+			StringBuilder sb = new StringBuilder();
+			sb.append(uniqueTasksInSet.size() + " of " + numTasksToBeBuilt + " generated successfully. " + tasksNotBuilt.size()
+					+ " of " + numTasksToBeBuilt + " generated with errors.\n");
+			if (!tasksNotBuilt.isEmpty())
+			{
+				logger.println(sb);
+				throw new RuntimeException("The build process completed with errors.");
+			}
+			else
+			{
+				sb.append("The build process was successfully completed. ");
+				logger.println(sb);
+			}
+		}
+
+		private static final long serialVersionUID = 1L;
+
+		FilePath resolveOutputFile()
+		{
 			String outputFile = step.getOutputFile();
-			if (outputFile == null || outputFile.trim().isEmpty()) {
+			if (outputFile == null || outputFile.trim().isEmpty())
+			{
 				return null;
 			}
 
-			try {
+			try
+			{
 				FilePath workspace = getContext().get(FilePath.class);
-				if (workspace == null) {
-					throw new IllegalStateException("Could not find workspace to save file outputFile: " + outputFile +
-							". You should use it inside a 'node' block");
+				if (workspace == null)
+				{
+					throw new IllegalStateException("Could not find workspace to save file outputFile: " + outputFile
+							+ ". You should use it inside a 'node' block");
 				}
 				return workspace.child(outputFile);
-			} catch (IOException | InterruptedException e) {
+			}
+			catch (IOException | InterruptedException e)
+			{
 				throw new IllegalStateException(e);
 			}
 		}
 
-		public Item getProject() {
+		public Item getProject()
+		{
 			return run.getParent();
 		}
 
-    }
+	}
 }
