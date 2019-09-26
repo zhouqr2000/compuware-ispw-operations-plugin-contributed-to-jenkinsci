@@ -45,10 +45,6 @@ import jenkins.model.Jenkins;
  */
 public class GitToIspwPublishStep extends AbstractStepImpl
 {
-	// GIT related
-	private String gitRepoUrl = DescriptorImpl.gitRepoUrl;
-	private String gitCredentialsId = DescriptorImpl.gitCredentialsId;
-
 	// ISPW related
 	private String connectionId = DescriptorImpl.connectionId;
 	private String credentialsId = DescriptorImpl.credentialsId;
@@ -79,7 +75,6 @@ public class GitToIspwPublishStep extends AbstractStepImpl
 		@Override
 		protected Integer run() throws Exception
 		{
-
 			PrintStream logger = listener.getLogger();
 
 			EnvVars envVars = getContext().get(hudson.EnvVars.class);
@@ -192,7 +187,7 @@ public class GitToIspwPublishStep extends AbstractStepImpl
 				CliExecutor cliExecutor = new CliExecutor(logger, run, listener, launcher, envVars, targetFolder,
 						topazCliWorkspace, globalConfig, cliScriptFileRemote, workDir, objectQueue);
 				boolean success = cliExecutor.execute(true, step.connectionId, step.credentialsId, step.runtimeConfig,
-						step.stream, step.app, ispwLevel, containerPref, containerDesc, step.gitRepoUrl, step.gitCredentialsId, ref, refId, hash);
+						step.stream, step.app, ispwLevel, containerPref, containerDesc, ref, refId, hash);
 
 				if (success)
 				{
@@ -214,11 +209,6 @@ public class GitToIspwPublishStep extends AbstractStepImpl
 	@Extension
 	public static final class DescriptorImpl extends AbstractStepDescriptorImpl
 	{
-
-		// GIT related
-		public static final String gitRepoUrl = StringUtils.EMPTY;
-		public static final String gitCredentialsId = StringUtils.EMPTY;
-
 		// ISPW related
 		public static final String connectionId = StringUtils.EMPTY;
 		public static final String credentialsId = StringUtils.EMPTY;
@@ -250,13 +240,6 @@ public class GitToIspwPublishStep extends AbstractStepImpl
 			return "gitToIspwIntegration";
 		}
 
-		// GIT
-		public ListBoxModel doFillGitCredentialsIdItems(@AncestorInPath Jenkins context,
-				@QueryParameter String gitCredentialsId, @AncestorInPath Item project)
-		{
-			return GitToIspwUtils.buildStandardCredentialsIdItems(context, gitCredentialsId, project);
-		}
-
 		// ISPW
 		public ListBoxModel doFillConnectionIdItems(@AncestorInPath Jenkins context, @QueryParameter String connectionId,
 				@AncestorInPath Item project)
@@ -275,42 +258,6 @@ public class GitToIspwPublishStep extends AbstractStepImpl
 	@Initializer(before = InitMilestone.PLUGINS_STARTED)
 	public static void xStreamCompatibility()
 	{
-	}
-
-	/**
-	 * @return the gitRepoUrl
-	 */
-	public String getGitRepoUrl()
-	{
-		return gitRepoUrl;
-	}
-
-	/**
-	 * @param gitRepoUrl
-	 *            the gitRepoUrl to set
-	 */
-	@DataBoundSetter
-	public void setGitRepoUrl(String gitRepoUrl)
-	{
-		this.gitRepoUrl = gitRepoUrl;
-	}
-
-	/**
-	 * @return the gitCredentialsId
-	 */
-	public String getGitCredentialsId()
-	{
-		return gitCredentialsId;
-	}
-
-	/**
-	 * @param gitCredentialsId
-	 *            the gitCredentialsId to set
-	 */
-	@DataBoundSetter
-	public void setGitCredentialsId(String gitCredentialsId)
-	{
-		this.gitCredentialsId = gitCredentialsId;
 	}
 
 	/**

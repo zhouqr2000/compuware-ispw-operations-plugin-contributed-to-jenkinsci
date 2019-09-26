@@ -34,6 +34,7 @@ import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.model.Item;
 import hudson.remoting.VirtualChannel;
+import hudson.scm.SCM;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.ListBoxModel;
@@ -47,17 +48,14 @@ import jenkins.model.Jenkins;
  */
 public class GitToIspwPublish extends Builder
 {
-	// GIT related
-	private String gitRepoUrl = DescriptorImpl.gitRepoUrl;
-	private String gitCredentialsId = DescriptorImpl.gitCredentialsId;
-
 	// ISPW related
 	private String connectionId = DescriptorImpl.connectionId;
 	private String credentialsId = DescriptorImpl.credentialsId;
 	private String runtimeConfig = DescriptorImpl.runtimeConfig;
 	private String stream = DescriptorImpl.stream;
 	private String app = DescriptorImpl.app;
-
+	private static SCM scm;
+	
 	// Branch mapping
 	private String branchMapping = DescriptorImpl.branchMapping;
 
@@ -67,11 +65,14 @@ public class GitToIspwPublish extends Builder
 	}
 
 	@Override
-	public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
+	public synchronized boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
 			throws InterruptedException, IOException
 	{
 		PrintStream logger = listener.getLogger();
 
+		AbstractProject<?, ?> project = build.getProject();
+		scm = project.getScm();
+		
 		EnvVars envVars = build.getEnvironment(listener);
 
 		String hash = envVars.get(GitToIspwConstants.VAR_HASH, GitToIspwConstants.VAR_HASH);
@@ -178,7 +179,7 @@ public class GitToIspwPublish extends Builder
 			CliExecutor cliExecutor = new CliExecutor(logger, build, listener, launcher, envVars, targetFolder,
 					topazCliWorkspace, globalConfig, cliScriptFileRemote, workDir, objectQueue);
 			boolean success = cliExecutor.execute(true, connectionId, credentialsId, runtimeConfig, stream, app, ispwLevel,
-					containerPref, containerDesc, gitRepoUrl, gitCredentialsId, ref, refId, hash);
+					containerPref, containerDesc, ref, refId, hash);
 
 			if (success)
 			{
@@ -199,11 +200,6 @@ public class GitToIspwPublish extends Builder
 	@Extension
 	public static final class DescriptorImpl extends BuildStepDescriptor<Builder>
 	{
-
-		// GIT related
-		public static final String gitRepoUrl = StringUtils.EMPTY;
-		public static final String gitCredentialsId = StringUtils.EMPTY;
-
 		// ISPW related
 		public static final String connectionId = StringUtils.EMPTY;
 		public static final String credentialsId = StringUtils.EMPTY;
@@ -235,13 +231,6 @@ public class GitToIspwPublish extends Builder
 			return true;
 		}
 
-		// GIT
-		public ListBoxModel doFillGitCredentialsIdItems(@AncestorInPath Jenkins context,
-				@QueryParameter String gitCredentialsId, @AncestorInPath Item project)
-		{
-			return GitToIspwUtils.buildStandardCredentialsIdItems(context, gitCredentialsId, project);
-		}
-
 		// ISPW
 		public ListBoxModel doFillConnectionIdItems(@AncestorInPath Jenkins context, @QueryParameter String connectionId,
 				@AncestorInPath Item project)
@@ -260,42 +249,6 @@ public class GitToIspwPublish extends Builder
 	@Initializer(before = InitMilestone.PLUGINS_STARTED)
 	public static void xStreamCompatibility()
 	{
-	}
-
-	/**
-	 * @return the gitRepoUrl
-	 */
-	public String getGitRepoUrl()
-	{
-		return gitRepoUrl;
-	}
-
-	/**
-	 * @param gitRepoUrl
-	 *            the gitRepoUrl to set
-	 */
-	@DataBoundSetter
-	public void setGitRepoUrl(String gitRepoUrl)
-	{
-		this.gitRepoUrl = gitRepoUrl;
-	}
-
-	/**
-	 * @return the gitCredentialsId
-	 */
-	public String getGitCredentialsId()
-	{
-		return gitCredentialsId;
-	}
-
-	/**
-	 * @param gitCredentialsId
-	 *            the gitCredentialsId to set
-	 */
-	@DataBoundSetter
-	public void setGitCredentialsId(String gitCredentialsId)
-	{
-		this.gitCredentialsId = gitCredentialsId;
 	}
 
 	/**
@@ -404,6 +357,16 @@ public class GitToIspwPublish extends Builder
 	public void setBranchMapping(String branchMapping)
 	{
 		this.branchMapping = branchMapping;
+	}
+	
+	/**
+	 * Obtain the selected SCM object 
+	 * 
+	 * @return scm object
+	 */
+	public SCM getSCM()
+	{
+		return scm;
 	}
 
 }

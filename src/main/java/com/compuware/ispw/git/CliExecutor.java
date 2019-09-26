@@ -21,6 +21,17 @@ import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.util.ArgumentListBuilder;
+import hudson.plugins.git.GitSCM;
+import hudson.plugins.git.UserRemoteConfig;
+import hudson.scm.NullSCM;
+import hudson.scm.SCM;
+import hudson.tasks.Builder;
+import hudson.Util;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.Descriptor;
+import hudson.model.Job;
+import jenkins.model.Jenkins;
 
 /**
  * 
@@ -71,10 +82,12 @@ public class CliExecutor
 	}
 
 	public boolean execute(boolean bitbucketNotify, String connectionId, String credentialsId, String runtimeConfig,
-			String stream, String app, String ispwLevel, String containerPref, String containerDesc, 
-			String gitRepoUrl, String gitCredentialsId, String ref, String refId,
+			String stream, String app, String ispwLevel, String containerPref, String containerDesc, String ref, String refId,
 			String hash) throws InterruptedException, IOException
 	{
+		String gitRepoUrl = StringUtils.EMPTY;
+		String gitCredentialsId = StringUtils.EMPTY;
+		
 		HostConnection connection = globalConfig.getHostConnection(connectionId);
 		String host = ArgumentUtils.escapeForScript(connection.getHost());
 		String port = ArgumentUtils.escapeForScript(connection.getPort());
@@ -92,10 +105,35 @@ public class CliExecutor
 					+ containerPref + ", containerDesc=" + containerDesc);
 		}
 
+		GitToIspwPublish gitToIspwPublish = new GitToIspwPublish();
+		SCM scm = gitToIspwPublish.getSCM();
+		
+		logger.println("SCM type is " + scm.getType()); //$NON-NLS-1$
+		
+		if (scm instanceof GitSCM)
+		{
+			GitSCM gitSCM = (GitSCM) scm;
+			List<UserRemoteConfig> userRemoteConfigs = gitSCM.getUserRemoteConfigs();
+			gitRepoUrl = userRemoteConfigs.get(0).getUrl();
+			gitCredentialsId = userRemoteConfigs.get(0).getCredentialsId();
+		}
+		else
+		{
+			if (scm instanceof NullSCM)
+			{
+				throw new AbortException("Jenkins Git Plugin SCM is required along with selecting the Git option at the Source Code Management section and providing the Git repository URL and credentials."); //$NON-NLS-1$ 
+			}
+			else
+			{
+				throw new AbortException("The Git option must be selected in the Jenkins project Source Code Management section along with providing the Git repository URL and credentials.  The Source Code Management section selection type is " + scm.getType()); //$NON-NLS-1$ 
+			}
+		}
+
 		StandardUsernamePasswordCredentials gitCredentials = globalConfig.getLoginInformation(run.getParent(),
 				gitCredentialsId);
 		String gitUserId = ArgumentUtils.escapeForScript(gitCredentials.getUsername());
 		String gitPassword = ArgumentUtils.escapeForScript(gitCredentials.getPassword().getPlainText());
+
 		if (RestApiUtils.isIspwDebugMode())
 		{
 			logger.println("gitRepoUrl=" + gitRepoUrl + ", gitUserId=" + gitUserId + ", gitPassword=" + gitPassword);
