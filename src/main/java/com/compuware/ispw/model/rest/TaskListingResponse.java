@@ -10,7 +10,7 @@
 * Compuware Corporation. All other company or product names are trademarks
 * of their respective owners.
 * 
-* Copyright (c) 2017 Compuware Corporation. All rights reserved.
+* Copyright (c) 2017-2019 Compuware Corporation. All rights reserved.
 ******************************************************************************/
 
 package com.compuware.ispw.model.rest;
