@@ -204,9 +204,9 @@ public class GitToIspwPublish extends Builder
 				logger.println("debugMsg=" + debugMsg);
 			}
 
-			CliExecutor cliExecutor = new CliExecutor(logger, build, listener, launcher, envVars, targetFolder,
+			CliExecutor cliExecutor = new CliExecutor(logger, build, launcher, envVars, targetFolder,
 					topazCliWorkspace, globalConfig, cliScriptFileRemote, workDir, objectQueue);
-			boolean success = cliExecutor.execute(true, connectionId, credentialsId, runtimeConfig, stream, app, ispwLevel,
+			boolean success = cliExecutor.execute(connectionId, credentialsId, runtimeConfig, stream, app, ispwLevel,
 					containerPref, containerDesc, gitRepoUrl, gitCredentialsId, ref, refId, hash);
 
 			if (success)
