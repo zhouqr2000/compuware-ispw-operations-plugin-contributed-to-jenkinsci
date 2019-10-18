@@ -189,9 +189,9 @@ public class GitToIspwPublishStep extends AbstractStepImpl
 					logger.println("debugMsg=" + debugMsg);
 				}
 
-				CliExecutor cliExecutor = new CliExecutor(logger, run, listener, launcher, envVars, targetFolder,
+				CliExecutor cliExecutor = new CliExecutor(logger, run, launcher, envVars, targetFolder,
 						topazCliWorkspace, globalConfig, cliScriptFileRemote, workDir, objectQueue);
-				boolean success = cliExecutor.execute(true, step.connectionId, step.credentialsId, step.runtimeConfig,
+				boolean success = cliExecutor.execute(step.connectionId, step.credentialsId, step.runtimeConfig,
 						step.stream, step.app, ispwLevel, containerPref, containerDesc, step.gitRepoUrl, step.gitCredentialsId, ref, refId, hash);
 
 				if (success)
