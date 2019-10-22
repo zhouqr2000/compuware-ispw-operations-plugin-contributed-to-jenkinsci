@@ -16,10 +16,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 /**
- * 
+ * Class to hold the parameters required to do an automatic build.
  */
 public class BuildParms implements Serializable
 {
+	// IF YOU CHANGE THIS FILE, YOU MUST ALSO UPDATE THE FILE IN THE ISPW CLI
+
 	private static final long serialVersionUID = 1L;
 	private static Gson gson = new GsonBuilder().create();
 	private String containerId;
@@ -79,8 +81,8 @@ public class BuildParms implements Serializable
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
+	/**
+	 * Returns a json String
 	 */
 	@Override
 	public String toString()
@@ -88,9 +90,15 @@ public class BuildParms implements Serializable
 		return gson.toJson(this);
 	}
 
-	public static BuildParms parse(String s)
+	/**
+	 * Uses gson to parse a json String into a BuildParms object.
+	 * 
+	 * @param jsonString
+	 * @return a new BuildParms object
+	 */
+	public static BuildParms parse(String jsonString)
 	{
-		return gson.fromJson(s, BuildParms.class);
+		return gson.fromJson(jsonString, BuildParms.class);
 	}
 
 	/**
@@ -153,10 +161,13 @@ public class BuildParms implements Serializable
 	}
 
 	/**
-	 * @param releaseId the releaseId to set
+	 * @param releaseId
+	 *            the releaseId to set
 	 */
 	public void setReleaseId(String releaseId)
 	{
 		this.releaseId = releaseId;
 	}
+
+	// IF YOU CHANGE THIS FILE, YOU MUST ALSO UPDATE THE FILE IN THE ISPW CLI
 }
