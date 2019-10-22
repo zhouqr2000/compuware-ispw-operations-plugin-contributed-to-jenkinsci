@@ -107,10 +107,11 @@ public class GitToIspwUtils
 					containerPref = StringUtils.trimToEmpty(tokenizer.nextToken());
 				}
 
-				if(tokenizer.hasMoreElements()) {
+				if (tokenizer.hasMoreElements())
+				{
 					containerDesc = StringUtils.trimToEmpty(tokenizer.nextToken());
 				}
-				
+
 				RefMap refMap = new RefMap(ispwLevel, containerPref, containerDesc);
 				map.put(pattern, refMap);
 			}
@@ -118,7 +119,7 @@ public class GitToIspwUtils
 
 		return map;
 	}
-	
+
 	/**
 	 * Gets the ref, refId, fromHash, and toHash environment variables and trims them to empty.
 	 * 
@@ -163,8 +164,8 @@ public class GitToIspwUtils
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-	public static boolean callCli(Launcher launcher, Run<?, ?> build, PrintStream logger, EnvVars envVars, RefMap refMap, IGitToIspwPublish publishStep, String workspacePath)
-			throws InterruptedException, IOException
+	public static boolean callCli(Launcher launcher, Run<?, ?> build, PrintStream logger, EnvVars envVars, RefMap refMap,
+			IGitToIspwPublish publishStep, String workspacePath) throws InterruptedException, IOException
 	{
 		CpwrGlobalConfiguration globalConfig = CpwrGlobalConfiguration.get();
 		if (launcher == null)
@@ -177,7 +178,7 @@ public class GitToIspwUtils
 		{
 			return false;
 		}
-		
+
 		String toHash = envVars.get(GitToIspwConstants.VAR_TO_HASH, null);
 		String fromHash = envVars.get(GitToIspwConstants.VAR_FROM_HASH, null);
 		String ref = envVars.get(GitToIspwConstants.VAR_REF, null);
@@ -212,21 +213,23 @@ public class GitToIspwUtils
 			String buildTag = envVars.get("BUILD_TAG"); //$NON-NLS-1$
 			logger.println("Getting buildTag =" + buildTag);
 		}
-   
+
 		boolean success = true;
-			CliExecutor cliExecutor = new CliExecutor(logger, build, launcher, envVars, workspacePath, topazCliWorkspace,
-					globalConfig, cliScriptFileRemote, workDir);
-			try
-			{
-				success = cliExecutor.execute(true, publishStep.getConnectionId(), publishStep.getCredentialsId(),
-						publishStep.getRuntimeConfig(), publishStep.getStream(), publishStep.getApp(), refMap.getIspwLevel(), refMap.getContainerPref(), refMap.getContainerDesc(), 
-						publishStep.getGitRepoUrl(), publishStep.getGitCredentialsId(),ref, refId, fromHash, toHash);
-			}
-			catch (AbortException e)
-			{
-				logger.println(e);
-				success = false;
-			}
+		CliExecutor cliExecutor = new CliExecutor(logger, build, launcher, envVars, workspacePath, topazCliWorkspace,
+				globalConfig, cliScriptFileRemote, workDir);
+		try
+		{
+
+			success = cliExecutor.execute(publishStep.getConnectionId(), publishStep.getCredentialsId(),
+					publishStep.getRuntimeConfig(), publishStep.getStream(), publishStep.getApp(), refMap.getIspwLevel(),
+					refMap.getContainerPref(), refMap.getContainerDesc(), publishStep.getGitRepoUrl(),
+					publishStep.getGitCredentialsId(), ref, refId, fromHash, toHash);
+		}
+		catch (AbortException e)
+		{
+			logger.println(e);
+			success = false;
+		}
 
 		if (!success)
 		{
@@ -238,62 +241,4 @@ public class GitToIspwUtils
 		}
 		return success;
 	}
-
-	/**
-	 * Logs the results to the logger.
-	 * 
-	 * @param logger
-	 *            the logger
-	 * @param pushes
-	 *            the list of GitPushInfos to acquire information from
-	 */
-/*	public static void logResults(PrintStream logger, List<GitPushInfo> pushes)
-	{
-		GitPushInfo metaPush = new GitPushInfo();
-		if (pushes != null && !pushes.isEmpty())
-		{
-			metaPush.setFromHash(pushes.get(0).getFromHash());
-			metaPush.setToHash(pushes.get(pushes.size() - 1).getToHash());
-
-			for (GitPushInfo push : pushes)
-			{
-				metaPush.getSuccessfulCommits().addAll(push.getSuccessfulCommits());
-				if (!metaPush.getFailedCommits().isEmpty())
-				{
-					metaPush.getFailedCommits().addAll(push.getFailedCommits());
-					break; // once there's one failed commit, there's no point in looking at more pushes because they were not
-							// attempted.
-				}
-			}
-		}
-
-		logger.println("***********************************************************");
-		logger.println("*  Synchronization report for Git push                    *");
-		logger.println("*  From hash " + metaPush.getFromHash() + "     *");
-		logger.println("*  To hash " + metaPush.getToHash() + "       *");
-		logger.println("*                                                         *");
-		for (String commitId : metaPush.getSuccessfulCommits())
-		{
-			logger.println("*  " + commitId + "--- SUCCESSFUL *");
-		}
-		for (String commitId : metaPush.getFailedCommits())
-		{
-			logger.println("*  " + commitId + "------ FAILURE *");
-		}
-
-		boolean isAllCommitsAttempted = true;
-		if (!(!metaPush.getSuccessfulCommits().isEmpty() && metaPush.getSuccessfulCommits()
-				.get(metaPush.getSuccessfulCommits().size() - 1).equals(metaPush.getToHash())))
-		{
-			isAllCommitsAttempted = false;
-		}
-		if (!isAllCommitsAttempted && !(!metaPush.getFailedCommits().isEmpty()
-				&& metaPush.getFailedCommits().get(metaPush.getFailedCommits().size() - 1).equals(metaPush.getToHash())))
-		{
-			// if the "toHash" does not match either the last successful commit or the last failed commit, then there were some
-			// commits that were not attempted.
-			logger.println("*  SYNCHRONIZATION NOT ATTEMPTED ON REMAINING COMMITS     *");
-		}
-		logger.println("***********************************************************");
-	}*/
 }
