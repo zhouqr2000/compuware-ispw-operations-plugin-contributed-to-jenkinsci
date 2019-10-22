@@ -161,22 +161,30 @@
 	      <tr>
 	        <td valign="top">mname</td>
 	        <td valign="top">Component of this type in the assignment will be built, if specified</td>
-	      </tr>
+        </tr>
+        <tr>
+	        <td valign="top">buildAutomatically</td>
+	        <td valign="top">The request parameters for the build will come from a file written to the Jenkins build directory. This option is only valid when used in combination with a Git to ISPW Integration step</td>
+        </tr>
 	    </tbody>
 	  </table>
 	  Example:
 	  <table border="1">
 	    <tbody>
 	      <tr>
-	        <td>BuildAssignment</td>
-	      </tr>
-	      <tr>
-	        <td>
+	        <td valign="top">BuildAssignment #1</td>
+	        <td valign="top">
 	          <pre>runtimeConfiguration=TPZP<br />assignmentId=PLAY001386<br />mname=TREXX23<br />mtype=COPY<br />level=DEV1</pre>
+          </td>
+        </tr>
+	      <tr>
+	        <td valign="top">BuildAssignment #2</td>
+	        <td valign="top">
+	          <pre>buildAutomatically = true<br /></pre>
 	        </td>
 	      </tr>
 	    </tbody>
-	  </table>
+    </table>
 	  <br /><strong>BuildRelease Action:</strong>
 	  <br /> Required:
 	  <table border="1">
@@ -192,7 +200,7 @@
 	      <tr>
 	        <td valign="top">level</td>
 	        <td valign="top">Tasks in the release at this level will be built</td>
-	      </tr>
+        </tr>
 	    </tbody>
 	  </table>
 	  Optional:
@@ -210,22 +218,30 @@
 	      <tr>
 	        <td valign="top">mname</td>
 	        <td valign="top">Component of this type in the release will be built, if specified</td>
-	      </tr>
+        </tr>
+        <tr>
+	        <td valign="top">buildAutomatically</td>
+	        <td valign="top">The request parameters for the build will come from a file written to the Jenkins build directory. This option is only valid when used in combination with a Git to ISPW Integration step</td>
+        </tr>
 	    </tbody>
 	  </table>
 	  Example:
 	  <table border="1">
 	    <tbody>
 	      <tr>
-	        <td>BuildRelease</td>
-	      </tr>
-	      <tr>
-	        <td>
+	        <td valign="top">BuildRelease #1</td>
+	        <td valign="top">
 	          <pre>runtimeConfiguration=TPZP<br />releaseId=TESTREL<br />assignmentId=PLAY001386<br />mname=TREXX23<br />mtype=COPY<br />level=DEV1</pre>
+	        </td>
+        </tr>
+        <tr>
+	        <td valign="top">BuildRelease #2</td>
+	        <td valign="top">
+	          <pre>buildAutomatically = true<br /></pre>
 	        </td>
 	      </tr>
 	    </tbody>
-	  </table>
+    </table>
 	  <br /><strong>BuildTask Action:</strong>
 	  <br /> Required:
 	  <table border="1">
@@ -263,7 +279,11 @@
 	      <tr>
 	        <td valign="top">assignmentId</td>
 	        <td valign="top">The ID of the assignment to build the task in. This will be looked up if it is not specified</td>
-	      </tr>
+        </tr>
+        <tr>
+	        <td valign="top">buildAutomatically</td>
+	        <td valign="top">The request parameters for the build will come from a file written to the Jenkins build directory. This option is only valid when used in combination with a Git to ISPW Integration step</td>
+        </tr>
 	    </tbody>
 	  </table>
 	  Example:
@@ -271,8 +291,8 @@
 	  <table border="1">
 	    <tbody>
 	      <tr>
-	        <td>BuildTask #1</td>
-	        <td>
+	        <td valign="top">BuildTask #1</td>
+	        <td valign="top">
 	          <pre>runtimeConfiguration=TPZP<br />application=PLAY<br />level=DEV1<br />mname=TREXX04<br />mtype=COPY<br />assignmentId=PLAY000099</pre>
 	        </td>
 	      </tr>
@@ -280,6 +300,12 @@
 	        <td valign="top">BuildTask #2</td>
 	        <td valign="top">
 	          <pre>runtimeConfiguration=TPZP<br />taskId=7E38639716C2</pre>
+	        </td>
+        </tr>
+        <tr>
+	        <td valign="top">BuildTask #3</td>
+	        <td valign="top">
+	          <pre>runtimeConfiguration=TPZP<br />buildAutomatically = true<br /></pre>
 	        </td>
 	      </tr>
 	    </tbody>
