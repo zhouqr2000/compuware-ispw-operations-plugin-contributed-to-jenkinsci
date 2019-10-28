@@ -10,6 +10,7 @@
  */
 package com.compuware.ispw.restapi.action;
 
+import java.io.File;
 import java.io.PrintStream;
 import com.compuware.ispw.model.rest.BuildResponse;
 import com.compuware.ispw.restapi.Constants;
@@ -22,7 +23,7 @@ import com.compuware.ispw.restapi.util.RestApiUtils;
 /**
  * Action to build an assignment
  */
-public class BuildAssignmentAction extends SetInfoPostAction
+public class BuildAssignmentAction extends SetInfoPostAction implements IBuildAction
 {
 	private static final String[] defaultProps = new String[]{assignmentId, level, runtimeConfiguration};
 
@@ -61,5 +62,17 @@ public class BuildAssignmentAction extends SetInfoPostAction
 				+ ispwRequestBean.getIspwContextPathBean().getAssignmentId());
 
 		return buildResp;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.compuware.ispw.restapi.action.IBuildAction#getIspwRequestBean(java.lang.String, java.lang.String, com.compuware.ispw.restapi.WebhookToken, java.io.File)
+	 */
+	@Override
+	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody, WebhookToken webhookToken,
+			File buildDirectory)
+	{
+		System.out.println("getIspwRequestBean");
+		ispwRequestBody = getRequestBody(ispwRequestBody, buildDirectory, this.getLogger());
+		return getIspwRequestBean(srid, ispwRequestBody, webhookToken);
 	}
 }
