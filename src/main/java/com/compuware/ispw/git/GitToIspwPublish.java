@@ -9,8 +9,6 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -100,7 +98,7 @@ public class GitToIspwPublish extends Builder implements IGitToIspwPublish
 		File workspaceFile = new File(workspacePath);
 		workspaceFile.mkdirs();
 		Map<String, RefMap> map = GitToIspwUtils.parse(branchMapping);
-		logger.println("map=" + map);
+		logger.println("map=" + map); //$NON-NLS-1$
 		String refId = envVars.get(GitToIspwConstants.VAR_REF_ID, null);
 		BranchPatternMatcher matcher = new BranchPatternMatcher(map, logger);
 		RefMap refMap = matcher.match(refId);
@@ -110,7 +108,7 @@ public class GitToIspwPublish extends Builder implements IGitToIspwPublish
 
 		if (!success)
 		{
-			throw new AbortException("An error occurred while synchronizing source to ISPW");
+			throw new AbortException("An error occurred while synchronizing source to ISPW"); //$NON-NLS-1$
 		}
 		return true;
 	}
@@ -139,7 +137,7 @@ public class GitToIspwPublish extends Builder implements IGitToIspwPublish
 		@Override
 		public String getDisplayName()
 		{
-			return "Git to ISPW Integration";
+			return "Git to ISPW Integration"; //$NON-NLS-1$
 		}
 
 		@SuppressWarnings("rawtypes")
