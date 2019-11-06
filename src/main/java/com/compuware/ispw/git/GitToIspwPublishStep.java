@@ -93,11 +93,12 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
 			workspaceFile.mkdirs();
 			
 			List<? extends ChangeLogSet<? extends Entry>> changeSets = getChangeSets(run, logger);
-			
-			//Change sets only exists for multibranch pipeline
-			if (changeSets != null)
+			String branchName = envVars.get("BRANCH_NAME", StringUtils.EMPTY); 
+
+			//For multibranch pipeline only
+			if (changeSets != null && !branchName.isEmpty())
 			{
-				logger.println("Change log set found for multibranch project");
+				logger.println("Change log set and branch name found for multibranch project. Branch name: " + branchName);
 				Iterator<? extends ChangeLogSet<? extends Entry>> itrChangeSets = changeSets.iterator();
 				while (itrChangeSets.hasNext())
 				{
@@ -121,23 +122,17 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
 							if (ref.getName().contentEquals(refId))
 							{
 							    fromHash = ref.getObjectId().getName();
-								logger.println("fromHash is " + fromHash); //$NON-NLS-1$
-							    logger.println("toHash is " + toHash); //$NON-NLS-1$
+								logger.println("fromHash is " + fromHash);
+							    logger.println("toHash is " + toHash);
 							}
 						}
 					}
 
 					envVars.put(GitToIspwConstants.VAR_TO_HASH, toHash);
 					envVars.put(GitToIspwConstants.VAR_FROM_HASH, fromHash);
-					String branchName = envVars.get("BRANCH_NAME", null); //$NON-NLS-1$
-					if (branchName == null)
-					{
-						throw new AbortException("Unable to determine the branch name"); //$NON-NLS-1$
-					}
 					envVars.put(GitToIspwConstants.VAR_REF, branchName);
 				}
 			}
-			
 	
 			Map<String, RefMap> map = GitToIspwUtils.parse(step.branchMapping);
 			logger.println("map=" + map);
@@ -152,19 +147,7 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
 			RefMap refMap = matcher.match(refId);
 
 			Launcher launcher = getContext().get(Launcher.class);
-			// Sync to ISPW
-			if (launcher == null)
-			{
-		   	   	logger.println("kathy launcher is null");
-			}
-			if (run == null)
-			{
-				logger.println("kathy run is null");
-			}
-			if (workspacePath == null)
-			{
-				logger.println("workspace path is null");
-			}
+
 			boolean success = GitToIspwUtils.callCli(launcher, run, logger, envVars, refMap, step, workspacePath);
 
 			if (success)
