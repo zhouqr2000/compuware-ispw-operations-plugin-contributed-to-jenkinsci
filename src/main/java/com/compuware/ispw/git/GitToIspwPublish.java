@@ -107,7 +107,7 @@ public class GitToIspwPublish extends Builder implements IGitToIspwPublish
 		RefMap refMap = matcher.match(refId);
 
 		// Sync to ISPW
-		boolean success = GitToIspwUtils.callCli(launcher, build, logger, envVars, refMap, this, workspacePath);
+		boolean success = GitToIspwUtils.callCli(launcher, build, logger, envVars, refMap, this, workspacePath, false);
 
 		if (!success)
 		{

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
+import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
@@ -23,9 +24,11 @@ import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
+import hudson.model.AbstractBuild;
 import hudson.model.Item;
 import hudson.model.Run;
 import hudson.remoting.VirtualChannel;
+import hudson.scm.ChangeLogSet;
 import hudson.security.ACL;
 import hudson.util.ListBoxModel;
 import hudson.util.ListBoxModel.Option;
@@ -165,7 +168,7 @@ public class GitToIspwUtils
 	 * @throws IOException
 	 */
 	public static boolean callCli(Launcher launcher, Run<?, ?> build, PrintStream logger, EnvVars envVars, RefMap refMap,
-			IGitToIspwPublish publishStep, String workspacePath) throws InterruptedException, IOException
+			IGitToIspwPublish publishStep, String workspacePath, boolean isPrintHelpOnly) throws InterruptedException, IOException
 	{
 		CpwrGlobalConfiguration globalConfig = CpwrGlobalConfiguration.get();
 		if (launcher == null)
@@ -183,14 +186,18 @@ public class GitToIspwUtils
 		String fromHash = envVars.get(GitToIspwConstants.VAR_FROM_HASH, null);
 		String ref = envVars.get(GitToIspwConstants.VAR_REF, null);
 		String refId = envVars.get(GitToIspwConstants.VAR_REF_ID, null);
-		if (refMap == null)
+		
+		if (!isPrintHelpOnly)
 		{
-			logger.println("branch mapping is not defined for refId: " + refId);
-			return false;
-		}
-		else
-		{
-			logger.println("mapping refId: " + refId + " to refMap=" + refMap.toString());
+			if (refMap == null)
+			{
+				logger.println("branch mapping is not defined for refId: " + refId);
+				return false;
+			}
+			else
+			{
+				logger.println("mapping refId: " + refId + " to refMap=" + refMap.toString());
+			}
 		}
 		Properties remoteProperties = vChannel.call(new RemoteSystemProperties());
 		String remoteFileSeparator = remoteProperties.getProperty(CommonConstants.FILE_SEPARATOR_PROPERTY_KEY);
@@ -219,11 +226,20 @@ public class GitToIspwUtils
 				globalConfig, cliScriptFileRemote, workDir);
 		try
 		{
-
+			String ispwLevel = StringUtils.EMPTY;
+			String containerDesc = StringUtils.EMPTY;
+			String containerPref = StringUtils.EMPTY;
+			
+			if (refMap != null)
+			{
+				ispwLevel = refMap.getIspwLevel();
+				containerDesc = refMap.getContainerDesc();
+				containerPref = refMap.getContainerPref();
+			}
 			success = cliExecutor.execute(publishStep.getConnectionId(), publishStep.getCredentialsId(),
-					publishStep.getRuntimeConfig(), publishStep.getStream(), publishStep.getApp(), refMap.getIspwLevel(),
-					refMap.getContainerPref(), refMap.getContainerDesc(), publishStep.getGitRepoUrl(),
-					publishStep.getGitCredentialsId(), ref, refId, fromHash, toHash);
+					publishStep.getRuntimeConfig(), publishStep.getStream(), publishStep.getApp(), ispwLevel,
+					containerPref, containerDesc, publishStep.getGitRepoUrl(),
+					publishStep.getGitCredentialsId(), ref, refId, fromHash, toHash, isPrintHelpOnly);
 		}
 		catch (AbortException e)
 		{
@@ -233,12 +249,53 @@ public class GitToIspwUtils
 
 		if (!success)
 		{
-			logger.println("Synchronization for push ending with commit " + toHash + " failed.");
+			if (fromHash.trim().isEmpty())
+			{
+				logger.println("Synchronization failed.");
+			}
+			else if (fromHash.contentEquals("-1"))
+			{
+				logger.println("Synchronization for " + toHash.trim().replaceAll(":",  " , ") + " failed.");
+			}
+			else
+			{
+				logger.println("Synchronization for push ending with commit " + toHash.trim() + " failed.");
+			}
 		}
 		else
 		{
-			logger.println("Synchronization for push ending with commit " + toHash + " was successful.");
+			if (fromHash.contentEquals("-1"))
+			{
+				logger.println("Synchronization for " + toHash.trim().replaceAll(":",  " , ") + " was successful.");
+			}
+			else
+			{
+				logger.println("Synchronization for push ending with commit " + toHash.trim() + " was successful.");
+			}
 		}
 		return success;
+	}
+	
+	/**
+	* Get the change sets 
+	 * 
+	 * @param run - job execution 
+	 * 
+	 * @return the <ChangeLogSet> List. Else, null.
+	*/
+	public static List<? extends ChangeLogSet<? extends ChangeLogSet.Entry>> getChangeSets(Run<?, ?> run, PrintStream logger)
+	{
+		if (run instanceof AbstractBuild)
+		{
+			//freestyle project
+			return Collections.singletonList(((AbstractBuild<?, ?>) run).getChangeSet());
+		}
+		else if (run instanceof WorkflowRun)
+		{
+			//pipeline
+			return ((WorkflowRun) run).getChangeSets();
+		}
+
+		return null;
 	}
 }
