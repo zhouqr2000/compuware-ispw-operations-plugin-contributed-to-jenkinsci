@@ -191,7 +191,7 @@ public class GitToIspwUtils
 		{
 			if (refMap == null)
 			{
-				logger.println("branch mapping is not defined for refId: " + refId);
+				logger.println("Please refine your branch mapping to match the branch name or ID in order to find correct refId.");
 				return false;
 			}
 			else
