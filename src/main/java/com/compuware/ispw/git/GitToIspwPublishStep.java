@@ -2,9 +2,16 @@ package com.compuware.ispw.git;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.inject.Inject;
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepDescriptorImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractSynchronousNonBlockingStepExecution;
@@ -13,27 +20,30 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
-import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+
 import com.compuware.ispw.restapi.util.RestApiUtils;
-import com.compuware.jenkins.common.configuration.CpwrGlobalConfiguration;
+
 import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
+import hudson.model.AbstractBuild;
 import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.scm.ChangeLogSet;
+import hudson.scm.ChangeLogSet.Entry;
 import hudson.util.ListBoxModel;
 import jenkins.model.Jenkins;
 
 /**
- * GIT to ISPW integration pipeline
- * 
+* GIT to ISPW integration pipeline
+* 
  * @author Sam Zhou
- *
- */
+*
+*/
 public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspwPublish
 {
 	// GIT related
@@ -70,6 +80,8 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
 		@Override
 		protected Integer run() throws Exception
 		{
+			boolean isPrintHelpOnly = false;
+			
 			PrintStream logger = listener.getLogger();
 
 			EnvVars envVars = getContext().get(hudson.EnvVars.class);
@@ -77,17 +89,87 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
 			String workspacePath = envVars.get("WORKSPACE");
 			File workspaceFile = new File(workspacePath);
 			workspaceFile.mkdirs();
+			
+			List<? extends ChangeLogSet<? extends Entry>> changeSets = GitToIspwUtils.getChangeSets(run, logger);
+			String branchName = envVars.get("BRANCH_NAME", StringUtils.EMPTY); 
+
+			//For multibranch pipeline only
+			if (changeSets != null && !branchName.isEmpty())
+			{
+				HashSet<String> changedPathSet = new HashSet<String>();
+				String paths;
+				
+				logger.println("Branch name: " + branchName);
+				Iterator<? extends ChangeLogSet<? extends Entry>> itrChangeSets = changeSets.iterator();
+				
+				if (!itrChangeSets.hasNext())
+				{
+					isPrintHelpOnly = true;
+				}
+				while (itrChangeSets.hasNext())
+				{
+					ChangeLogSet<? extends Entry> changeLogSets = itrChangeSets.next();
+					Iterator<? extends Entry> itrChangeSet = changeLogSets.iterator();
+					while (itrChangeSet.hasNext())
+					{
+						Entry changeLogSet = itrChangeSet.next();
+						logger.println("Commit ID = " + changeLogSet.getCommitId());
+						Collection<String> affectedPaths = changeLogSet.getAffectedPaths();
+						
+						for (Iterator<String> iterator = affectedPaths.iterator(); iterator.hasNext();)
+						{
+							String affectedPath = iterator.next();
+							changedPathSet.add(affectedPath);
+						}
+					}
+
+					logger.println("ChangedPathSet = " + changedPathSet);
+					if (!changedPathSet.isEmpty())
+					{
+						Set<String> pathSet = changedPathSet;
+						paths = StringUtils.join(pathSet, ":");
+					}
+					else
+					{
+						throw new AbortException("No changed files were detected.");
+					}
+
+					// provide a list of paths in the var_to_hash, and set var_from_hash to -1 (indicator this is for
+					// multibranch project)
+					envVars.put(GitToIspwConstants.VAR_TO_HASH, paths);
+					envVars.put(GitToIspwConstants.VAR_FROM_HASH, "-1");
+					envVars.put(GitToIspwConstants.VAR_REF, branchName);
+				}
+			}
+	
 			Map<String, RefMap> map = GitToIspwUtils.parse(step.branchMapping);
 			logger.println("map=" + map);
 			String refId = envVars.get(GitToIspwConstants.VAR_REF_ID, null);
+			
 			BranchPatternMatcher matcher = new BranchPatternMatcher(map, logger);
-			RefMap refMap = matcher.match(refId);
 
+			RefMap refMap = null;
+			if (refId == null || refId.trim().isEmpty())
+			{
+				logger.println("Using branch name for branch pattern match: " + branchName);
+				
+				refMap = matcher.match(branchName);
+			}
+			else
+			{
+				logger.println("Using refid for branch pattern match: " + refId);
+				refMap = matcher.match(refId);
+			}
+			
 			Launcher launcher = getContext().get(Launcher.class);
-			// Sync to ISPW
-			boolean success = GitToIspwUtils.callCli(launcher, run, logger, envVars, refMap, step, workspacePath);
 
-			if (success)
+			boolean success = GitToIspwUtils.callCli(launcher, run, logger, envVars, refMap, step, workspacePath, isPrintHelpOnly);
+			
+			if (isPrintHelpOnly)
+			{
+				throw new AbortException("No changed files were detected.");
+			}
+			else if (success)
 			{
 				return 0;
 			}
@@ -97,6 +179,8 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
 			}
 		}
 	}
+
+
 
 	@Extension
 	public static final class DescriptorImpl extends AbstractStepDescriptorImpl

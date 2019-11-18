@@ -8,14 +8,15 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
+
 import com.compuware.ispw.restapi.util.RestApiUtils;
+
 import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.Extension;
@@ -96,7 +97,7 @@ public class GitToIspwPublish extends Builder implements IGitToIspwPublish
 
 		EnvVars envVars = build.getEnvironment(listener);
 		GitToIspwUtils.trimEnvironmentVariables(envVars);
-		String workspacePath = envVars.get("WORKSPACE"); //$NON-NLS-1$
+		String workspacePath = envVars.get("WORKSPACE");
 		File workspaceFile = new File(workspacePath);
 		workspaceFile.mkdirs();
 		Map<String, RefMap> map = GitToIspwUtils.parse(branchMapping);
@@ -106,7 +107,7 @@ public class GitToIspwPublish extends Builder implements IGitToIspwPublish
 		RefMap refMap = matcher.match(refId);
 
 		// Sync to ISPW
-		boolean success = GitToIspwUtils.callCli(launcher, build, logger, envVars, refMap, this, workspacePath);
+		boolean success = GitToIspwUtils.callCli(launcher, build, logger, envVars, refMap, this, workspacePath, false);
 
 		if (!success)
 		{

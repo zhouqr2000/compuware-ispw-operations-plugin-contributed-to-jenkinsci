@@ -71,7 +71,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jenkins.version>2.130</jenkins.version>
+		<jenkins.version>2.164.3</jenkins.version>
 		<java.level>8</java.level>
 		<workflow.version>1.10</workflow.version>
 		<maven.test.skip>false</maven.test.skip>
@@ -205,6 +205,23 @@
 	      <artifactId>cloudbees-folder</artifactId>
 	      <version>6.8</version>
 	    </dependency>
+	    
+		<!-- https://mvnrepository.com/artifact/org.jenkins-ci.plugins.workflow/workflow-step-api -->
+		<dependency>
+    	  <groupId>org.jenkins-ci.plugins.workflow</groupId>
+    	  <artifactId>workflow-step-api</artifactId>
+    	  <version>1.14.2</version>
+		</dependency>
+		<dependency>
+          <groupId>org.jenkins-ci.plugins.workflow</groupId>
+          <artifactId>workflow-api</artifactId>
+          <version>1.14.2</version>
+        </dependency>
+        <dependency>
+          <groupId>org.jenkins-ci.plugins.workflow</groupId>
+          <artifactId>workflow-job</artifactId>
+          <version>1.14.2</version>
+        </dependency>
 	    
 		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
 		<dependency>
