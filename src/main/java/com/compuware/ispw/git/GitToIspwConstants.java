@@ -26,7 +26,7 @@ public class GitToIspwConstants
 	public static final String GIT_PW_PARAM = "-gitPassword"; //$NON-NLS-1$
 	public static final String GIT_REF_PARAM = "-gitBranch"; //$NON-NLS-1$
 	public static final String GIT_HASH_PARAM = "-gitCommit"; //$NON-NLS-1$
-	public static final String JENKINS_WORKSPACE_PATH_ARG_PARAM = "-jenkinsWorkspaceJobPath";  //$NON-NLS-1$
+	public static final String GIT_LOCAL_PATH_ARG_PARAM = "-gitLocalPath";  //$NON-NLS-1$
 	public static final String GIT_FROM_HASH_PARAM = "-gitFromHash"; //$NON-NLS-1$
 
 
