@@ -251,26 +251,15 @@ public class GitToIspwUtils
 		{
 			if (fromHash.trim().isEmpty())
 			{
-				logger.println("Synchronization failed.");
+				logger.println("Failure - Synchronization failed.");
 			}
 			else if (fromHash.contentEquals("-1"))
 			{
-				logger.println("Synchronization for " + toHash.trim().replaceAll(":",  " , ") + " failed.");
+				logger.println("Failure - Synchronization for " + toHash.trim().replaceAll(":",  " , "));
 			}
 			else
 			{
-				logger.println("Synchronization for push ending with commit " + toHash.trim() + " failed.");
-			}
-		}
-		else
-		{
-			if (fromHash.contentEquals("-1"))
-			{
-				logger.println("Synchronization for " + toHash.trim().replaceAll(":",  " , ") + " was successful.");
-			}
-			else
-			{
-				logger.println("Synchronization for push ending with commit " + toHash.trim() + " was successful.");
+				logger.println("Failure - Synchronization for push ending with commit " + toHash.trim());
 			}
 		}
 		return success;
