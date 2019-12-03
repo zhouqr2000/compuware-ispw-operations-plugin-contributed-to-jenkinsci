@@ -20,12 +20,14 @@ import com.compuware.ispw.restapi.util.RestApiUtils;
 import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.Launcher;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
+import hudson.model.Computer;
 import hudson.model.Item;
 import hudson.plugins.git.GitSCM;
 import hudson.plugins.git.UserRemoteConfig;
@@ -98,8 +100,34 @@ public class GitToIspwPublish extends Builder implements IGitToIspwPublish
 		EnvVars envVars = build.getEnvironment(listener);
 		GitToIspwUtils.trimEnvironmentVariables(envVars);
 		String workspacePath = envVars.get("WORKSPACE");
-		File workspaceFile = new File(workspacePath);
-		workspaceFile.mkdirs();
+		String nodeName = envVars.get("NODE_NAME");
+		if (nodeName.contentEquals("master"))
+		{
+			FilePath wsPath = new FilePath(new File(workspacePath));
+			wsPath.mkdirs();
+		}
+		else
+		{
+			Jenkins jenkins = Jenkins.getInstanceOrNull();
+			if (jenkins == null)
+			{
+				throw new AbortException("The Jenkins instance " + nodeName + " has not been started or was already shut down.");
+			}
+			else
+			{
+				Computer computer = jenkins.getComputer(nodeName);
+				if (computer != null)
+				{
+					FilePath wsPath = new FilePath(computer.getChannel(), workspacePath);
+					wsPath.mkdirs();
+				}
+				else
+				{
+					throw new AbortException("Unable to access the Jenkins instance " + nodeName);
+				}
+			}
+		}
+		
 		Map<String, RefMap> map = GitToIspwUtils.parse(branchMapping);
 		logger.println("map=" + map);
 		String refId = envVars.get(GitToIspwConstants.VAR_REF_ID, null);

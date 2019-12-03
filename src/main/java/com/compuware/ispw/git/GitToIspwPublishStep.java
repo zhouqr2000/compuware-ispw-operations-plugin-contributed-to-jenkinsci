@@ -26,10 +26,11 @@ import com.compuware.ispw.restapi.util.RestApiUtils;
 import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.Launcher;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
-import hudson.model.AbstractBuild;
+import hudson.model.Computer;
 import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -87,9 +88,34 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
 			EnvVars envVars = getContext().get(hudson.EnvVars.class);
 			GitToIspwUtils.trimEnvironmentVariables(envVars);
 			String workspacePath = envVars.get("WORKSPACE");
-			File workspaceFile = new File(workspacePath);
-			workspaceFile.mkdirs();
-			
+			String nodeName = envVars.get("NODE_NAME");
+			if (nodeName.contentEquals("master"))
+			{
+				FilePath wsPath = new FilePath(new File(workspacePath));
+				wsPath.mkdirs();
+			}
+			else
+			{
+				Jenkins jenkins = Jenkins.getInstanceOrNull();
+				if (jenkins == null)
+				{
+					throw new AbortException("The Jenkins instance " + nodeName + " has not been started or was already shut down.");
+				}
+				else
+				{
+					Computer computer = jenkins.getComputer(nodeName);
+					if (computer != null)
+					{
+						FilePath wsPath = new FilePath(computer.getChannel(), workspacePath);
+						wsPath.mkdirs();
+					}
+					else
+					{
+						throw new AbortException("Unable to access the Jenkins instance " + nodeName);
+					}
+				}
+			}
+	
 			List<? extends ChangeLogSet<? extends Entry>> changeSets = GitToIspwUtils.getChangeSets(run, logger);
 			String branchName = envVars.get("BRANCH_NAME", StringUtils.EMPTY); 
 

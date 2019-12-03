@@ -36,10 +36,9 @@ public class CliExecutor
 	private String topazCliWorkspace;
 	private String jenkinsJobWorkspacePath;
 	private String cliScriptFileRemote;
-	private FilePath workDir;
 
 	public CliExecutor(PrintStream logger, Run<?, ?> run, Launcher launcher, EnvVars envVars, String jenkinsJobWorkspacePath,
-			String topazCliWorkspace, CpwrGlobalConfiguration globalConfig, String cliScriptFileRemote, FilePath workDir)
+			String topazCliWorkspace, CpwrGlobalConfiguration globalConfig, String cliScriptFileRemote)
 
 	{
 		this.logger = logger;
@@ -53,8 +52,6 @@ public class CliExecutor
 		this.topazCliWorkspace = topazCliWorkspace;
 
 		this.cliScriptFileRemote = cliScriptFileRemote;
-
-		this.workDir = workDir;
 	}
 
 
@@ -66,6 +63,10 @@ public class CliExecutor
 		
 		String host;
 		String port;
+		String gitUserId = StringUtils.EMPTY;
+		String gitPassword = StringUtils.EMPTY;
+		String userId = StringUtils.EMPTY;
+		String password = StringUtils.EMPTY;
 		
 		HostConnection connection = globalConfig.getHostConnection(connectionId);
 		if (connection != null)
@@ -83,22 +84,36 @@ public class CliExecutor
 		String timeout = ArgumentUtils.escapeForScript(connection.getTimeout());
 
 		StandardUsernamePasswordCredentials credentials = globalConfig.getLoginInformation(run.getParent(), credentialsId);
-		String userId = ArgumentUtils.escapeForScript(credentials.getUsername());
-		String password = ArgumentUtils.escapeForScript(credentials.getPassword().getPlainText());
-		if (RestApiUtils.isIspwDebugMode())
+		if (credentials != null)
 		{
-			logger.println("host=" + host + ", port=" + port + ", protocol=" + protocol + ", codePage=" + codePage
-					+ ", timeout=" + timeout + ", userId=" + userId + ", password=" + password + ", containerPref="
-					+ containerPref + ", containerDesc=" + containerDesc);
+			userId = ArgumentUtils.escapeForScript(credentials.getUsername());
+			password = ArgumentUtils.escapeForScript(credentials.getPassword().getPlainText());
+			if (RestApiUtils.isIspwDebugMode())
+			{
+				logger.println("host=" + host + ", port=" + port + ", protocol=" + protocol + ", codePage=" + codePage
+						+ ", timeout=" + timeout + ", userId=" + userId + ", password=" + password + ", containerPref="
+						+ containerPref + ", containerDesc=" + containerDesc);
+			}
+		}
+		else
+		{
+			logger.println("The host credentials were not able to be obtained.");
 		}
 
 		StandardUsernamePasswordCredentials gitCredentials = globalConfig.getLoginInformation(run.getParent(),
 				gitCredentialsId);
-		String gitUserId = ArgumentUtils.escapeForScript(gitCredentials.getUsername());
-		String gitPassword = ArgumentUtils.escapeForScript(gitCredentials.getPassword().getPlainText());
-		if (RestApiUtils.isIspwDebugMode())
+		if (gitCredentials != null)
 		{
-			logger.println("gitRepoUrl=" + gitRepoUrl + ", gitUserId=" + gitUserId + ", gitPassword=" + gitPassword);
+			gitUserId = ArgumentUtils.escapeForScript(gitCredentials.getUsername());
+			gitPassword = ArgumentUtils.escapeForScript(gitCredentials.getPassword().getPlainText());
+			if (RestApiUtils.isIspwDebugMode())
+			{
+				logger.println("gitRepoUrl=" + gitRepoUrl + ", gitUserId=" + gitUserId + ", gitPassword=" + gitPassword);
+			}
+		}
+		else
+		{
+			logger.println("The git credentials were not able to be obtained.");
 		}
 
 		ArgumentListBuilder args = new ArgumentListBuilder();
@@ -164,11 +179,10 @@ public class CliExecutor
 		args.add(GitToIspwConstants.GIT_HASH_PARAM, toHash);
 		args.add(GitToIspwConstants.JENKINS_WORKSPACE_PATH_ARG_PARAM, jenkinsJobWorkspacePath);
 
-		workDir.mkdirs();
 		logger.println("Shell script: " + args.toString());
 
 		// invoke the CLI (execute the batch/shell script)
-		int exitValue = launcher.launch().cmds(args).envs(envVars).stdout(logger).pwd(workDir).join();
+		int exitValue = launcher.launch().cmds(args).envs(envVars).stdout(logger).pwd(jenkinsJobWorkspacePath).join();
 
 		String osFile = launcher.isUnix()
 				? GitToIspwConstants.SCM_DOWNLOADER_CLI_SH
