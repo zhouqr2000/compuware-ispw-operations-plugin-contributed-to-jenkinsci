@@ -223,7 +223,7 @@ public class GitToIspwUtils
 
 		boolean success = true;
 		CliExecutor cliExecutor = new CliExecutor(logger, build, launcher, envVars, workspacePath, topazCliWorkspace,
-				globalConfig, cliScriptFileRemote, workDir);
+				globalConfig, cliScriptFileRemote);
 		try
 		{
 			String ispwLevel = StringUtils.EMPTY;
