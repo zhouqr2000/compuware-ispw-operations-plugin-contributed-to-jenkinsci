@@ -1,5 +1,6 @@
 package com.compuware.ispw.git;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Collections;
@@ -16,6 +17,7 @@ import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
+import com.compuware.ispw.restapi.Constants;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 import com.compuware.jenkins.common.configuration.CpwrGlobalConfiguration;
 import com.compuware.jenkins.common.utils.CommonConstants;
@@ -25,6 +27,7 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
 import hudson.model.AbstractBuild;
+import hudson.model.Computer;
 import hudson.model.Item;
 import hudson.model.Run;
 import hudson.remoting.VirtualChannel;
@@ -143,6 +146,59 @@ public class GitToIspwUtils
 	}
 
 	/**
+	 * Get file path in virtual workspace
+	 * 
+	 * @param envVars
+	 *            the jenkins env
+	 * @param fileName
+	 *            the file inside virtual workspace
+	 * @return the file path
+	 */
+	public static FilePath getFilePathInVirtualWorkspace(EnvVars envVars, String fileName)
+	{
+		FilePath filePath = null;
+
+		try
+		{
+			String workspacePath = envVars.get(Constants.ENV_VAR_WORKSPACE);
+			String nodeName = envVars.get(Constants.ENV_VAR_NODENAME);
+			if (nodeName.contentEquals(Constants.ENV_VAR_MASTER))
+			{
+				FilePath wsPath = new FilePath(new File(workspacePath));
+				filePath = new FilePath(wsPath, fileName);
+			}
+			else
+			{
+				Jenkins jenkins = Jenkins.getInstanceOrNull();
+				if (jenkins == null)
+				{
+					throw new AbortException(
+							"The Jenkins instance " + nodeName + " has not been started or was already shut down.");
+				}
+				else
+				{
+					Computer computer = jenkins.getComputer(nodeName);
+					if (computer != null)
+					{
+						FilePath wsPath = new FilePath(computer.getChannel(), workspacePath);
+						filePath = new FilePath(wsPath, fileName);
+					}
+					else
+					{
+						throw new AbortException("Unable to access the Jenkins instance " + nodeName);
+					}
+				}
+			}
+		}
+		catch (Exception x)
+		{
+			x.printStackTrace();
+		}
+
+		return filePath;
+	}
+	
+	/**
 	 * Calls the IspwCLI and returns whether the execution was successful. Any exceptions thrown by the executor are caught and
 	 * returned as a boolean.
 	 * 
@@ -168,7 +224,7 @@ public class GitToIspwUtils
 	 * @throws IOException
 	 */
 	public static boolean callCli(Launcher launcher, Run<?, ?> build, PrintStream logger, EnvVars envVars, RefMap refMap,
-			IGitToIspwPublish publishStep, String workspacePath, boolean isPrintHelpOnly) throws InterruptedException, IOException
+			IGitToIspwPublish publishStep, boolean isPrintHelpOnly) throws InterruptedException, IOException
 	{
 		CpwrGlobalConfiguration globalConfig = CpwrGlobalConfiguration.get();
 		if (launcher == null)
@@ -200,7 +256,14 @@ public class GitToIspwUtils
 			}
 		}
 		Properties remoteProperties = vChannel.call(new RemoteSystemProperties());
+
 		String remoteFileSeparator = remoteProperties.getProperty(CommonConstants.FILE_SEPARATOR_PROPERTY_KEY);
+		
+		String workspacePath = envVars.get(Constants.ENV_VAR_WORKSPACE);
+		
+		String topazCliWorkspace = workspacePath + remoteFileSeparator + CommonConstants.TOPAZ_CLI_WORKSPACE;
+		logger.println("TopazCliWorkspace: " + topazCliWorkspace); //$NON-NLS-1$
+		
 		String osFile = launcher.isUnix()
 				? GitToIspwConstants.SCM_DOWNLOADER_CLI_SH
 				: GitToIspwConstants.SCM_DOWNLOADER_CLI_BAT;
@@ -208,9 +271,6 @@ public class GitToIspwUtils
 		logger.println("CLI Script File: " + cliScriptFile); //$NON-NLS-1$
 		String cliScriptFileRemote = new FilePath(vChannel, cliScriptFile).getRemote();
 		logger.println("CLI Script File Remote: " + cliScriptFileRemote); //$NON-NLS-1$
-
-		String topazCliWorkspace = workspacePath + "\\" + CommonConstants.TOPAZ_CLI_WORKSPACE;
-		logger.println("TopazCliWorkspace: " + topazCliWorkspace); //$NON-NLS-1$
 
 		FilePath workDir = new FilePath(vChannel, build.getRootDir().toString());
 		workDir.mkdirs();

@@ -46,7 +46,7 @@ public class CliExecutor
 		this.run = run;
 		this.envVars = envVars;
 		this.launcher = launcher;
-		this.targetFolder = run.getRootDir().getAbsolutePath();
+		this.targetFolder = jenkinsJobWorkspacePath;
 		this.globalConfig = globalConfig;
 
 		this.jenkinsJobWorkspacePath = jenkinsJobWorkspacePath;
@@ -66,6 +66,10 @@ public class CliExecutor
 		
 		String host;
 		String port;
+		String gitUserId = StringUtils.EMPTY;
+		String gitPassword = StringUtils.EMPTY;
+		String userId = StringUtils.EMPTY;
+		String password = StringUtils.EMPTY;
 		
 		HostConnection connection = globalConfig.getHostConnection(connectionId);
 		if (connection != null)
@@ -83,22 +87,36 @@ public class CliExecutor
 		String timeout = ArgumentUtils.escapeForScript(connection.getTimeout());
 
 		StandardUsernamePasswordCredentials credentials = globalConfig.getLoginInformation(run.getParent(), credentialsId);
-		String userId = ArgumentUtils.escapeForScript(credentials.getUsername());
-		String password = ArgumentUtils.escapeForScript(credentials.getPassword().getPlainText());
-		if (RestApiUtils.isIspwDebugMode())
+		if (credentials != null)
 		{
-			logger.println("host=" + host + ", port=" + port + ", protocol=" + protocol + ", codePage=" + codePage
-					+ ", timeout=" + timeout + ", userId=" + userId + ", password=" + password + ", containerPref="
-					+ containerPref + ", containerDesc=" + containerDesc);
+			userId = ArgumentUtils.escapeForScript(credentials.getUsername());
+			password = ArgumentUtils.escapeForScript(credentials.getPassword().getPlainText());
+			if (RestApiUtils.isIspwDebugMode())
+			{
+				logger.println("host=" + host + ", port=" + port + ", protocol=" + protocol + ", codePage=" + codePage
+						+ ", timeout=" + timeout + ", userId=" + userId + ", password=" + password + ", containerPref="
+						+ containerPref + ", containerDesc=" + containerDesc);
+			}
+		}
+		else
+		{
+			logger.println("The host credentials were not able to be obtained.");
 		}
 
 		StandardUsernamePasswordCredentials gitCredentials = globalConfig.getLoginInformation(run.getParent(),
 				gitCredentialsId);
-		String gitUserId = ArgumentUtils.escapeForScript(gitCredentials.getUsername());
-		String gitPassword = ArgumentUtils.escapeForScript(gitCredentials.getPassword().getPlainText());
-		if (RestApiUtils.isIspwDebugMode())
+		if (gitCredentials != null)
 		{
-			logger.println("gitRepoUrl=" + gitRepoUrl + ", gitUserId=" + gitUserId + ", gitPassword=" + gitPassword);
+			gitUserId = ArgumentUtils.escapeForScript(gitCredentials.getUsername());
+			gitPassword = ArgumentUtils.escapeForScript(gitCredentials.getPassword().getPlainText());
+			if (RestApiUtils.isIspwDebugMode())
+			{
+				logger.println("gitRepoUrl=" + gitRepoUrl + ", gitUserId=" + gitUserId + ", gitPassword=" + gitPassword);
+			}
+		}
+		else
+		{
+			logger.println("The git credentials were not able to be obtained.");
 		}
 
 		ArgumentListBuilder args = new ArgumentListBuilder();

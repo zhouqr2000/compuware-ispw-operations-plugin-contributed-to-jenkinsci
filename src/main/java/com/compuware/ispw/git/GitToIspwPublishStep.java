@@ -1,17 +1,16 @@
 package com.compuware.ispw.git;
 
-import java.io.File;
 import java.io.PrintStream;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.inject.Inject;
+
 import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepDescriptorImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractSynchronousNonBlockingStepExecution;
@@ -29,7 +28,6 @@ import hudson.Extension;
 import hudson.Launcher;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
-import hudson.model.AbstractBuild;
 import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -86,10 +84,7 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
 
 			EnvVars envVars = getContext().get(hudson.EnvVars.class);
 			GitToIspwUtils.trimEnvironmentVariables(envVars);
-			String workspacePath = envVars.get("WORKSPACE");
-			File workspaceFile = new File(workspacePath);
-			workspaceFile.mkdirs();
-			
+
 			List<? extends ChangeLogSet<? extends Entry>> changeSets = GitToIspwUtils.getChangeSets(run, logger);
 			String branchName = envVars.get("BRANCH_NAME", StringUtils.EMPTY); 
 
@@ -163,7 +158,7 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
 			
 			Launcher launcher = getContext().get(Launcher.class);
 
-			boolean success = GitToIspwUtils.callCli(launcher, run, logger, envVars, refMap, step, workspacePath, isPrintHelpOnly);
+			boolean success = GitToIspwUtils.callCli(launcher, run, logger, envVars, refMap, step, isPrintHelpOnly);
 			
 			if (isPrintHelpOnly)
 			{

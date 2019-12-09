@@ -24,6 +24,7 @@ import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
+import com.compuware.ispw.git.GitToIspwUtils;
 import com.compuware.ispw.model.rest.BuildResponse;
 import com.compuware.ispw.model.rest.SetInfoResponse;
 import com.compuware.ispw.model.rest.TaskInfo;
@@ -378,8 +379,10 @@ public class IspwRestApiRequest extends Builder {
 		IspwRequestBean ispwRequestBean = null;
 		if (action instanceof IBuildAction)
 		{
+			FilePath buildParmPath = GitToIspwUtils.getFilePathInVirtualWorkspace(envVars, IBuildAction.BUILD_PARAM_FILE_NAME);
+			
 			ispwRequestBean = ((IBuildAction) action).getIspwRequestBean(cesIspwHost, ispwRequestBody, webhookToken,
-					buildDirectory);
+					buildParmPath);
 		}
 		else
 		{

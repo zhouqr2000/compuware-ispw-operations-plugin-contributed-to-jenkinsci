@@ -97,9 +97,7 @@ public class GitToIspwPublish extends Builder implements IGitToIspwPublish
 
 		EnvVars envVars = build.getEnvironment(listener);
 		GitToIspwUtils.trimEnvironmentVariables(envVars);
-		String workspacePath = envVars.get("WORKSPACE");
-		File workspaceFile = new File(workspacePath);
-		workspaceFile.mkdirs();
+
 		Map<String, RefMap> map = GitToIspwUtils.parse(branchMapping);
 		logger.println("map=" + map);
 		String refId = envVars.get(GitToIspwConstants.VAR_REF_ID, null);
@@ -107,7 +105,7 @@ public class GitToIspwPublish extends Builder implements IGitToIspwPublish
 		RefMap refMap = matcher.match(refId);
 
 		// Sync to ISPW
-		boolean success = GitToIspwUtils.callCli(launcher, build, logger, envVars, refMap, this, workspacePath, false);
+		boolean success = GitToIspwUtils.callCli(launcher, build, logger, envVars, refMap, this, false);
 
 		if (!success)
 		{

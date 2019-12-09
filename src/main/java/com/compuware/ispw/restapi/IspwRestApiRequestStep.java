@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepDescriptorImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepImpl;
@@ -20,6 +19,7 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
+import com.compuware.ispw.git.GitToIspwUtils;
 import com.compuware.ispw.model.rest.BuildResponse;
 import com.compuware.ispw.model.rest.SetInfoResponse;
 import com.compuware.ispw.model.rest.TaskInfo;
@@ -32,7 +32,6 @@ import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
 import com.compuware.ispw.restapi.util.ReflectUtils;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 import com.compuware.jenkins.common.configuration.HostConnection;
-
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
@@ -407,8 +406,10 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			IspwRequestBean ispwRequestBean = null;
 			if (action instanceof IBuildAction)
 			{
+				FilePath buildParmPath = GitToIspwUtils.getFilePathInVirtualWorkspace(envVars, IBuildAction.BUILD_PARAM_FILE_NAME);
+				
 				ispwRequestBean = ((IBuildAction) action).getIspwRequestBean(cesIspwHost, step.ispwRequestBody, webhookToken,
-						buildDirectory);
+						buildParmPath);
 			}
 			else
 			{
