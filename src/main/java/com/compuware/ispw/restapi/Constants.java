@@ -32,4 +32,7 @@ public class Constants {
 	public static final int POLLING_COUNT = 120;
 	public static final int POLLING_INTERVAL = 2000;
 
+	public static final String ENV_VAR_WORKSPACE = "WORKSPACE";
+	public static final String ENV_VAR_MASTER = "master";
+	public static final String ENV_VAR_NODENAME = "NODE_NAME";
 }

@@ -10,18 +10,15 @@
  */
 package com.compuware.ispw.restapi.action;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.StringUtils;
 import com.compuware.ispw.restapi.BuildParms;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
 import com.compuware.ispw.restapi.util.RestApiUtils;
+import hudson.FilePath;
 
 /**
  * Interface for actions that run the ISPW build operation.
@@ -38,13 +35,13 @@ public interface IBuildAction
 	 * 
 	 * @param ispwRequestBody
 	 *            the request body entered by the user.
-	 * @param buildDirectory
-	 *            the directory of this Jenkins job run. (should be something like "Jenkins\jobs\job-name\builds\42")
+	 * @param buildParmPath
+	 *            The file contain the build parms. (should be something like "Jenkins\jobs\job-name\builds\42")
 	 * @param logger
 	 *            the logger.
 	 * @return a String containing the request body that should be used.
 	 */
-	public default String getRequestBody(String ispwRequestBody, File buildDirectory, PrintStream logger)
+	public default String getRequestBody(String ispwRequestBody, FilePath buildParmPath, PrintStream logger)
 	{
 		String buildAutomaticallyRegex = "(?i)(?m)(^(?!#)(.+)?buildautomatically.+true(.+)?$)"; //$NON-NLS-1$
 		Pattern buildAutomaticallyPattern = Pattern.compile(buildAutomaticallyRegex,
@@ -52,18 +49,18 @@ public interface IBuildAction
 		if (ispwRequestBody != null)
 		{
 			Matcher buildAutomaticallyMatcher = buildAutomaticallyPattern.matcher(ispwRequestBody);
-			if (buildAutomaticallyMatcher.find() && buildDirectory != null)
+			if (buildAutomaticallyMatcher.find() && buildParmPath != null)
 			{
 				ispwRequestBody = buildAutomaticallyMatcher.replaceAll(StringUtils.EMPTY);
 
-				// if a line of the body contains "buildautomatically" and "true" case insensitive, and the line is not a
-				// comment.
-				File parmFile = new File(buildDirectory, BUILD_PARAM_FILE_NAME);
-				logger.println("Build parameters will automatically be retrieved from file " + parmFile.getAbsolutePath());
-
 				try
 				{
-					String jsonString = FileUtils.readFileToString(parmFile, CharEncoding.UTF_8);
+					// if a line of the body contains "buildautomatically" and "true" case insensitive, and the line is not a
+					// comment.
+					// File parmFile = new File(buildParmPath, BUILD_PARAM_FILE_NAME);
+					logger.println("Build parameters will automatically be retrieved from file " + buildParmPath.toURI());
+
+					String jsonString = buildParmPath.readToString();
 					BuildParms buildParms = null;
 					if (jsonString != null && !jsonString.isEmpty())
 					{
@@ -102,7 +99,7 @@ public interface IBuildAction
 					}
 
 				}
-				catch (IOException e)
+				catch (Exception e)
 				{
 					e.printStackTrace();
 				}
@@ -116,6 +113,6 @@ public interface IBuildAction
 	}
 
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody, WebhookToken webhookToken,
-			File buildDirectory);
+			FilePath buildParmPath);
 
 }

@@ -36,22 +36,25 @@ public class CliExecutor
 	private String topazCliWorkspace;
 	private String jenkinsJobWorkspacePath;
 	private String cliScriptFileRemote;
+	private FilePath workDir;
 
 	public CliExecutor(PrintStream logger, Run<?, ?> run, Launcher launcher, EnvVars envVars, String jenkinsJobWorkspacePath,
-			String topazCliWorkspace, CpwrGlobalConfiguration globalConfig, String cliScriptFileRemote)
+			String topazCliWorkspace, CpwrGlobalConfiguration globalConfig, String cliScriptFileRemote, FilePath workDir)
 
 	{
 		this.logger = logger;
 		this.run = run;
 		this.envVars = envVars;
 		this.launcher = launcher;
-		this.targetFolder = run.getRootDir().getAbsolutePath();
+		this.targetFolder = jenkinsJobWorkspacePath;
 		this.globalConfig = globalConfig;
 
 		this.jenkinsJobWorkspacePath = jenkinsJobWorkspacePath;
 		this.topazCliWorkspace = topazCliWorkspace;
 
 		this.cliScriptFileRemote = cliScriptFileRemote;
+
+		this.workDir = workDir;
 	}
 
 
@@ -179,10 +182,11 @@ public class CliExecutor
 		args.add(GitToIspwConstants.GIT_HASH_PARAM, toHash);
 		args.add(GitToIspwConstants.JENKINS_WORKSPACE_PATH_ARG_PARAM, jenkinsJobWorkspacePath);
 
+		workDir.mkdirs();
 		logger.println("Shell script: " + args.toString());
 
 		// invoke the CLI (execute the batch/shell script)
-		int exitValue = launcher.launch().cmds(args).envs(envVars).stdout(logger).pwd(jenkinsJobWorkspacePath).join();
+		int exitValue = launcher.launch().cmds(args).envs(envVars).stdout(logger).pwd(workDir).join();
 
 		String osFile = launcher.isUnix()
 				? GitToIspwConstants.SCM_DOWNLOADER_CLI_SH

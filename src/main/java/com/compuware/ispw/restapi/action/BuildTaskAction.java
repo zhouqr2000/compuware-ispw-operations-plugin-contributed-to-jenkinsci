@@ -10,7 +10,6 @@
  */
 package com.compuware.ispw.restapi.action;
 
-import java.io.File;
 import java.io.PrintStream;
 import com.compuware.ispw.model.rest.BuildResponse;
 import com.compuware.ispw.restapi.Constants;
@@ -19,6 +18,7 @@ import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.JsonProcessor;
 import com.compuware.ispw.restapi.WebhookToken;
 import com.compuware.ispw.restapi.util.RestApiUtils;
+import hudson.FilePath;
 
 /**
  * 
@@ -105,9 +105,9 @@ public class BuildTaskAction extends SetInfoPostAction implements IBuildAction
 	 */
 	@Override
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody, WebhookToken webhookToken,
-			File buildDirectory)
+			FilePath buildParmPath)
 	{
-		ispwRequestBody = getRequestBody(ispwRequestBody, buildDirectory, this.getLogger());
+		ispwRequestBody = getRequestBody(ispwRequestBody, buildParmPath, this.getLogger());
 		return getIspwRequestBean(srid, ispwRequestBody, webhookToken);
 	}
 }
