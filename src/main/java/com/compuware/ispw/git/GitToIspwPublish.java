@@ -3,20 +3,16 @@
  */
 package com.compuware.ispw.git;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
-
 import com.compuware.ispw.restapi.util.RestApiUtils;
-
 import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.Extension;
