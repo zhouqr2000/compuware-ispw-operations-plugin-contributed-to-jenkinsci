@@ -34,11 +34,11 @@ public class CliExecutor
 
 	private String targetFolder;
 	private String topazCliWorkspace;
-	private String jenkinsJobWorkspacePath;
+	private String gitLocalPath;
 	private String cliScriptFileRemote;
 	private FilePath workDir;
 
-	public CliExecutor(PrintStream logger, Run<?, ?> run, Launcher launcher, EnvVars envVars, String jenkinsJobWorkspacePath,
+	public CliExecutor(PrintStream logger, Run<?, ?> run, Launcher launcher, EnvVars envVars, String gitLocalPath,
 			String topazCliWorkspace, CpwrGlobalConfiguration globalConfig, String cliScriptFileRemote, FilePath workDir)
 
 	{
@@ -49,7 +49,7 @@ public class CliExecutor
 		this.targetFolder = jenkinsJobWorkspacePath;
 		this.globalConfig = globalConfig;
 
-		this.jenkinsJobWorkspacePath = jenkinsJobWorkspacePath;
+		this.gitLocalPath = gitLocalPath;
 		this.topazCliWorkspace = topazCliWorkspace;
 
 		this.cliScriptFileRemote = cliScriptFileRemote;
@@ -187,7 +187,7 @@ public class CliExecutor
 			toHash = "\"" + toHash + "\"";
 		}
 		args.add(GitToIspwConstants.GIT_HASH_PARAM, toHash);
-		args.add(GitToIspwConstants.JENKINS_WORKSPACE_PATH_ARG_PARAM, jenkinsJobWorkspacePath);
+		args.add(GitToIspwConstants.GIT_LOCAL_PATH_ARG_PARAM, gitLocalPath);
 
 		workDir.mkdirs();
 		logger.println("Shell script: " + args.toString());
