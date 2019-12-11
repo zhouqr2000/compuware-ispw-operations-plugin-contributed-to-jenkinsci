@@ -179,6 +179,13 @@ public class CliExecutor
 		args.add(GitToIspwConstants.GIT_REPO_URL_PARAM, ArgumentUtils.escapeForScript(gitRepoUrl));
 		args.add(GitToIspwConstants.GIT_REF_PARAM, ref);
 		args.add(GitToIspwConstants.GIT_FROM_HASH_PARAM, fromHash);
+		
+		// If the path doesn't contains space, the argument is not
+		// properly double quoted, we need to fix it here
+		if (!toHash.contains(" "))
+		{
+			toHash = "\"" + toHash + "\"";
+		}
 		args.add(GitToIspwConstants.GIT_HASH_PARAM, toHash);
 		args.add(GitToIspwConstants.JENKINS_WORKSPACE_PATH_ARG_PARAM, jenkinsJobWorkspacePath);
 
@@ -186,6 +193,7 @@ public class CliExecutor
 		logger.println("Shell script: " + args.toString());
 
 		// invoke the CLI (execute the batch/shell script)
+		
 		int exitValue = launcher.launch().cmds(args).envs(envVars).stdout(logger).pwd(workDir).join();
 
 		String osFile = launcher.isUnix()
