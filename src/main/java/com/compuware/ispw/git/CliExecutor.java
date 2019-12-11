@@ -46,7 +46,7 @@ public class CliExecutor
 		this.run = run;
 		this.envVars = envVars;
 		this.launcher = launcher;
-		this.targetFolder = jenkinsJobWorkspacePath;
+		this.targetFolder = gitLocalPath;
 		this.globalConfig = globalConfig;
 
 		this.gitLocalPath = gitLocalPath;
