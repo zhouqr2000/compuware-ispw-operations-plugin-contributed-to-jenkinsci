@@ -32,6 +32,8 @@ import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.scm.ChangeLogSet;
+import hudson.scm.EditType;
+import hudson.scm.ChangeLogSet.AffectedFile;
 import hudson.scm.ChangeLogSet.Entry;
 import hudson.util.ListBoxModel;
 import jenkins.model.Jenkins;
@@ -109,11 +111,14 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
 					{
 						Entry changeLogSet = itrChangeSet.next();
 						logger.println("Commit ID = " + changeLogSet.getCommitId());
-						Collection<String> affectedPaths = changeLogSet.getAffectedPaths();
-						
-						for (Iterator<String> iterator = affectedPaths.iterator(); iterator.hasNext();)
+						Collection<? extends AffectedFile> affectedFiles = changeLogSet.getAffectedFiles();
+						for (AffectedFile affectedFile : affectedFiles)
 						{
-							String affectedPath = iterator.next();
+							String affectedPath = affectedFile.getPath();
+							if (affectedFile.getEditType() == EditType.DELETE)
+							{
+								affectedPath = "|" + changeLogSet.getCommitId() + "|" + affectedPath;
+							}
 							changedPathSet.add(affectedPath);
 						}
 					}
