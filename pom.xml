@@ -28,7 +28,7 @@
 	<version>1.0.5-SNAPSHOT</version>
 	<packaging>hpi</packaging>
 	<name>Compuware ISPW Operations Plugin</name>
-	<url>https://wiki.jenkins.io/display/JENKINS/Compuware+ISPW+Operations+Plugin</url>
+	<url>https://github.com/jenkinsci/compuware-ispw-operations-plugin</url>
 	<description>The Compuware ISPW Operations plugin allows Jenkins users to execute ISPW operations, such as Generate, Promote, Deploy or Regress on the mainframe. See the release notes for changes and compatibility https://github.com/jenkinsci/compuware-ispw-operations-plugin.</description>
 
 	<developers>
