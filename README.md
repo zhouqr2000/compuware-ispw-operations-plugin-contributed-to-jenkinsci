@@ -23,7 +23,7 @@ The following are required to use this plugin:
 ### Installing in a Jenkins Instance
 
 -   Install the Compuware ISPW Operations plugin according to the
-    Jenkins instructions for installing plugins.  Dependent plugins will
+    Jenkins instructions for installing plugins. Dependent plugins will
     automatically be installed.
 
   
@@ -163,8 +163,6 @@ The following are required to use this plugin:
     Compuware ISPW Operations plugin appears. The script can be added to
     the Pipeline section when configuring a Pipeline job. A sample
     script is shown below:
-
-&nbsp;
 
 ```
 ispwOperation connectionId: 'e0fbb6eb-b01d-4d55-b18b-2f321c174474', credentialsId: 'f1d2762b-9a40-46ad-a9df-b982147acc85', ispwAction: 'GenerateTasksInAssignment', ispwRequestBody: '''assignmentId=PLAY000313
