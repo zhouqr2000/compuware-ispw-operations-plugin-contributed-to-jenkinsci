@@ -18,7 +18,7 @@ public class CancelAssignmentAction extends SetInfoPostAction {
 	/**
 	 * Constructor
 	 * 
-	 * @param logger
+	 * @param logger the jenkins logger
 	 */
 	public CancelAssignmentAction(PrintStream logger) {
 		super(logger);

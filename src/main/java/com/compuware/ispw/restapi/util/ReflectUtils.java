@@ -171,13 +171,7 @@ public class ReflectUtils {
 		}
 	}
 
-	/**
-	 * Instance a generic type, must contains a default constructor
-	 * 
-	 * @param clazz
-	 *            the class to be instantiated
-	 * @return an instance of type T
-	 */
+	/* (non-Javadoc) */
 	public static <T> T newInstance(Class<T> clazz) {
 		T t = null;
 

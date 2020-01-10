@@ -18,7 +18,7 @@ public class CancelReleaseAction extends SetInfoPostAction {
 	/**
 	 * Constructor
 	 * 
-	 * @param logger
+	 * @param logger the jenkins logger
 	 */
 	public CancelReleaseAction(PrintStream logger) {
 		super(logger);

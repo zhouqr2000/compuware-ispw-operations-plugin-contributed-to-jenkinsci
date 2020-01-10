@@ -208,20 +208,18 @@ public class GitToIspwUtils
 	 *            the Jenkins Run
 	 * @param logger
 	 *            the logger
-	 * @param mapDb
-	 *            the database that store the Git push information.
-	 * @param gitPushList
-	 *            the list of GitPushInfos that is linked to the database. The IspwCLI will be called once for each push.
 	 * @param envVars
 	 *            the environment variables including ref, refId, fromHash, and toHash
+	 * @param refMap
+	 *            the ref map
 	 * @param publishStep
 	 *            The step that this CLI execution is being called from. The publish step is used to get the information input
 	 *            into the Jenkins UI.
-	 * @param workspacePath
-	 *            The folder that holds the git repository cloned by the SCM step.
-	 * @return a boolean indicating success.
-	 * @throws InterruptedException
-	 * @throws IOException
+	 * @param isPrintHelpOnly
+	 *            only print help
+	 * @return a boolean to indicate success
+	 * @throws InterruptedException the exception
+	 * @throws IOException the exception
 	 */
 	public static boolean callCli(Launcher launcher, Run<?, ?> build, PrintStream logger, EnvVars envVars, RefMap refMap,
 			IGitToIspwPublish publishStep, boolean isPrintHelpOnly) throws InterruptedException, IOException
@@ -325,12 +323,8 @@ public class GitToIspwUtils
 		return success;
 	}
 	
-	/**
-	* Get the change sets 
-	 * 
-	 * @param run - job execution 
-	 * 
-	 * @return the <ChangeLogSet> List. Else, null.
+	/*
+	 (non-Javadoc) 
 	*/
 	public static List<? extends ChangeLogSet<? extends ChangeLogSet.Entry>> getChangeSets(Run<?, ?> run, PrintStream logger)
 	{

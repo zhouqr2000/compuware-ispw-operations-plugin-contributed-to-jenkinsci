@@ -18,7 +18,7 @@ public class CloseAssignmentAction extends SetInfoPostAction {
 	/**
 	 * Constructor
 	 * 
-	 * @param logger
+	 * @param logger the jenkins logger
 	 */
 	public CloseAssignmentAction(PrintStream logger) {
 		super(logger);

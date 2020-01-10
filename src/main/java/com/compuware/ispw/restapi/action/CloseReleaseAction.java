@@ -18,7 +18,7 @@ public class CloseReleaseAction extends SetInfoPostAction {
 	/**
 	 * Constructor
 	 * 
-	 * @param logger
+	 * @param logger the jenkins logger
 	 */
 	public CloseReleaseAction(PrintStream logger) {
 		super(logger);

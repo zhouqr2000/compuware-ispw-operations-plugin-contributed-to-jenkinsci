@@ -93,7 +93,7 @@ public class BuildParms implements Serializable
 	/**
 	 * Uses gson to parse a json String into a BuildParms object.
 	 * 
-	 * @param jsonString
+	 * @param jsonString the JSON string
 	 * @return a new BuildParms object
 	 */
 	public static BuildParms parse(String jsonString)

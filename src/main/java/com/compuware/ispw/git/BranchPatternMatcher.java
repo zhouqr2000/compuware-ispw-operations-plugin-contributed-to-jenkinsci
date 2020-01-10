@@ -21,10 +21,8 @@ public class BranchPatternMatcher
 	/**
 	 * Constructor
 	 * 
-	 * @param repo
-	 *            the GIT repo
-	 * @param ispwDao
-	 *            the ISPW DAO instance
+	 * @param branchPatternToIspwLevel branch pattern to ispw level
+	 * @param log the jenkins log
 	 */
 	public BranchPatternMatcher(Map<String, RefMap> branchPatternToIspwLevel, PrintStream log)
 	{
@@ -77,8 +75,8 @@ public class BranchPatternMatcher
 	/**
 	 * Convert wildcard to regular expression
 	 * 
-	 * @param wildcard
-	 * @return
+	 * @param wildcard the wild card
+	 * @return the regex wild card
 	 */
 	public static String wildcardToRegex(String wildcard)
 	{

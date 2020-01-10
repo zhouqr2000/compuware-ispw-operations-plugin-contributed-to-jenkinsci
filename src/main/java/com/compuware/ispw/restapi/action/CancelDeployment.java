@@ -24,7 +24,7 @@ public class CancelDeployment extends SetInfoPostAction
 	/**
 	 * Constructor
 	 * 
-	 * @param logger
+	 * @param logger the jenkins logger
 	 */
 	public CancelDeployment(PrintStream logger)
 	{

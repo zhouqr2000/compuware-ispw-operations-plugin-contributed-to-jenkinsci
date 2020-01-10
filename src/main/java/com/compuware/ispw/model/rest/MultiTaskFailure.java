@@ -118,7 +118,7 @@ public class MultiTaskFailure
 	/**
 	 * Sets the error message
 	 * 
-	 * @param errorMessage
+	 * @param errorMessage the error message
 	 */
 	public void setErrorMessage(String errorMessage)
 	{
