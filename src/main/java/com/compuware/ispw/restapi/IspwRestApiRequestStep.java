@@ -473,7 +473,7 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 					BuildResponse buildResp = (BuildResponse) respObject;
 					setId = buildResp.getSetId();
 				}
-				if (!setId.equals(StringUtils.EMPTY)
+				if (StringUtils.isNotBlank(setId)
 						&& (respObject instanceof TaskResponse || respObject instanceof BuildResponse))
 				{
 					HashSet<String> set = new HashSet<String>();

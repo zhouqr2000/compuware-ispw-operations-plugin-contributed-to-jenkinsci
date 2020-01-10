@@ -464,7 +464,7 @@ public class IspwRestApiRequest extends Builder {
 				BuildResponse buildResp = (BuildResponse) respObject;
 				setId = buildResp.getSetId();
 			}
-			if (!setId.equals(StringUtils.EMPTY) && (respObject instanceof TaskResponse || respObject instanceof BuildResponse))
+			if (StringUtils.isNotBlank(setId) && (respObject instanceof TaskResponse || respObject instanceof BuildResponse))
 			{
 				HashSet<String> set = new HashSet<String>();
 
