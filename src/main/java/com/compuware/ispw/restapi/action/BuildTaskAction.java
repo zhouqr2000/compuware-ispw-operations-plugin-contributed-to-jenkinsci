@@ -6,7 +6,7 @@
  * All Compuware products listed within the materials are trademarks of Compuware Corporation. All other company or product
  * names are trademarks of their respective owners.
  * 
- * Copyright (c) 2019 Compuware Corporation. All rights reserved.
+ * Copyright (c) 2020 Compuware Corporation. All rights reserved.
  */
 package com.compuware.ispw.restapi.action;
 
@@ -43,7 +43,13 @@ public class BuildTaskAction extends SetInfoPostAction implements IBuildAction
 	@Override
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody, WebhookToken webhookToken)
 	{
-		return getIspwRequestBean(srid, ispwRequestBody, webhookToken, contextPath);
+		IspwRequestBean bean = getIspwRequestBean(srid, ispwRequestBody, webhookToken, contextPath);
+
+		String contextPath = bean.getContextPath();
+		contextPath = contextPath.replaceAll(",", "&taskId=");
+		bean.setContextPath(contextPath);
+
+		return bean;
 	}
 
 	@SuppressWarnings("nls")
