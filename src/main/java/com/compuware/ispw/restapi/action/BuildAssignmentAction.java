@@ -52,7 +52,7 @@ public class BuildAssignmentAction extends SetInfoPostAction implements IBuildAc
 	@Override
 	public void startLog(PrintStream logger, IspwContextPathBean ispwContextPathBean, Object jsonObject)
 	{
-		logger.println("The build process started for assignment " + ispwContextPathBean.getAssignmentId() + " at level "
+		logger.println("ISPW: The build process started for assignment " + ispwContextPathBean.getAssignmentId() + " at level "
 				+ ispwContextPathBean.getLevel());
 	}
 
@@ -61,7 +61,7 @@ public class BuildAssignmentAction extends SetInfoPostAction implements IBuildAc
 	public Object endLog(PrintStream logger, IspwRequestBean ispwRequestBean, String responseJson)
 	{
 		BuildResponse buildResp = new JsonProcessor().parse(responseJson, BuildResponse.class);
-		logger.println("Set " + buildResp.getSetId() + " created to build tasks in assignment "
+		logger.println("ISPW: Set " + buildResp.getSetId() + " -  created to build tasks in assignment "
 				+ ispwRequestBean.getIspwContextPathBean().getAssignmentId());
 
 		return buildResp;

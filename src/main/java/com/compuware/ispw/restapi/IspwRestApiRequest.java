@@ -433,7 +433,6 @@ public class IspwRestApiRequest extends Builder {
 			logger.println("responseJson=" + responseJson);
 
 		Object respObject = action.endLog(logger, ispwRequestBean, responseJson);
-		logger.println("ISPW Operation Complete");
 		
 		if(skipWaitingForSet) {
 			logger.println("Skip waiting for the completion of the set for this job...");
@@ -472,43 +471,43 @@ public class IspwRestApiRequest extends Builder {
 							jsonProcessor.parse(pollingJson, SetInfoResponse.class);
 					String setState = StringUtils.trimToEmpty(setInfoResp.getState());
 					if (!set.contains(setState)) {
-						logger.println("Set " + setInfoResp.getSetid() + " status - " + setState);
+						logger.println("ISPW: Set " + setInfoResp.getSetid() + " status - " + setState);
 						set.add(setState);
 
 						if (setState.equals(Constants.SET_STATE_CLOSED) || setState.equals(Constants.SET_STATE_COMPLETE)
 								|| setState.equals(Constants.SET_STATE_WAITING_APPROVAL)) {
-							logger.println("Action " + ispwAction + " completed");
+							logger.println("ISPW: Action " + ispwAction + " completed");
 							break;
 						}
 						else if (Constants.SET_STATE_FAILED.equalsIgnoreCase(setState))
 						{
-							throw new AbortException("Set ID " + setId + " Failed for action "
+							throw new AbortException("ISPW: Set ID " + setId + " - Failed for action "
 									+ ispwAction);
 						}
 						else if (Constants.SET_STATE_TERMINATED.equalsIgnoreCase(setState)
 								&& SetOperationAction.SET_ACTION_TERMINATE.equalsIgnoreCase(ispwRequestBean.getIspwContextPathBean().getAction()))
 						{
-							logger.println("Set " + setId + " successfully terminated");
+							logger.println("ISPW: Set " + setId + " - successfully terminated");
 							break;
 						}
 						else if (Constants.SET_STATE_HELD.equalsIgnoreCase(setState)
 								&& SetOperationAction.SET_ACTION_HOLD.equalsIgnoreCase(ispwRequestBean.getIspwContextPathBean().getAction()))
 						{
-							logger.println("Set " + setId + " successfully held");
+							logger.println("ISPW: Set " + setId + " - successfully held");
 							isSetHeld = true;
 							break;
 						}
 						else if (Constants.SET_STATE_HELD.equalsIgnoreCase(setState)
 								&& SetOperationAction.SET_ACTION_UNLOCK.equalsIgnoreCase(ispwRequestBean.getIspwContextPathBean().getAction()))
 						{
-							logger.println("Set " + setId + " successfully unlocked.  Set is currently held.");
+							logger.println("ISPW: Set " + setId + " - successfully unlocked.  Set is currently held.");
 							break;
 						}
 						else if ((Constants.SET_STATE_RELEASED.equalsIgnoreCase(setState)
 								|| Constants.SET_STATE_WAITING_LOCK.equalsIgnoreCase(setState))
 								&& SetOperationAction.SET_ACTION_RELEASE.equalsIgnoreCase(ispwRequestBean.getIspwContextPathBean().getAction()))
 						{
-							logger.println("Set " + setId + " successfully released");
+							logger.println("ISPW: Set " + setId + " - successfully released");
 							break;
 						}
 					}
@@ -549,11 +548,11 @@ public class IspwRestApiRequest extends Builder {
 
 			if (buildResponse.getTasksBuilt().size() == 1)
 			{
-				logger.println(buildResponse.getTasksBuilt().size() + " task will be built as part of " + setId);
+				logger.println("ISPW: Set " + setId + " - " + buildResponse.getTasksBuilt().size() + " task will be built");
 			}
 			else
 			{
-				logger.println(buildResponse.getTasksBuilt().size() + " tasks will be built as part of " + setId);
+				logger.println("ISPW: Set " + setId + " - " + buildResponse.getTasksBuilt().size() + " tasks will be built");
 			}
 
 			List<TaskInfo> tasksBuilt = buildResponse.getTasksBuilt();
@@ -568,7 +567,7 @@ public class IspwRestApiRequest extends Builder {
 			{
 				if (task.getOperation().equals("G")) //$NON-NLS-1$
 				{
-					logger.println(task.getModuleName() + " has been compiled successfully");
+					logger.println("ISPW: " + task.getModuleName() + " compiled successfully");
 				}
 				// Remove all successfully built tasks
 				uniqueTasksInSet.add(task.getTaskId());
@@ -577,22 +576,22 @@ public class IspwRestApiRequest extends Builder {
 
 			for (TaskInfo task : tasksNotBuilt)
 			{
-				logger.println(task.getModuleName() + " did not compile successfully");
+				logger.println("ISPW: " + task.getModuleName() + " did not compile successfully");
 			}
 			
 			StringBuilder sb = new StringBuilder();
-			sb.append(uniqueTasksInSet.size() + " of " + numTasksToBeBuilt + " generated successfully. " + tasksNotBuilt.size()
+			sb.append("ISPW: " + uniqueTasksInSet.size() + " of " + numTasksToBeBuilt + " generated successfully. " + tasksNotBuilt.size()
 					+ " of " + numTasksToBeBuilt + " generated with errors.\n");
 			
 			if (!tasksNotBuilt.isEmpty())
 			{
 				isSuccessful = false;
-				sb.append("The build process completed with errors. ");
+				sb.append("ISPW: The build process completed with errors. ");
 			}
 			else
 			{
 				isSuccessful = true;
-				sb.append("The build process was successfully completed. ");
+				sb.append("ISPW: The build process was successfully completed. ");
 			}
 			
 			logger.println(sb);
