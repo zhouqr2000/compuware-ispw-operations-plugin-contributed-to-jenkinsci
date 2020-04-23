@@ -52,7 +52,7 @@ public class BuildReleaseAction extends SetInfoPostAction implements IBuildActio
 	@Override
 	public void startLog(PrintStream logger, IspwContextPathBean ispwContextPathBean, Object jsonObject)
 	{
-		logger.println("Building tasks in release " + ispwContextPathBean.getReleaseId() + " at level "
+		logger.println("ISPW: Building tasks in release " + ispwContextPathBean.getReleaseId() + " at level "
 				+ ispwContextPathBean.getLevel());
 	}
 
@@ -61,7 +61,7 @@ public class BuildReleaseAction extends SetInfoPostAction implements IBuildActio
 	public Object endLog(PrintStream logger, IspwRequestBean ispwRequestBean, String responseJson)
 	{
 		BuildResponse buildResp = new JsonProcessor().parse(responseJson, BuildResponse.class);
-		logger.println("Set " + buildResp.getSetId() + " created to build tasks in release "
+		logger.println("ISPW: Set " + buildResp.getSetId() + " - created to build tasks in release "
 				+ ispwRequestBean.getIspwContextPathBean().getReleaseId());
 
 		return buildResp;

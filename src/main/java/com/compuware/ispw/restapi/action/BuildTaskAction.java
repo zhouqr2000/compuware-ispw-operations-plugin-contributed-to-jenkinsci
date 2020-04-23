@@ -61,20 +61,11 @@ public class BuildTaskAction extends SetInfoPostAction implements IBuildAction
 	{
 		if (ispwContextPathBean.getTaskId() != null)
 		{
-			logger.println("The build process has started for task " + ispwContextPathBean.getTaskId());
+			logger.println("ISPW: The build process has started for task " + ispwContextPathBean.getTaskId());
 		}
 		else
 		{
-			logger.print("The build process has started for task " + ispwContextPathBean.getMname() + " with type " + ispwContextPathBean.getMtype()
-					+ " at level " + ispwContextPathBean.getLevel());
-			if (ispwContextPathBean.getAssignmentId() != null)
-			{
-				logger.println(" within assignment " + ispwContextPathBean.getAssignmentId());
-			}
-			else
-			{
-				logger.println();
-			}
+			logger.println("ISPW: The build process has started for task " + ispwContextPathBean.getMname());
 		}
 	}
 
@@ -83,28 +74,7 @@ public class BuildTaskAction extends SetInfoPostAction implements IBuildAction
 	public Object endLog(PrintStream logger, IspwRequestBean ispwRequestBean, String responseJson)
 	{
 		BuildResponse buildResp = new JsonProcessor().parse(responseJson, BuildResponse.class);
-		
-		if (ispwRequestBean.getIspwContextPathBean().getTaskId() != null)
-		{
-			logger.println("Set " + buildResp.getSetId() + " created to build task "
-					+ ispwRequestBean.getIspwContextPathBean().getTaskId());
-		}
-		else
-		{
-			logger.print("Set " + buildResp.getSetId() + " created to build task "
-					+ ispwRequestBean.getIspwContextPathBean().getMname() + " with type "
-					+ ispwRequestBean.getIspwContextPathBean().getMtype() + " at level "
-					+ ispwRequestBean.getIspwContextPathBean().getLevel());
-			
-			if (ispwRequestBean.getIspwContextPathBean().getAssignmentId() != null)
-			{
-				logger.println(" within assignment " + ispwRequestBean.getIspwContextPathBean().getAssignmentId());
-			}
-			else
-			{
-				logger.println();
-			}
-		}
+		logger.println("ISPW: Set " + buildResp.getSetId() + " - Set created to process the build. ");
 
 		return buildResp;
 	}

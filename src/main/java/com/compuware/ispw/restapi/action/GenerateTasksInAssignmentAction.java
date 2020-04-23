@@ -40,7 +40,7 @@ public class GenerateTasksInAssignmentAction extends SetInfoPostAction {
 	@Override
 	public void startLog(PrintStream logger, IspwContextPathBean ispwContextPathBean, Object jsonObject)
 	{
-		logger.println("Generating tasks in Assignment "
+		logger.println("ISPW: Generating tasks in Assignment "
 				+ ispwContextPathBean.getAssignmentId() + " at level "
 				+ ispwContextPathBean.getLevel());
 	}
@@ -49,7 +49,7 @@ public class GenerateTasksInAssignmentAction extends SetInfoPostAction {
 	public Object endLog(PrintStream logger, IspwRequestBean ispwRequestBean, String responseJson)
 	{
 		TaskResponse taskResponse = new JsonProcessor().parse(responseJson, TaskResponse.class);
-		logger.println("Set "+taskResponse.getSetId()+" created to generate");
+		logger.println("ISPW: Set "+taskResponse.getSetId()+" - created to generate");
 
 		return taskResponse;
 	}

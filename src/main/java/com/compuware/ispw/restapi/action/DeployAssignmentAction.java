@@ -40,7 +40,7 @@ public class DeployAssignmentAction extends SetInfoPostAction {
 	@Override
 	public void startLog(PrintStream logger, IspwContextPathBean ispwContextPathBean, Object jsonObject)
 	{
-		logger.println("Deploying Assignment " + ispwContextPathBean.getAssignmentId()
+		logger.println("ISPW: Deploying Assignment " + ispwContextPathBean.getAssignmentId()
 		+ " at level " + ispwContextPathBean.getLevel());
 	}
 
@@ -48,7 +48,7 @@ public class DeployAssignmentAction extends SetInfoPostAction {
 	public Object endLog(PrintStream logger, IspwRequestBean ispwRequestBean, String responseJson)
 	{
 		TaskResponse taskResp = new JsonProcessor().parse(responseJson, TaskResponse.class);
-		logger.println("Set "+taskResp.getSetId()+" created to deploy Assignment "+ispwRequestBean.getIspwContextPathBean().getAssignmentId());
+		logger.println("ISPW: Set "+taskResp.getSetId()+" - created to deploy Assignment "+ispwRequestBean.getIspwContextPathBean().getAssignmentId());
 		
 		return taskResp;
 

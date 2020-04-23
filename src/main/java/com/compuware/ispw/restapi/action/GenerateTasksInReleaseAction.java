@@ -40,7 +40,7 @@ public class GenerateTasksInReleaseAction extends SetInfoPostAction {
 	@Override
 	public void startLog(PrintStream logger, IspwContextPathBean ispwContextPathBean, Object jsonObject)
 	{
-		logger.println("Generating tasks in Release " + ispwContextPathBean.getReleaseId()
+		logger.println("ISPW: Generating tasks in Release " + ispwContextPathBean.getReleaseId()
 		+ " at level " + ispwContextPathBean.getLevel());
 	}
 
@@ -48,7 +48,7 @@ public class GenerateTasksInReleaseAction extends SetInfoPostAction {
 	public Object endLog(PrintStream logger, IspwRequestBean ispwRequestBean, String responseJson)
 	{
 		TaskResponse taskResp = new JsonProcessor().parse(responseJson, TaskResponse.class);
-		logger.println("Set "+taskResp.getSetId()+" created to generate Release "+ispwRequestBean.getIspwContextPathBean().getReleaseId());
+		logger.println("ISPW: Set "+taskResp.getSetId()+" - created to generate Release "+ispwRequestBean.getIspwContextPathBean().getReleaseId());
 		
 		return taskResp;
 	}
