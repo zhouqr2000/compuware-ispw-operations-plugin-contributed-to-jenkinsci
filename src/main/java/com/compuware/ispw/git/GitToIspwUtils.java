@@ -102,7 +102,7 @@ public class GitToIspwUtils
 				String containerDesc = StringUtils.EMPTY;
 
 				String rest = line.substring(indexOfArrow + 2);
-				StringTokenizer tokenizer = new StringTokenizer(rest, ",");
+				StringTokenizer tokenizer = new StringTokenizer(rest, ",");  //$NON-NLS-1$
 				if (tokenizer.hasMoreTokens())
 				{
 					ispwLevel = StringUtils.trimToEmpty(tokenizer.nextToken());
@@ -173,7 +173,7 @@ public class GitToIspwUtils
 				if (jenkins == null)
 				{
 					throw new AbortException(
-							"The Jenkins instance " + nodeName + " has not been started or was already shut down.");
+							"The Jenkins instance " + nodeName + " has not been started or was already shut down."); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				else
 				{
@@ -185,7 +185,7 @@ public class GitToIspwUtils
 					}
 					else
 					{
-						throw new AbortException("Unable to access the Jenkins instance " + nodeName);
+						throw new AbortException("Unable to access the Jenkins instance " + nodeName); //$NON-NLS-1$
 					}
 				}
 			}
@@ -222,22 +222,22 @@ public class GitToIspwUtils
 			IGitToIspwPublish publishStep) throws InterruptedException, IOException
 	{
 		CpwrGlobalConfiguration globalConfig = CpwrGlobalConfiguration.get();
-		RestApiUtils.assertNotNull(logger, globalConfig, "Jenkins:launcher cannot be null");
+		RestApiUtils.assertNotNull(logger, globalConfig, "Jenkins:launcher cannot be null"); //$NON-NLS-1$
 
 		VirtualChannel vChannel = launcher.getChannel();
-		RestApiUtils.assertNotNull(logger, vChannel, "Jenkins:vChannel cannot be null");
+		RestApiUtils.assertNotNull(logger, vChannel, "Jenkins:vChannel cannot be null"); //$NON-NLS-1$
 
 		String toHash = envVars.get(GitToIspwConstants.VAR_TO_HASH, null);
 		String fromHash = envVars.get(GitToIspwConstants.VAR_FROM_HASH, null);
 		String ref = envVars.get(GitToIspwConstants.VAR_REF, null);
 		String refId = envVars.get(GitToIspwConstants.VAR_REF_ID, null);
 		
-		logger.println(String.format("toHash=%s, fromHash=%s, ref=%s, refId=%s", toHash, fromHash, ref, refId));
+		logger.println(String.format("toHash=%s, fromHash=%s, ref=%s, refId=%s", toHash, fromHash, ref, refId)); //$NON-NLS-1$
 		RestApiUtils.assertNotNull(logger, refMap,
-				"refMap is null. Failed to mapping refId: %s to refMap. Please refine your branch mapping to match the branch name or ID in order to find correct refId.",
+				"refMap is null. Failed to mapping refId: %s to refMap. Please refine your branch mapping to match the branch name or ID in order to find correct refId.", //$NON-NLS-1$
 				refId);
 		
-		logger.println("Mapping refId: " + refId + " to refMap=" + refMap.toString());
+		logger.println("Mapping refId: " + refId + " to refMap=" + refMap.toString()); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		Properties remoteProperties = vChannel.call(new RemoteSystemProperties());
 		String remoteFileSeparator = remoteProperties.getProperty(CommonConstants.FILE_SEPARATOR_PROPERTY_KEY);
@@ -261,7 +261,7 @@ public class GitToIspwUtils
 		if (RestApiUtils.isIspwDebugMode())
 		{
 			String buildTag = envVars.get("BUILD_TAG"); //$NON-NLS-1$
-			logger.println("Getting buildTag =" + buildTag);
+			logger.println("Getting buildTag =" + buildTag); //$NON-NLS-1$
 		}
 
 		boolean success = true;
@@ -296,18 +296,18 @@ public class GitToIspwUtils
 		}
 
 		if (!success)
-		{
+		{	
 			if (fromHash.trim().isEmpty())
 			{
-				logger.println("Failure: Synchronization failed.");
+				logger.println("Failure: Synchronization failed."); //$NON-NLS-1$
 			}
-			else if (fromHash.contentEquals("-1"))
+			else if (fromHash.contentEquals("-1")) //$NON-NLS-1$
 			{
-				logger.println("Failure: Synchronization for " + toHash.trim().replaceAll(":",  ", "));
+				logger.println("Failure: Errors occurred while synchronizing the Git repository to ISPW."); //$NON-NLS-1$
 			}
 			else
 			{
-				logger.println("Failure: Synchronization for push ending with commit " + toHash.trim());
+				logger.println("Failure: Synchronization for push ending with commit " + toHash.trim()); //$NON-NLS-1$
 			}
 		}
 		
