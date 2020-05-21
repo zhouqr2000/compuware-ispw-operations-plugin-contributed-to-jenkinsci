@@ -61,8 +61,16 @@ public class BuildReleaseAction extends SetInfoPostAction implements IBuildActio
 	public Object endLog(PrintStream logger, IspwRequestBean ispwRequestBean, String responseJson)
 	{
 		BuildResponse buildResp = new JsonProcessor().parse(responseJson, BuildResponse.class);
-		logger.println("ISPW: Set " + buildResp.getSetId() + " - created to build tasks in release "
+		
+		if (buildResp.getSetId() == null && !buildResp.getMessage().trim().isEmpty())
+		{
+			logger.println("ISPW: " + buildResp.getMessage());
+		}
+		else
+		{
+			logger.println("ISPW: Set " + buildResp.getSetId() + " - created to build tasks in release "
 				+ ispwRequestBean.getIspwContextPathBean().getReleaseId());
+		}
 
 		return buildResp;
 	}
