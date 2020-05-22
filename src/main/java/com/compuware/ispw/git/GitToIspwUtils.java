@@ -3,6 +3,10 @@ package com.compuware.ispw.git;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +14,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
+import org.jenkinsci.plugins.gitclient.GitClient;
+import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
@@ -21,6 +27,7 @@ import com.compuware.ispw.restapi.Constants;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 import com.compuware.jenkins.common.configuration.CpwrGlobalConfiguration;
 import com.compuware.jenkins.common.utils.CommonConstants;
+import com.google.common.collect.Iterables;
 import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.FilePath;
@@ -30,8 +37,15 @@ import hudson.model.AbstractBuild;
 import hudson.model.Computer;
 import hudson.model.Item;
 import hudson.model.Run;
+import hudson.model.TaskListener;
+import hudson.plugins.git.Branch;
+import hudson.plugins.git.GitChangeLogParser;
+import hudson.plugins.git.GitSCM;
+import hudson.plugins.git.Revision;
+import hudson.plugins.git.util.BuildData;
 import hudson.remoting.VirtualChannel;
 import hudson.scm.ChangeLogSet;
+import hudson.scm.SCM;
 import hudson.security.ACL;
 import hudson.util.ListBoxModel;
 import hudson.util.ListBoxModel.Option;
@@ -39,7 +53,7 @@ import jenkins.model.Jenkins;
 
 public class GitToIspwUtils
 {
-
+	
 	public static ListBoxModel buildStandardCredentialsIdItems(@AncestorInPath Jenkins context,
 			@QueryParameter String credentialsId, @AncestorInPath Item project)
 	{
@@ -102,7 +116,7 @@ public class GitToIspwUtils
 				String containerDesc = StringUtils.EMPTY;
 
 				String rest = line.substring(indexOfArrow + 2);
-				StringTokenizer tokenizer = new StringTokenizer(rest, ",");
+				StringTokenizer tokenizer = new StringTokenizer(rest, ",");  //$NON-NLS-1$
 				if (tokenizer.hasMoreTokens())
 				{
 					ispwLevel = StringUtils.trimToEmpty(tokenizer.nextToken());
@@ -173,7 +187,7 @@ public class GitToIspwUtils
 				if (jenkins == null)
 				{
 					throw new AbortException(
-							"The Jenkins instance " + nodeName + " has not been started or was already shut down.");
+							"The Jenkins instance " + nodeName + " has not been started or was already shut down."); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				else
 				{
@@ -185,7 +199,7 @@ public class GitToIspwUtils
 					}
 					else
 					{
-						throw new AbortException("Unable to access the Jenkins instance " + nodeName);
+						throw new AbortException("Unable to access the Jenkins instance " + nodeName); //$NON-NLS-1$
 					}
 				}
 			}
@@ -222,22 +236,22 @@ public class GitToIspwUtils
 			IGitToIspwPublish publishStep) throws InterruptedException, IOException
 	{
 		CpwrGlobalConfiguration globalConfig = CpwrGlobalConfiguration.get();
-		RestApiUtils.assertNotNull(logger, globalConfig, "Jenkins:launcher cannot be null");
+		RestApiUtils.assertNotNull(logger, globalConfig, "Jenkins:launcher cannot be null"); //$NON-NLS-1$
 
 		VirtualChannel vChannel = launcher.getChannel();
-		RestApiUtils.assertNotNull(logger, vChannel, "Jenkins:vChannel cannot be null");
+		RestApiUtils.assertNotNull(logger, vChannel, "Jenkins:vChannel cannot be null"); //$NON-NLS-1$
 
 		String toHash = envVars.get(GitToIspwConstants.VAR_TO_HASH, null);
 		String fromHash = envVars.get(GitToIspwConstants.VAR_FROM_HASH, null);
 		String ref = envVars.get(GitToIspwConstants.VAR_REF, null);
 		String refId = envVars.get(GitToIspwConstants.VAR_REF_ID, null);
 		
-		logger.println(String.format("toHash=%s, fromHash=%s, ref=%s, refId=%s", toHash, fromHash, ref, refId));
+		logger.println(String.format("toHash=%s, fromHash=%s, ref=%s, refId=%s", toHash, fromHash, ref, refId)); //$NON-NLS-1$
 		RestApiUtils.assertNotNull(logger, refMap,
-				"refMap is null. Failed to mapping refId: %s to refMap. Please refine your branch mapping to match the branch name or ID in order to find correct refId.",
+				"refMap is null. Failed to mapping refId: %s to refMap. Please refine your branch mapping to match the branch name or ID in order to find correct refId.", //$NON-NLS-1$
 				refId);
 		
-		logger.println("Mapping refId: " + refId + " to refMap=" + refMap.toString());
+		logger.println("Mapping refId: " + refId + " to refMap=" + refMap.toString()); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		Properties remoteProperties = vChannel.call(new RemoteSystemProperties());
 		String remoteFileSeparator = remoteProperties.getProperty(CommonConstants.FILE_SEPARATOR_PROPERTY_KEY);
@@ -261,7 +275,7 @@ public class GitToIspwUtils
 		if (RestApiUtils.isIspwDebugMode())
 		{
 			String buildTag = envVars.get("BUILD_TAG"); //$NON-NLS-1$
-			logger.println("Getting buildTag =" + buildTag);
+			logger.println("Getting buildTag =" + buildTag); //$NON-NLS-1$
 		}
 
 		boolean success = true;
@@ -285,7 +299,7 @@ public class GitToIspwUtils
 		}
 		catch (AbortException e)
 		{
-			logger.println(e);
+			logger.println(e.getMessage());
 			
 			if (RestApiUtils.isIspwDebugMode())
 			{
@@ -296,27 +310,32 @@ public class GitToIspwUtils
 		}
 
 		if (!success)
-		{
+		{	
 			if (fromHash.trim().isEmpty())
 			{
-				logger.println("Failure: Synchronization failed.");
+				logger.println("Failure: Synchronization failed."); //$NON-NLS-1$
 			}
-			else if (fromHash.contentEquals("-1"))
+			else if (fromHash.contentEquals("-1")) //$NON-NLS-1$
 			{
-				logger.println("Failure: Synchronization for " + toHash.trim().replaceAll(":",  ", "));
+				logger.println("Failure: Errors occurred while synchronizing the Git repository to ISPW."); //$NON-NLS-1$
 			}
 			else
 			{
-				logger.println("Failure: Synchronization for push ending with commit " + toHash.trim());
+				logger.println("Failure: Synchronization for push ending with commit " + toHash.trim()); //$NON-NLS-1$
 			}
 		}
 		
 		return success;
 	}
 	
-	/*
-	 (non-Javadoc) 
-	*/
+	/**
+	 * Get the changed log 
+	 * @param run  
+	 *           the Jenkins build
+	 * @param logger 
+	 *           logging the message
+	 * @return list of ChangeLogSet
+	 */
 	public static List<? extends ChangeLogSet<? extends ChangeLogSet.Entry>> getChangeSets(Run<?, ?> run, PrintStream logger)
 	{
 		if (run instanceof AbstractBuild)
@@ -332,4 +351,215 @@ public class GitToIspwUtils
 
 		return null;
 	}
+	
+	/**
+	 * check if the same revision is used by requested build and its previous build
+	 * @param run 
+	 *           the requested build
+	 * @param gitSCM 
+	 *           the Git SCM used by the build
+	 * @param logger 
+	 *           logger for logging the message
+	 * @return true or false
+	 */
+	public static boolean isSameRevisionUsedbyLastBuild(WorkflowRun run, GitSCM gitSCM, PrintStream logger)
+	{
+		Revision curRevision = getRevision(run, gitSCM);
+		
+		Revision preBuildRevision = getRevision(run.getPreviousBuild(), gitSCM);
+
+		boolean result = isSameRevision(curRevision, preBuildRevision) && !(run.getPreviousBuild()).isBuilding();
+		
+		if (RestApiUtils.isIspwDebugMode())
+		{
+			Branch branch = Iterables.getFirst(curRevision.getBranches(), null);
+
+			if (result)
+			{
+				logger.println("The same revision " + curRevision.getSha1String() + " for branch " + branch.getName() //$NON-NLS-1$ //$NON-NLS-2$
+						+ " is used for computing the changelog for the Git source "); //$NON-NLS-1$
+			}
+
+		}
+
+		return result;
+	}
+	
+	/**
+	 * Check if the same revision is used between two runs for a multibranch pipeline project
+	 * @param firstRevision  
+	 *             first revision to compare
+	 * @param secondBuildRevision 
+	 *             second revision to compare
+	 * @return true or false
+	 */
+	public static boolean isSameRevision(Revision firstRevision, Revision secondBuildRevision)
+	{
+		if (firstRevision != null && secondBuildRevision != null && firstRevision.getBranches() != null
+				&& secondBuildRevision.getBranches() != null)
+		{
+			if (firstRevision.getSha1String() != null
+					&& firstRevision.getSha1String().equals(secondBuildRevision.getSha1String()))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+	
+	/**
+	 * get the Git revision of the specific build of the multibranch pipeline project
+	 * @param run 	the current build of the multibranch pipeline project
+	 * @param gitSCM  the Git SCM of the multibranch pipeline project
+	 * @return Revision returns the Git revision of the Jenkins build.
+	 */
+	public static Revision getRevision(WorkflowRun run, GitSCM gitSCM) 
+	{
+		BuildData buildData = gitSCM.getBuildData(run);
+		if (buildData != null) {
+			return buildData.getLastBuiltRevision();
+		}
+		return null;
+	}
+	
+	
+	/**
+	 * 
+	 * @param run
+	 * @param listener
+	 * @return
+	 */
+	public static boolean isReCalculateChangesRequired(WorkflowRun run, TaskListener listener)
+	{
+		if (run != null)
+		{
+			WorkflowJob job = run.getParent();
+			Collection<? extends SCM> scms = job.getSCMs();
+
+			if (scms != null && !scms.isEmpty())
+			{
+				SCM thescm = scms.iterator().next();
+
+				if (thescm instanceof GitSCM && isSameRevisionUsedbyLastBuild(run, (GitSCM) thescm, listener.getLogger()))
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+	
+	
+	
+	@SuppressWarnings("deprecation")
+	public static List <CustomGitChangeSetList> calculateGitSCMChanges(Run<?, ?> run, FilePath workspace, TaskListener listener, EnvVars envVars) 
+	{
+		CustomGitChangeSetList customGitChangeSetList = null;
+        List <CustomGitChangeSetList> listChangeLogSet = new ArrayList<CustomGitChangeSetList> ();
+		
+        PrintStream logger = listener.getLogger();		
+		WorkflowRun curRun = ((WorkflowRun) run);
+		WorkflowJob job = curRun.getParent();
+
+		if (run != null && job != null)
+		{
+
+			Collection<? extends SCM> scms = job.getSCMs();
+
+			if (scms != null && scms.size() >= 1)
+			{
+				SCM thescm = scms.iterator().next();
+				if (thescm instanceof GitSCM)
+				{
+					GitSCM gitScm = (GitSCM) thescm;
+
+					if (RestApiUtils.isIspwDebugMode())
+					{
+						logger.println("Retrieve the GitSCM object " + gitScm.getScmName()); //$NON-NLS-1$
+					}
+					
+					// find the commit to compute the changelog
+
+					WorkflowRun theRun = curRun;
+					WorkflowRun preRun = theRun.getPreviousBuild();
+
+					Revision revision = getRevision(theRun, gitScm);
+					Revision preRevision = null;
+
+					if (preRun != null)
+					{
+						preRevision = getRevision(preRun, gitScm);
+
+						while (isSameRevision(revision, preRevision) && !preRun.isBuilding())
+						{
+							theRun = preRun;
+							preRun = theRun.getPreviousBuild();
+							if (theRun != null && preRun != null)
+							{
+								revision = getRevision(theRun, gitScm);
+								preRevision = getRevision(preRun, gitScm);
+							}
+							else if (preRun == null)
+							{
+								break;
+							}
+
+						}
+					}
+
+					if (preRun == null)
+					{
+						logger.println("Skipping changelog. There is no proper revision for computing the changelog."); //$NON-NLS-1$
+						return listChangeLogSet;
+					}
+
+					logger.println("Compute the changelog between [ " + revision.toString() + "] and [" + preRevision.toString() //$NON-NLS-1$ //$NON-NLS-2$
+							+ "]."); //$NON-NLS-1$
+					try
+					{
+						GitClient git = gitScm.createClient(listener, envVars, run, workspace);
+
+						StringWriter sw = new StringWriter();
+						git.changelog(preRevision.getSha1String(), revision.getSha1String(), sw);
+						String logString = sw.toString();
+
+						if (logString.trim().length() > 0)
+						{
+							if (RestApiUtils.isIspwDebugMode())
+							{
+								logger.println("Calculated changed log = \n " + logString); //$NON-NLS-1$
+							}
+
+							String[] lines = logString.split("\\r?\\n"); //$NON-NLS-1$
+
+							if (RestApiUtils.isIspwDebugMode())
+							{
+								logger.println("The changed log array length is " + lines.length); //$NON-NLS-1$
+							}
+
+							logger.println("Start to parse the changelog."); //$NON-NLS-1$
+
+							GitChangeLogParser logparser = (GitChangeLogParser) gitScm.createChangeLogParser();
+							List<String> logs = new ArrayList<String>(Arrays.asList(lines));
+							customGitChangeSetList = new CustomGitChangeSetList(run, null, logparser.parse(logs));
+							listChangeLogSet.add(customGitChangeSetList);
+						}
+					}
+					catch (Exception x)
+					{
+						logger.println("Failed to calculate the changelog."); //$NON-NLS-1$
+						if (RestApiUtils.isIspwDebugMode())
+						{
+							x.printStackTrace(logger);
+						}						
+					}
+				}
+			}
+		} 	
+		
+		return listChangeLogSet;
+	}
+
 }
