@@ -88,7 +88,7 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
             FilePath workspace = getContext().get(FilePath.class);
                         
 			List<? extends ChangeLogSet<? extends Entry>> changeSets = GitToIspwUtils.getChangeSets(run, logger);
-			String branchName = envVars.get("BRANCH_NAME", StringUtils.EMPTY);  //$NON-NLS-1$
+			String branchName = envVars.get("BRANCH_NAME", StringUtils.EMPTY); 
 
 			
 			boolean calculatLog = false;
@@ -114,9 +114,8 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
 			{
 				HashSet<String> changedPathSet = new HashSet<String>();
 				String paths;
-
-				logger.println("Branch name: " + branchName); //$NON-NLS-1$
-
+				
+				logger.println("Branch name: " + branchName);
 				Iterator<? extends ChangeLogSet<? extends Entry>> itrChangeSets = changeSets.iterator();
 
 				if (calculatLog)
@@ -129,33 +128,29 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
 					itrChangeSets = GitToIspwUtils.calculateGitSCMChanges(run, workspace, listener, envVars).iterator();
 				}
 				
-
 				if (!itrChangeSets.hasNext())
 				{
-					logger.println("No changed files were detected."); //$NON-NLS-1$
+					logger.println("No changed files were detected.");
 					return 0; // should be a success
 				}
-
+				
 				while (itrChangeSets.hasNext())
 				{
 					ChangeLogSet<? extends Entry> changeLogSets = itrChangeSets.next();
-
 					Iterator<? extends Entry> itrChangeSet = changeLogSets.iterator();
 					while (itrChangeSet.hasNext())
 					{
 						Entry changeLogSet = itrChangeSet.next();
-						logger.println("Commit ID = " + changeLogSet.getCommitId()); //$NON-NLS-1$
-
+						logger.println("Commit ID = " + changeLogSet.getCommitId());
+						
 						Collection<? extends AffectedFile> affectedFiles = changeLogSet.getAffectedFiles();
 						for (AffectedFile affectedFile : affectedFiles)
 						{
 							String affectedPath = affectedFile.getPath();
-
 							if (affectedFile.getEditType() == EditType.DELETE)
 							{
-								affectedPath = "|" + changeLogSet.getCommitId() + "|" + affectedPath; //$NON-NLS-1$ //$NON-NLS-2$
+								affectedPath = "|" + changeLogSet.getCommitId() + "|" + affectedPath;
 							}
-
 							changedPathSet.add(affectedPath);
 							
 							if (RestApiUtils.isIspwDebugMode())
@@ -165,16 +160,16 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
 						}
 					}
 
-					logger.println("ChangedPathSet = " + changedPathSet); //$NON-NLS-1$
-
+					logger.println("ChangedPathSet = " + changedPathSet);
+					
 					if (!changedPathSet.isEmpty())
 					{
 						Set<String> pathSet = changedPathSet;
-						paths = StringUtils.join(pathSet, ":"); //$NON-NLS-1$
+						paths = StringUtils.join(pathSet, ":");
 					}
 					else
 					{
-						logger.println("No changed files were detected."); //$NON-NLS-1$
+						logger.println("No changed files were detected.");
 						return 0;
 					}
 
@@ -185,11 +180,10 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
 					envVars.put(GitToIspwConstants.VAR_FROM_HASH, GitToIspwConstants.VAR_FROM_HASH_TYPE_CHANGESET);
 					envVars.put(GitToIspwConstants.VAR_REF, branchName);
 				}
-			
 			}
 	
 			Map<String, RefMap> map = GitToIspwUtils.parse(step.branchMapping);
-			logger.println("map=" + map); //$NON-NLS-1$
+			logger.println("map=" + map);
 			
 			String refId = envVars.get(GitToIspwConstants.VAR_REF_ID, null);
 			
@@ -198,19 +192,19 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
 			RefMap refMap = null;
 			if (StringUtils.isBlank(refId))
 			{
-				logger.println("Using branch name for branch pattern match: " + branchName); //$NON-NLS-1$
+				logger.println("Using branch name for branch pattern match: " + branchName);
 				matchTo = StringUtils.trimToNull(branchName);
 			}
 			else
 			{
-				logger.println("Using refid for branch pattern match: " + refId); //$NON-NLS-1$
+				logger.println("Using refid for branch pattern match: " + refId);
 				matchTo = StringUtils.trimToNull(refId);
 			}
-			RestApiUtils.assertNotNull(logger, matchTo, "Cannot match a branchName or refId, both is null or empty"); //$NON-NLS-1$
+			RestApiUtils.assertNotNull(logger, matchTo, "Cannot match a branchName or refId, both is null or empty");
 			
 			refMap = matcher.match(matchTo);
 			RestApiUtils.assertNotNull(logger, refMap,
-					"Cannot find a branch pattern matchs the branch - %s, please adjust your branch mapping.", matchTo); //$NON-NLS-1$
+					"Cannot find a branch pattern matchs the branch - %s, please adjust your branch mapping.", matchTo);
 			
 			Launcher launcher = getContext().get(Launcher.class);
 			if(GitToIspwUtils.callCli(launcher, run, logger, envVars, refMap, step))
@@ -219,7 +213,7 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
 			}
 			else
 			{
-				throw new AbortException("An error occurred while synchronizing source to ISPW"); //$NON-NLS-1$
+				throw new AbortException("An error occurred while synchronizing source to ISPW");
 			}
 		}
 	}
@@ -257,13 +251,13 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
 		@Override
 		public String getDisplayName()
 		{
-			return "Git to ISPW Integration"; //$NON-NLS-1$
+			return "Git to ISPW Integration";
 		}
 
 		@Override
 		public String getFunctionName()
 		{
-			return "gitToIspwIntegration"; //$NON-NLS-1$
+			return "gitToIspwIntegration";
 		}
 
 		// GIT
