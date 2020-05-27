@@ -326,7 +326,8 @@ information.
 
 -   Add support for flexible YAML location for ISPW/GIT integration
 -   Make logs consistent between Jenkins operations and Topaz actions 
--   Auto clean up a task if the task is in failed status while loading source from GIT into ISPW   
+-   Auto clean up a task if the task is in failed status while loading source from GIT into ISPW
+-   Build process re-runnable for a failed ispw/git synchronization
 
 ### Version 1.0.5
 

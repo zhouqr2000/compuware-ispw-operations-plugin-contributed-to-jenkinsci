@@ -90,16 +90,26 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
 			List<? extends ChangeLogSet<? extends Entry>> changeSets = GitToIspwUtils.getChangeSets(run, logger);
 			String branchName = envVars.get("BRANCH_NAME", StringUtils.EMPTY); 
 
-			
 			boolean calculatLog = false;
-			if (run instanceof WorkflowRun && (changeSets == null || changeSets.isEmpty())
-					&& GitToIspwUtils.isReCalculateChangesRequired((WorkflowRun) run, listener))
+			if (run instanceof WorkflowRun && (changeSets == null || changeSets.isEmpty()))
 			{
-				if (RestApiUtils.isIspwDebugMode())  
+				WorkflowRun workflowRun = (WorkflowRun) run;
+				WorkflowRun previousRun = workflowRun.getPreviousBuild();
+				
+				//If we decide only recalculate based on whether the previous build failed, we need to comment out
+				//the following condition
+				if (previousRun != null /*&& !hudson.model.Result.SUCCESS.equals(previousRun.getResult())*/)
 				{
-					logger.println("GitToIspwPublishStep: Calculate the changelog when re-running the last build."); //$NON-NLS-1$
+					if (GitToIspwUtils.isReCalculateChangesRequired(workflowRun, listener))
+					{
+						if (RestApiUtils.isIspwDebugMode())
+						{
+							logger.println(
+									"GitToIspwPublishStep: Calculate the changelog when re-running the last build."); //$NON-NLS-1$
+						}
+						calculatLog = true;
+					}
 				}
-				calculatLog = true;            
 			}
 			
 			FilePath buildParmPath = GitToIspwUtils.getFilePathInVirtualWorkspace(envVars, IBuildAction.BUILD_PARAM_FILE_NAME);
