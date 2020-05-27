@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepDescriptorImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractSynchronousNonBlockingStepExecution;
@@ -17,10 +18,12 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
+import com.compuware.ispw.restapi.action.IBuildAction;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.Launcher;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
@@ -81,18 +84,59 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
 
 			EnvVars envVars = getContext().get(hudson.EnvVars.class);
 			GitToIspwUtils.trimEnvironmentVariables(envVars);
-
+			           
+            FilePath workspace = getContext().get(FilePath.class);
+                        
 			List<? extends ChangeLogSet<? extends Entry>> changeSets = GitToIspwUtils.getChangeSets(run, logger);
 			String branchName = envVars.get("BRANCH_NAME", StringUtils.EMPTY); 
 
+			boolean calculatLog = false;
+			if (run instanceof WorkflowRun && (changeSets == null || changeSets.isEmpty()))
+			{
+				WorkflowRun workflowRun = (WorkflowRun) run;
+				WorkflowRun previousRun = workflowRun.getPreviousBuild();
+				
+				//If we decide only recalculate based on whether the previous build failed, we need to comment out
+				//the following condition
+				if (previousRun != null /*&& !hudson.model.Result.SUCCESS.equals(previousRun.getResult())*/)
+				{
+					if (GitToIspwUtils.isReCalculateChangesRequired(workflowRun, listener))
+					{
+						if (RestApiUtils.isIspwDebugMode())
+						{
+							logger.println(
+									"GitToIspwPublishStep: Calculate the changelog when re-running the last build."); //$NON-NLS-1$
+						}
+						calculatLog = true;
+					}
+				}
+			}
+			
+			FilePath buildParmPath = GitToIspwUtils.getFilePathInVirtualWorkspace(envVars, IBuildAction.BUILD_PARAM_FILE_NAME);
+        	
+			if (buildParmPath.exists()) {
+        		logger.println("Remove the old build parm files." + buildParmPath.getName()); //$NON-NLS-1$
+        		buildParmPath.delete();
+        	}
+			
 			//For multibranch pipeline only
-			if (changeSets != null && !branchName.isEmpty())
+			if ((changeSets != null || calculatLog) && !branchName.isEmpty())
 			{
 				HashSet<String> changedPathSet = new HashSet<String>();
 				String paths;
 				
 				logger.println("Branch name: " + branchName);
 				Iterator<? extends ChangeLogSet<? extends Entry>> itrChangeSets = changeSets.iterator();
+
+				if (calculatLog)
+				{
+					if (RestApiUtils.isIspwDebugMode())
+					{
+						logger.println("GitToIspwPublishStep: Calculate the change log. "); //$NON-NLS-1$
+					}
+
+					itrChangeSets = GitToIspwUtils.calculateGitSCMChanges(run, workspace, listener, envVars).iterator();
+				}
 				
 				if (!itrChangeSets.hasNext())
 				{
@@ -118,6 +162,11 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
 								affectedPath = "|" + changeLogSet.getCommitId() + "|" + affectedPath;
 							}
 							changedPathSet.add(affectedPath);
+							
+							if (RestApiUtils.isIspwDebugMode())
+							{
+								logger.println("GitToIspwPublishStep: add a file path - " + affectedPath); //$NON-NLS-1$
+							}
 						}
 					}
 
