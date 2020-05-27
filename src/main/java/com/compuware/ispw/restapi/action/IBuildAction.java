@@ -117,8 +117,7 @@ public interface IBuildAction extends IAction
 							ispwRequestBody = requestBodyBuilder.toString();
 						}
 						
-						logger.println("Done reading automaticBuildParams.txt, delete it.");
-						buildParmPath.delete();
+						logger.println("Done reading automaticBuildParams.txt.");
 					}
 					catch (IOException | InterruptedException e)
 					{
