@@ -74,7 +74,14 @@ public class BuildTaskAction extends SetInfoPostAction implements IBuildAction
 	public Object endLog(PrintStream logger, IspwRequestBean ispwRequestBean, String responseJson)
 	{
 		BuildResponse buildResp = new JsonProcessor().parse(responseJson, BuildResponse.class);
-		logger.println("ISPW: Set " + buildResp.getSetId() + " - Set created to process the build. ");
+		if (buildResp.getSetId() == null && !buildResp.getMessage().trim().isEmpty())
+		{
+			logger.println("ISPW: " + buildResp.getMessage());
+		}
+		else
+		{
+			logger.println("ISPW: Set " + buildResp.getSetId() + " - Set created to process the build. ");
+		}
 
 		return buildResp;
 	}

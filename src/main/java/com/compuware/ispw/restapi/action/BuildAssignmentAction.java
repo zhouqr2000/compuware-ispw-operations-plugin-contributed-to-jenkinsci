@@ -61,8 +61,15 @@ public class BuildAssignmentAction extends SetInfoPostAction implements IBuildAc
 	public Object endLog(PrintStream logger, IspwRequestBean ispwRequestBean, String responseJson)
 	{
 		BuildResponse buildResp = new JsonProcessor().parse(responseJson, BuildResponse.class);
-		logger.println("ISPW: Set " + buildResp.getSetId() + " -  created to build tasks in assignment "
+		if (buildResp.getSetId() == null && !buildResp.getMessage().trim().isEmpty())
+		{
+			logger.println("ISPW: " + buildResp.getMessage());
+		}
+		else
+		{
+			logger.println("ISPW: Set " + buildResp.getSetId() + " -  created to build tasks in assignment "
 				+ ispwRequestBean.getIspwContextPathBean().getAssignmentId());
+		}
 
 		return buildResp;
 	}
