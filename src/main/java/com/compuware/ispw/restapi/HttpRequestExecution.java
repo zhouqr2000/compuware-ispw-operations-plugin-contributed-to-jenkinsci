@@ -411,6 +411,16 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 		try {
 			// validate status code
 			responseCodeIsValid(response);
+		} catch (AbortException x) {
+			if (!RestApiUtils.logMessageIfAny(logger(), response, true))
+			{
+				logger().println(x.getMessage());
+			}
+
+			throw x;
+		}
+
+		try {
 
 			// validate content
 			if (!validResponseContent.isEmpty()) {
