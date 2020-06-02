@@ -411,16 +411,6 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 		try {
 			// validate status code
 			responseCodeIsValid(response);
-		} catch (AbortException x) {
-			if (!RestApiUtils.logMessageIfAny(logger(), response, true))
-			{
-				logger().println(x.getMessage());
-			}
-
-			throw x;
-		}
-
-		try {
 
 			// validate content
 			if (!validResponseContent.isEmpty()) {
@@ -428,15 +418,20 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 					throw new AbortException("Fail: Response doesn't contain expected content '"
 							+ validResponseContent + "'");
 				}
-			}
-		} catch (AbortException x) {
-			if (RestApiUtils.isIspwDebugMode()) {
-				RestApiUtils.logMessageIfAny(logger(), response, true);
-			} else {
+			}		
+		}
+		catch (AbortException x)
+		{
+			if (RestApiUtils.logMessageIfAny(logger(), response, true))
+			{
 				logger().println(x.getMessage());
+				response.setAbortStatus(true);
 			}
-
-			throw x;
+			else
+			{
+				logger().println(x.getMessage());
+				throw x;
+			}
 		}
 
 		//save file

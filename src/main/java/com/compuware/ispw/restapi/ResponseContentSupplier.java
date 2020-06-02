@@ -36,6 +36,7 @@ public class ResponseContentSupplier implements Serializable, AutoCloseable {
 	private int status;
 	private Map<String, List<String>> headers = new HashMap<>();
 	private String charset;
+	private boolean isAbort = false;
 
 	private ResponseHandle responseHandle;
 	private String content;
@@ -157,5 +158,15 @@ public class ResponseContentSupplier implements Serializable, AutoCloseable {
 
 	void setHttpClient(CloseableHttpClient httpclient) {
 		this.httpclient = httpclient;
+	}
+	
+	public void setAbortStatus(boolean isAbort)
+	{
+		this.isAbort = isAbort;
+	}
+	
+	public boolean getAbortStatus()
+	{
+		return isAbort;
 	}
 }
