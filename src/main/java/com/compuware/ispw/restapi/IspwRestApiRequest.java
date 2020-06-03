@@ -545,10 +545,6 @@ public class IspwRestApiRequest extends Builder {
 		if (channel != null)
 		{
 			ResponseContentSupplier pollerSupplier = channel.call(poller);
-			if (pollerSupplier.getAbortStatus())
-			{
-				return isSuccessful;
-			}
 			String pollingJson = pollerSupplier.getContent();
 
 			JsonProcessor jsonProcessor = new JsonProcessor();
