@@ -428,6 +428,11 @@ public class IspwRestApiRequest extends Builder {
 		
 		ResponseContentSupplier supplier = channel.call(exec);
 		
+		if (supplier.getAbortStatus())
+		{
+			return false;
+		}
+		
 		String responseJson = supplier.getContent();
 		if (RestApiUtils.isIspwDebugMode())
 			logger.println("responseJson=" + responseJson);

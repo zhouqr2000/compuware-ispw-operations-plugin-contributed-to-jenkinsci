@@ -319,8 +319,9 @@ public class RestApiUtils {
 		
 	}
 	
-	public static void logMessageIfAny(PrintStream logger, ResponseContentSupplier response,
+	public static boolean logMessageIfAny(PrintStream logger, ResponseContentSupplier response,
 			boolean isError) {
+		boolean anyMessage = false;
 		String jsonContent = StringUtils.trimToEmpty(response.getContent());
 
 		if (jsonContent.startsWith("{") && jsonContent.endsWith("}")) {
@@ -335,12 +336,19 @@ public class RestApiUtils {
 							.replaceAll("( \\.)", ".");
 			
 			if (StringUtils.isNotBlank(message)) {
+				anyMessage = true;
 				if (isError)
+				{
 					logger.println("Error - " + message);
+				}
 				else
+				{
 					logger.println("Message - " + message);
+				}
 			}
 		}
+		
+		return anyMessage;
 	}
 	
 	public static String getSystemProperty(String key) {
