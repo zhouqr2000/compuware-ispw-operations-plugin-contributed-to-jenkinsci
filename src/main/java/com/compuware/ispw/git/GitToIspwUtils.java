@@ -367,19 +367,23 @@ public class GitToIspwUtils
 		boolean result = true;
 		
 		Revision curRevision = getRevision(run, gitSCM);
-		
-		Revision preBuildRevision = getRevision(run.getPreviousBuild(), gitSCM);
 
-		if (curRevision != null && preBuildRevision != null) {
-			result = isSameRevision(curRevision, preBuildRevision) && !(run.getPreviousBuild()).isBuilding();
+		WorkflowRun prevBuild = run.getPreviousBuild();
 
-			if (RestApiUtils.isIspwDebugMode()) {
-				Branch branch = Iterables.getFirst(curRevision.getBranches(), null);
+		if (prevBuild != null) {
+			Revision preBuildRevision = getRevision(prevBuild, gitSCM);
 
-				if (result) {
-					logger.println(
-							"The same revision " + curRevision.getSha1String() + " for branch " + branch.getName() //$NON-NLS-1$ //$NON-NLS-2$
-									+ " is used for computing the changelog for the Git source "); //$NON-NLS-1$
+			if (curRevision != null && preBuildRevision != null) {
+				result = isSameRevision(curRevision, preBuildRevision) && !prevBuild.isBuilding();
+
+				if (RestApiUtils.isIspwDebugMode()) {
+					Branch branch = Iterables.getFirst(curRevision.getBranches(), null);
+
+					if (result) {
+						logger.println(
+								"The same revision " + curRevision.getSha1String() + " for branch " + branch.getName() //$NON-NLS-1$ //$NON-NLS-2$
+										+ " is used for computing the changelog for the Git source "); //$NON-NLS-1$
+					}
 				}
 			}
 		}
