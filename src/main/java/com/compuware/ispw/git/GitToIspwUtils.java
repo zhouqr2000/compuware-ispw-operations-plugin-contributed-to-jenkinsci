@@ -226,8 +226,8 @@ public class GitToIspwUtils
 	 *            the environment variables including ref, refId, fromHash, and toHash
 	 * @param refMap
 	 *            the ref map
-	 * @param isPrintHelpOnly
-	 *            only print help
+	 * @param publishStep
+	 *            publish step
 	 * @return a boolean to indicate success
 	 * @throws InterruptedException the exception
 	 * @throws IOException the exception
