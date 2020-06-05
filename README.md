@@ -322,6 +322,10 @@ The Compuware site provides a variety of product and support
 information.
 
 # Change Log
+### Version 1.0.7
+
+- TBD
+
 ### Version 1.0.6
 
 -   Add support for flexible YAML location for ISPW/GIT integration
