@@ -432,9 +432,9 @@ public class GitToIspwUtils
 	
 	/**
 	 * 
-	 * @param run
-	 * @param listener
-	 * @return
+	 * @param run the workflow run instance
+	 * @param listener the task listener
+	 * @return true if need recalc
 	 */
 	public static boolean isReCalculateChangesRequired(WorkflowRun run, TaskListener listener)
 	{
