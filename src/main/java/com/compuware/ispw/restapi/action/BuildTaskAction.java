@@ -7,14 +7,14 @@
  * names are trademarks of their respective owners.
  * 
  * Copyright (c) 2020 Compuware Corporation. All rights reserved.
- * (c) Copyright 2020 BMC Software, Inc.
  */
 package com.compuware.ispw.restapi.action;
 
 import java.io.PrintStream;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.compuware.ispw.model.rest.BuildResponse;
-import com.compuware.ispw.restapi.BuildParms;
-import com.compuware.ispw.restapi.BuildParmsRequestBody;
 import com.compuware.ispw.restapi.Constants;
 import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
@@ -33,8 +33,6 @@ public class BuildTaskAction extends SetInfoPostAction implements IBuildAction
 	private static final String contextPath = "/ispw/{srid}/build?taskId={taskId}&application={application}&assignmentId={assignmentId}" //$NON-NLS-1$
 			+ "&level={level}&mname={mname}&mtype={mtype}"; //$NON-NLS-1$
 
-	private BuildParms buildParms;
-	
 	public static String getDefaultProps()
 	{
 		return RestApiUtils.join(Constants.LINE_SEPARATOR, defaultProps, true);
@@ -95,30 +93,15 @@ public class BuildTaskAction extends SetInfoPostAction implements IBuildAction
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody, WebhookToken webhookToken,
 			FilePath buildParmPath)
 	{
-		BuildParmsRequestBody buildParmsRequestBody = getRequestBody(ispwRequestBody, buildParmPath, this.getLogger());
+		ispwRequestBody = getRequestBody(ispwRequestBody, buildParmPath, this.getLogger());
 		
-		if (buildParmsRequestBody.hasRequestBody())
+		if (StringUtils.isNotBlank(ispwRequestBody))
 		{
-			buildParms = buildParmsRequestBody.getBuildParms();
-
-			StringBuilder body = new StringBuilder(buildParmsRequestBody.getRequestBody());
-			
-			System.out.println("Request body: "+body.toString());
-			
-			return getIspwRequestBean(srid, body.toString(), webhookToken);
+			return getIspwRequestBean(srid, ispwRequestBody, webhookToken);
 		}
 		else
 		{
 			return null;
 		}
-	}
-	
-	/* (non-Javadoc)
-	 * @see com.compuware.ispw.restapi.action.IBuildAction#getBuildParms()
-	 */
-	@Override
-	public BuildParms getBuildParms()
-	{
-		return buildParms;
 	}
 }

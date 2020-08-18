@@ -247,7 +247,7 @@ public class IspwRestApiRequest extends Builder {
 	}
 
 	private List<HttpRequestNameValuePair> createParams(EnvVars envVars, AbstractBuild<?, ?> build,
-			TaskListener listener) throws IOException {
+			TaskListener listener) {
 		Map<String, String> buildVariables = build.getBuildVariables();
 		if (buildVariables.isEmpty()) {
 			return Collections.emptyList();
@@ -388,7 +388,7 @@ public class IspwRestApiRequest extends Builder {
 		this.token = cesIspwToken; // CES TOKEN
 
 		// This is a generated code for Visual Studio Code - REST Client
-		if (consoleLogResponseBody) {
+		if (Boolean.TRUE.equals(consoleLogResponseBody)) {
 			logger.println();
 			logger.println();
 			logger.println("### " + ispwAction + " - " + "RFC 2616");
@@ -405,7 +405,7 @@ public class IspwRestApiRequest extends Builder {
 		}
 
 		ArrayList<String> variables = RestApiUtils.getVariables(this.url);
-		if (variables.size() != 0)
+		if (!variables.isEmpty())
 		{
 			String errorMsg = "Action failed, need to define the following: " + variables;
 			throw new AbortException(errorMsg);
@@ -442,12 +442,14 @@ public class IspwRestApiRequest extends Builder {
 
 		Object respObject = action.endLog(logger, ispwRequestBean, responseJson);
 		
-		if(skipWaitingForSet) {
+		if(Boolean.TRUE.equals(skipWaitingForSet))
+		{
 			logger.println("Skip waiting for the completion of the set for this job...");
 		}
 		
 		// polling status if no webhook
-		if (webhookToken == null && !skipWaitingForSet) {
+		if (webhookToken == null && !skipWaitingForSet)
+		{
 			String setId = StringUtils.EMPTY;
 			if (respObject instanceof TaskResponse)
 			{
@@ -461,7 +463,7 @@ public class IspwRestApiRequest extends Builder {
 			}
 			if (StringUtils.isNotBlank(setId) && (respObject instanceof TaskResponse || respObject instanceof BuildResponse))
 			{
-				HashSet<String> set = new HashSet<String>();
+				HashSet<String> set = new HashSet<>();
 
 				int i = 0;
 				boolean isSetHeld = false;
@@ -478,48 +480,40 @@ public class IspwRestApiRequest extends Builder {
 					SetInfoResponse setInfoResp =
 							jsonProcessor.parse(pollingJson, SetInfoResponse.class);
 					String setState = StringUtils.trimToEmpty(setInfoResp.getState());
-					if (!set.contains(setState)) {
+					if (!set.contains(setState))
+					{
 						logger.println("ISPW: Set " + setInfoResp.getSetid() + " status - " + setState);
 						set.add(setState);
 
 						if (setState.equals(Constants.SET_STATE_CLOSED) || setState.equals(Constants.SET_STATE_COMPLETE)
-								|| setState.equals(Constants.SET_STATE_WAITING_APPROVAL)) {
+								|| setState.equals(Constants.SET_STATE_WAITING_APPROVAL))
+						{
 							logger.println("ISPW: Action " + ispwAction + " completed");
-							
-							/* If the SET is complete, if automatically build, we will try to generate TTT json */
-							if (action instanceof IBuildAction)
+							IspwContextPathBean ispwContextPathBean = ispwRequestBean.getIspwContextPathBean();
+							if (ispwContextPathBean != null && StringUtils.isNotBlank(ispwContextPathBean.getLevel()))
 							{
-								IBuildAction buildAction = (IBuildAction) action;
-								BuildParms buildParms = buildAction.getBuildParms();
-								if (buildParms != null)
-								{
-									String taskLevel = buildParms.getTaskLevel();
-									if (StringUtils.isNotBlank(taskLevel))
-									{
-										HttpRequestExecution poller1 = HttpRequestExecution.createPoller(setId, taskLevel, this, envVars,
-												build, listener);
-										ResponseContentSupplier pollerSupplier1 = channel.call(poller1);
-										String pollingJson1 = pollerSupplier1.getContent();
+							String taskLevel = ispwContextPathBean.getLevel();
+								HttpRequestExecution poller1 = HttpRequestExecution.createPoller(setId, taskLevel, this,
+										envVars, build, listener);
+								ResponseContentSupplier pollerSupplier1 = channel.call(poller1);
+								String pollingJson1 = pollerSupplier1.getContent();
 
-										JsonProcessor jsonProcessor1 = new JsonProcessor();
-										SetInfoResponse setInfoResp1 = jsonProcessor1.parse(pollingJson1,
-												SetInfoResponse.class);
-										logger.println("tasks="+setInfoResp1.getTasks());
-										
-										ProgramList programList = RestApiUtils.convertSetInfoResp(setInfoResp1);
-											
-										String tttJson = programList.toString();
-										if (consoleLogResponseBody)
-										{
-											logger.println("tttJson="+tttJson);
-										}
-										
-										File tttChangeSet = new File(buildDirectory, Constants.TTT_CHANGESET);
-										
-										logger.println("Saving TTT changeset to "+tttChangeSet.toString());
-										FileUtils.writeAllText(tttJson, tttChangeSet, Charset.defaultCharset());
-									}
+								JsonProcessor jsonProcessor1 = new JsonProcessor();
+								SetInfoResponse setInfoResp1 = jsonProcessor1.parse(pollingJson1,
+										SetInfoResponse.class);
+								logger.println("tasks=" + setInfoResp1.getTasks());
+
+								ProgramList programList = RestApiUtils.convertSetInfoResp(setInfoResp1);
+
+								String tttJson = programList.toString();
+								if (Boolean.TRUE.equals(consoleLogResponseBody)) {
+									logger.println("tttJson=" + tttJson);
 								}
+
+								File tttChangeSet = new File(buildDirectory, Constants.TTT_CHANGESET);
+
+								logger.println("Saving TTT changeset to " + tttChangeSet.toString());
+								FileUtils.writeAllText(tttJson, tttChangeSet, Charset.defaultCharset());
 							}
 							
 							break;

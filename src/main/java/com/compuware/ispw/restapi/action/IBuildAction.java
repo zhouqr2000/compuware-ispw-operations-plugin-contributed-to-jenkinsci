@@ -16,7 +16,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 import com.compuware.ispw.restapi.BuildParms;
-import com.compuware.ispw.restapi.BuildParmsRequestBody;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
 import com.compuware.ispw.restapi.util.RestApiUtils;
@@ -30,7 +29,7 @@ public interface IBuildAction extends IAction
 	public static String BUILD_PARAM_FILE_NAME = "automaticBuildParams.txt"; //$NON-NLS-1$
 
 	/**
-	 * Reads the given request body to find out if the parameters of the build should taken form the request body, or if they
+	 * Reads the given request body to find out if the parameters of the build should taken from the request body, or if they
 	 * should be read from a file. If the "buildautomatically" parameter is specified in the given body, the build parameters
 	 * will be read from a file in the given buildDirectory. The given request body will not be changed if the
 	 * "buildautomatically" parameter is not specified.
@@ -43,14 +42,11 @@ public interface IBuildAction extends IAction
 	 *            the logger.
 	 * @return a String containing the request body that should be used.
 	 */
-	public default BuildParmsRequestBody getRequestBody(String ispwRequestBody, FilePath buildParmPath, PrintStream logger)
+	public default String getRequestBody(String ispwRequestBody, FilePath buildParmPath, PrintStream logger)
 	{
 		String buildAutomaticallyRegex = "(?i)(?m)(^(?!#)(.+)?buildautomatically.+true(.+)?$)"; //$NON-NLS-1$
 		Pattern buildAutomaticallyPattern = Pattern.compile(buildAutomaticallyRegex,
 				Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-		
-		BuildParmsRequestBody buildParmsRequestBody = null;
-		
 		if (ispwRequestBody != null)
 		{
 			Matcher buildAutomaticallyMatcher = buildAutomaticallyPattern.matcher(ispwRequestBody);
@@ -65,7 +61,7 @@ public interface IBuildAction extends IAction
 					logger.println("Warn: " + x.getMessage());
 				}
 				
-				if(exists)
+				if (exists)
 				{
 					ispwRequestBody = buildAutomaticallyMatcher.replaceAll(StringUtils.EMPTY);
 
@@ -86,41 +82,7 @@ public interface IBuildAction extends IAction
 						
 						if (buildParms != null)
 						{
-							// Remove any line that is not a comment and contains application, assignmentid, releaseid, taskid,
-							// mname, mtype, or level. These parms will be replaced with parms from the file.
-							String linesToReplaceRegex = "(?i)(^(?!#)( +)?(application|assignmentid|releaseid|taskid|mname|mtype|level)(.+)?$)"; //$NON-NLS-1$
-							Pattern linesToReplacePattern = Pattern.compile(linesToReplaceRegex,
-									Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-							Matcher linesToReplaceMatcher = linesToReplacePattern.matcher(ispwRequestBody);
-							ispwRequestBody = linesToReplaceMatcher.replaceAll(StringUtils.EMPTY);
-	
-							StringBuilder requestBodyBuilder = new StringBuilder();
-							if (buildParms.getContainerId() != null)
-							{
-								requestBodyBuilder.append("assignmentId = " + buildParms.getContainerId());
-							}
-							if (buildParms.getTaskLevel() != null)
-							{
-								requestBodyBuilder.append("\nlevel = " + buildParms.getTaskLevel());
-							}
-							if (buildParms.getReleaseId() != null)
-							{
-								requestBodyBuilder.append("\nreleaseId = " + buildParms.getReleaseId());
-							}
-							if (buildParms.getTaskIds() != null && !buildParms.getTaskIds().isEmpty())
-							{
-								requestBodyBuilder.append("\ntaskId = ");
-								for (String taskId : buildParms.getTaskIds())
-								{
-									requestBodyBuilder.append(taskId + ",");
-								}
-								requestBodyBuilder.deleteCharAt(requestBodyBuilder.length() - 1); // remove last comma
-							}
-							requestBodyBuilder.append("\n").append(ispwRequestBody); // the original request body may still contain webhook event
-																		// information and runtime configuration
-							ispwRequestBody = requestBodyBuilder.toString();
-							
-							buildParmsRequestBody = new BuildParmsRequestBody(ispwRequestBody, buildParms);
+							ispwRequestBody = getRequestBodyUsingBuildParms(ispwRequestBody, buildParms);
 						}
 						
 						logger.println("Done reading automaticBuildParams.txt.");
@@ -131,7 +93,7 @@ public interface IBuildAction extends IAction
 						ispwRequestBody = StringUtils.EMPTY;
 						
 						e.printStackTrace();
-						logger.println("skip auto build, exception happens: " + e.getMessage());
+						logger.println("The tasks could not be built automatically because the following error occurred: " + e.getMessage());
 					}
 					
 				}
@@ -140,7 +102,7 @@ public interface IBuildAction extends IAction
 					//do NOT auto build if file doesn't exist
 					ispwRequestBody = StringUtils.EMPTY;
 					
-					logger.println("skip auto build, automaticBuildParams.txt doesn't exist.");
+					logger.println("The tasks could not be built automatically because the automaticBuildParams.txt file does not exist.");
 				}
 			}
 		}
@@ -148,11 +110,48 @@ public interface IBuildAction extends IAction
 		{
 			logger.println("Using requestBody :\n{" + ispwRequestBody + "\n}"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		return buildParmsRequestBody;
+		return ispwRequestBody;
 	}
 
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody, WebhookToken webhookToken,
 			FilePath buildParmPath);
+	
+	default String getRequestBodyUsingBuildParms(String inputRequestBody, BuildParms buildParms)
+	{
+		String ispwRequestBody = inputRequestBody;
+		// Remove any line that is not a comment and contains application, assignmentid, releaseid, taskid,
+		// mname, mtype, or level. These parms will be replaced with parms from the file.
+		String linesToReplaceRegex = "(?i)(^(?!#)( +)?(application|assignmentid|releaseid|taskid|mname|mtype|level)(.+)?$)"; //$NON-NLS-1$
+		Pattern linesToReplacePattern = Pattern.compile(linesToReplaceRegex,
+				Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+		Matcher linesToReplaceMatcher = linesToReplacePattern.matcher(ispwRequestBody);
+		ispwRequestBody = linesToReplaceMatcher.replaceAll(StringUtils.EMPTY);
 
-	public BuildParms getBuildParms();
+		StringBuilder requestBodyBuilder = new StringBuilder();
+		if (buildParms.getContainerId() != null)
+		{
+			requestBodyBuilder.append("assignmentId = " + buildParms.getContainerId());
+		}
+		if (buildParms.getTaskLevel() != null)
+		{
+			requestBodyBuilder.append("\nlevel = " + buildParms.getTaskLevel());
+		}
+		if (buildParms.getReleaseId() != null)
+		{
+			requestBodyBuilder.append("\nreleaseId = " + buildParms.getReleaseId());
+		}
+		if (buildParms.getTaskIds() != null && !buildParms.getTaskIds().isEmpty())
+		{
+			requestBodyBuilder.append("\ntaskId = ");
+			for (String taskId : buildParms.getTaskIds())
+			{
+				requestBodyBuilder.append(taskId + ",");
+			}
+			requestBodyBuilder.deleteCharAt(requestBodyBuilder.length() - 1); // remove last comma
+		}
+		requestBodyBuilder.append("\n").append(ispwRequestBody); // the original request body may still contain webhook event
+																// information and runtime configuration
+		ispwRequestBody = requestBodyBuilder.toString();
+		return ispwRequestBody;
+	}
 }

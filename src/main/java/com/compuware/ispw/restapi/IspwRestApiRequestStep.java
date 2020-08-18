@@ -397,11 +397,6 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 				
 				ispwRequestBean = ((IBuildAction) action).getIspwRequestBean(cesIspwHost, step.ispwRequestBody, webhookToken,
 						buildParmPath);
-				
-				if (ispwRequestBean == null) // in case of NO auto build
-				{
-					return null;
-				}
 			}
 			else
 			{
@@ -416,7 +411,7 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			step.token = cesIspwToken; // CES TOKEN
 
 			// This is a generated code for Visual Studio Code - REST Client
-			if (step.consoleLogResponseBody) {
+			if (Boolean.TRUE.equals(step.consoleLogResponseBody)) {
 				logger.println();
 				logger.println();
 				logger.println("### [" + step.ispwAction + "] - " + "RFC 2616");
@@ -434,7 +429,7 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			}
 
 			ArrayList<String> variables = RestApiUtils.getVariables(step.url);
-			if (variables.size() != 0)
+			if (!variables.isEmpty())
 			{
 				String errorMsg = "Action failed, need to define the following: " + variables;
 				logger.println(errorMsg);
@@ -448,14 +443,20 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 					HttpRequestExecution.from(step, listener, this);
 
 			ResponseContentSupplier supplier = runExec(exec);
-			
+			if (supplier == null)
+			{
+				String errorMsg = "Supplier is null. Please verify the pipeline script is structured correctly.";
+				logger.println(errorMsg);
+				throw new IllegalStateException(new Exception(errorMsg));
+			}
 			String responseJson = supplier.getContent();
 			if (RestApiUtils.isIspwDebugMode())
 				logger.println("responseJson=" + responseJson);
 
 			Object respObject = action.endLog(logger, ispwRequestBean, responseJson);
 			
-			if(step.skipWaitingForSet) {
+			if(Boolean.TRUE.equals(step.skipWaitingForSet))
+			{
 				logger.println("Skip waiting for the completion of the set for this job...");
 			}
 			
@@ -475,7 +476,7 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 				if (StringUtils.isNotBlank(setId)
 						&& (respObject instanceof TaskResponse || respObject instanceof BuildResponse))
 				{
-					HashSet<String> set = new HashSet<String>();
+					HashSet<String> set = new HashSet<>();
 
 					int i = 0;
 					boolean isSetHeld = false;
@@ -484,56 +485,61 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 						HttpRequestExecution poller = HttpRequestExecution
 								.createPoller(setId, step, listener, this);
 						ResponseContentSupplier pollerSupplier = runExec(poller);
+						if (pollerSupplier == null)
+						{
+							String errorMsg = "ResponseContentSupplier for polling is null. Please verify that the pipeline script is structured correctly.";
+							logger.println(errorMsg);
+							throw new IllegalStateException(new Exception(errorMsg));
+						}
 						String pollingJson = pollerSupplier.getContent();
 
 						JsonProcessor jsonProcessor = new JsonProcessor();
 						SetInfoResponse setInfoResp =
 								jsonProcessor.parse(pollingJson, SetInfoResponse.class);
 						String setState = StringUtils.trimToEmpty(setInfoResp.getState());
-						if (!set.contains(setState)) {
+						if (!set.contains(setState))
+						{
 							logger.println("Set " + setInfoResp.getSetid() + " status - "
 									+ setState);
 							set.add(setState);
 
-							if (setState.equals(Constants.SET_STATE_CLOSED) || setState.equals(Constants.SET_STATE_COMPLETE)) {
+							if (setState.equals(Constants.SET_STATE_CLOSED) || setState.equals(Constants.SET_STATE_COMPLETE))
+							{
 								logger.println("ISPW: Action " + step.ispwAction + " completed");
 								
-								/* If the SET is complete, if automatically build, we will try to generate TTT json */
-								if (action instanceof IBuildAction)
+								IspwContextPathBean ispwContextPathBean = ispwRequestBean.getIspwContextPathBean();
+								if (ispwContextPathBean != null && StringUtils.isNotBlank(ispwContextPathBean.getLevel()))
 								{
-									IBuildAction buildAction = (IBuildAction) action;
-									BuildParms buildParms = buildAction.getBuildParms();
-									if (buildParms != null)
+									String taskLevel = ispwContextPathBean.getLevel();
+									HttpRequestExecution poller1 = HttpRequestExecution.createPoller(setId, taskLevel,
+											step, listener, this);
+									ResponseContentSupplier pollerSupplier1 = runExec(poller1);
+									if (pollerSupplier1 == null)
 									{
-										String taskLevel = buildParms.getTaskLevel();
-										if (StringUtils.isNotBlank(taskLevel))
-										{
-											HttpRequestExecution poller1 = HttpRequestExecution.createPoller(setId, taskLevel,
-													step, listener, this);
-											ResponseContentSupplier pollerSupplier1 = runExec(poller1);
-											String pollingJson1 = pollerSupplier1.getContent();
-
-											JsonProcessor jsonProcessor1 = new JsonProcessor();
-											SetInfoResponse setInfoResp1 = jsonProcessor1.parse(pollingJson1,
-													SetInfoResponse.class);
-											logger.println("tasks="+setInfoResp1.getTasks());
-											
-											ProgramList programList = RestApiUtils.convertSetInfoResp(setInfoResp1);
-												
-											String tttJson = programList.toString();
-											if (step.consoleLogResponseBody)
-											{
-												logger.println("tttJson="+tttJson);
-											}
-											
-											File tttChangeSet = new File(buildDirectory, Constants.TTT_CHANGESET);
-											
-											logger.println("Saving TTT changeset to "+tttChangeSet.toString());
-											FileUtils.writeAllText(tttJson, tttChangeSet, Charset.defaultCharset());
-										}
+										String errorMsg = "ResponseContentSupplier for TTT file information is null. Please verify that the pipeline script is structured correctly.";
+										logger.println(errorMsg);
+										throw new IllegalStateException(new Exception(errorMsg));
 									}
+									String pollingJson1 = pollerSupplier1.getContent();
+
+									JsonProcessor jsonProcessor1 = new JsonProcessor();
+									SetInfoResponse setInfoResp1 = jsonProcessor1.parse(pollingJson1,
+											SetInfoResponse.class);
+									logger.println("tasks="+setInfoResp1.getTasks());
+									
+									ProgramList programList = RestApiUtils.convertSetInfoResp(setInfoResp1);
+										
+									String tttJson = programList.toString();
+									if (Boolean.TRUE.equals(step.consoleLogResponseBody))
+									{
+										logger.println("tttJson="+tttJson);
+									}
+									
+									File tttChangeSet = new File(buildDirectory, Constants.TTT_CHANGESET);
+									
+									logger.println("Saving TTT changeset to "+tttChangeSet.toString());
+									FileUtils.writeAllText(tttJson, tttChangeSet, Charset.defaultCharset());
 								}
-								
 								
 								break;
 							}
