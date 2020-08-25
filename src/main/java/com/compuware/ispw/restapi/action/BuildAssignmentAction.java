@@ -6,7 +6,8 @@
  * All Compuware products listed within the materials are trademarks of Compuware Corporation. All other company or product
  * names are trademarks of their respective owners.
  * 
- * Copyright (c) 2019 Compuware Corporation. All rights reserved.
+ * Copyright (c) 2020 Compuware Corporation. All rights reserved.
+ * (c) Copyright 2020 BMC Software, Inc.
  */
 package com.compuware.ispw.restapi.action;
 

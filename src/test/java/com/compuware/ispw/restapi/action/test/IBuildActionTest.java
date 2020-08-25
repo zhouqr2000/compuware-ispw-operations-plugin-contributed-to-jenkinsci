@@ -7,6 +7,7 @@
  * names are trademarks of their respective owners.
  * 
  * Copyright (c) 2019 Compuware Corporation. All rights reserved.
+ * (c) Copyright 2020 BMC Software, Inc.
  */
 package com.compuware.ispw.restapi.action.test;
 

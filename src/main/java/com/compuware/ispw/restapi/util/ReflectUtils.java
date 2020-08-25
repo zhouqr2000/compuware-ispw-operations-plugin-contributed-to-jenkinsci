@@ -121,12 +121,11 @@ public class ReflectUtils {
 				if (definedCommand.equals(command)) {
 					IspwAction ispwAction = field.getAnnotation(IspwAction.class);
 					clazz = ispwAction.clazz();
+					String message = String.format("Reflect to get command %s -> class %s", command, clazz.getName());
+					logger.info(message);
 				}
 			}
 		}
-
-		String message = String.format("Reflect to get command %s -> class %s", command, clazz.getName());
-		logger.info(message);
 
 		return clazz;
 	}

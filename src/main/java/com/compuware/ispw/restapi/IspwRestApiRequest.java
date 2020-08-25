@@ -492,7 +492,7 @@ public class IspwRestApiRequest extends Builder {
 							IspwContextPathBean ispwContextPathBean = ispwRequestBean.getIspwContextPathBean();
 							if (ispwContextPathBean != null && StringUtils.isNotBlank(ispwContextPathBean.getLevel()))
 							{
-							String taskLevel = ispwContextPathBean.getLevel();
+								String taskLevel = ispwContextPathBean.getLevel();
 								HttpRequestExecution poller1 = HttpRequestExecution.createPoller(setId, taskLevel, this,
 										envVars, build, listener);
 								ResponseContentSupplier pollerSupplier1 = channel.call(poller1);
