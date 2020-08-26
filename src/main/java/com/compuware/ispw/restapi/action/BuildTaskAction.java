@@ -100,7 +100,12 @@ public class BuildTaskAction extends SetInfoPostAction implements IBuildAction
 		if (buildParmsRequestBody.hasRequestBody())
 		{
 			buildParms = buildParmsRequestBody.getBuildParms();
-			return getIspwRequestBean(srid, buildParmsRequestBody.getRequestBody(), webhookToken);
+
+			StringBuilder body = new StringBuilder(buildParmsRequestBody.getRequestBody());
+			
+			System.out.println("Request body: "+body.toString());
+			
+			return getIspwRequestBean(srid, body.toString(), webhookToken);
 		}
 		else
 		{

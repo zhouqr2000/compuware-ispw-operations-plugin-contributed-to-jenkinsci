@@ -8,43 +8,47 @@
  * 
  * (c) Copyright 2020 BMC Software, Inc. 
  */
-package com.compuware.ispw.model.changeset;
+package com.compuware.ispw.model.ttt.rest;
 
 import java.io.Serializable;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.Expose;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 
 /**
  * Class to encapsulate the information for a deploy load module.
  */
-public class DeployTargetLoadModule implements Serializable
+@XmlRootElement(name = "deployTargetLoadModule")
+@XmlAccessorType(XmlAccessType.NONE)
+public class JaxbDeployTargetLoadModule implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-	@Expose
+	@XmlElement(name = "loadModName")
 	private String loadModName;
-
-	@Expose
+	
+	@XmlElement(name = "loadLibName")
 	private String loadLibName;
-
-	@Expose
+	
+	@XmlElement(name = "componentType")
 	private String componentType;
-
-	@Expose
+	
+	@XmlElement(name = "componentClass")
 	private String componentClass;
-
-	@Expose
+	
+	@XmlElement(name = "deployEnvironment")
 	private String deployEnvironment;
-
-	@Expose
+	
+	@XmlElement(name = "subenvironment")
 	private String subenvironment;
-
-	@Expose
+	
+	@XmlElement(name = "system")
 	private String system;
-
-	@Expose
+	
+	@XmlElement(name = "deployType")
 	private String deployType;
 
 	/**
@@ -87,7 +91,7 @@ public class DeployTargetLoadModule implements Serializable
 	@Override
 	public String toString()
 	{
-		return gson.toJson(this);
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
 	}
 
 	/* (non-Javadoc)
@@ -123,11 +127,11 @@ public class DeployTargetLoadModule implements Serializable
 		{
 			return false;
 		}
-		if (!(obj instanceof DeployTargetLoadModule))
+		if (!(obj instanceof JaxbDeployTargetLoadModule))
 		{
 			return false;
 		}
-		DeployTargetLoadModule other = (DeployTargetLoadModule) obj;
+		JaxbDeployTargetLoadModule other = (JaxbDeployTargetLoadModule) obj;
 		if (componentClass == null)
 		{
 			if (other.componentClass != null)
