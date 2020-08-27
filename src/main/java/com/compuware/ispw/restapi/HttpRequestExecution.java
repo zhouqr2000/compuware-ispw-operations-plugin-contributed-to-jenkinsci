@@ -99,7 +99,7 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 	static HttpRequestExecution createPoller(String setId, String level,
 			IspwRestApiRequest http, EnvVars envVars,
 			AbstractBuild<?, ?> build, TaskListener taskListener) throws AbortException {
-		return createPoller(setId, level, http, envVars, build, taskListener);
+		return createPoller(setId, level, null, http, envVars, build, taskListener);
 	}
 	
 	//create poller for rest api request
