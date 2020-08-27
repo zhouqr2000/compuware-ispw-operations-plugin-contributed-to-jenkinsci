@@ -525,8 +525,16 @@ public class IspwRestApiRequest extends Builder {
 						}
 						else if (Constants.SET_STATE_FAILED.equalsIgnoreCase(setState))
 						{
-							throw new AbortException("ISPW: Set ID " + setId + " - Failed for action "
-									+ ispwAction);
+							String actionName = ispwRequestBean.getIspwContextPathBean().getAction();
+							if (StringUtils.isBlank(actionName) && action != null)
+							{
+								actionName = action.getClass().getName();
+							}
+
+							if (StringUtils.isNotBlank(actionName))
+							{
+								logger.println(String.format("ISPW: Set " + setId + " - action [%s] failed", actionName));
+							}
 						}
 						else if (Constants.SET_STATE_TERMINATED.equalsIgnoreCase(setState)
 								&& SetOperationAction.SET_ACTION_TERMINATE.equalsIgnoreCase(ispwRequestBean.getIspwContextPathBean().getAction()))
