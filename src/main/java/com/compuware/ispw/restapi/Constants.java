@@ -39,4 +39,6 @@ public class Constants {
 	public static final String TTT_CHANGESET = "changedPrograms.json";
 	
 	public static final String REQUEST_BODY_RTCONFIG = "runtimeConfiguration";
+	
+	public static final String UTF_8 = "UTF-8";
 }

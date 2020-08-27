@@ -535,10 +535,15 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 										logger.println("tttJson="+tttJson);
 									}
 									
-									File tttChangeSet = new File(buildDirectory, Constants.TTT_CHANGESET);
+									FilePath tttChangeSet = GitToIspwUtils.getFilePathInVirtualWorkspace(envVars, Constants.TTT_CHANGESET);
+									if (tttChangeSet.exists())
+									{
+										logger.println("Deleting the old changed program list at " + tttChangeSet.getRemote());
+										tttChangeSet.delete();
+									}
 									
-									logger.println("Saving TTT changeset to "+tttChangeSet.toString());
-									FileUtils.writeAllText(tttJson, tttChangeSet, Charset.defaultCharset());
+									logger.println("Saving the changed program list to "+tttChangeSet.getRemote());
+									tttChangeSet.write(tttJson, Constants.UTF_8);
 								}
 								
 								break;
