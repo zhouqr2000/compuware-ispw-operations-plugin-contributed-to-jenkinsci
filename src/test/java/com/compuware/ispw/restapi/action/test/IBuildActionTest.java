@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.After;
 import org.junit.Before;
@@ -29,7 +30,7 @@ import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
 import com.compuware.ispw.restapi.action.IBuildAction;
-
+import com.compuware.ispw.restapi.util.RestApiUtilsTest;
 import hudson.FilePath;
 
 /**
@@ -40,6 +41,8 @@ public class IBuildActionTest
 {
 	@Rule
 	public TemporaryFolder tempFolder = new TemporaryFolder();
+	
+	private static Logger log = Logger.getLogger(IBuildActionTest.class);
 	PrintStream logger = System.out;
 	
 	@Before
@@ -115,12 +118,12 @@ public class IBuildActionTest
 		// file contains build parms
 		FileUtils.writeStringToFile(parmFile, "{\"containerId\":\"PLAY002455\",\"releaseId\":\"RELEASE666\",\"taskLevel\":\"DEV2\",\"taskIds\":[\"7E3A5D04D0C2\",\"7E3A5D04D3A3\"]}");
 		outputRequestBody = buildAction.getRequestBody(inputRequestBody,  new FilePath(parmFile), logger);
-		String expectedOutput = "assignmentId = PLAY002455\nlevel = DEV2\nreleaseId = RELEASE666\ntaskId = 7E3A5D04D0C2,7E3A5D04D3A3";
+		String expectedOutput = "assignmentId = PLAY002455\nlevel = DEV2\nreleaseId = RELEASE666\ntaskId = 7E3A5D04D0C2,7E3A5D04D3A3\n";
 		assertEquals("Failure of this test indicates a change in behavior", expectedOutput, outputRequestBody);
 		
 		FileUtils.writeStringToFile(parmFile, "{\"containerId\":\"PLAY002455\",\"taskLevel\":\"DEV2\",\"taskIds\":[\"7E3A5D04D0C2\",\"7E3A5D04D3A3\"]}");
 		outputRequestBody = buildAction.getRequestBody(inputRequestBody,  new FilePath(parmFile), logger);
-		expectedOutput = "assignmentId = PLAY002455\nlevel = DEV2\ntaskId = 7E3A5D04D0C2,7E3A5D04D3A3";
+		expectedOutput = "assignmentId = PLAY002455\nlevel = DEV2\ntaskId = 7E3A5D04D0C2,7E3A5D04D3A3\n";
 		assertEquals("Failure of this test indicates a change in behavior", expectedOutput, outputRequestBody);
 	}
 	
@@ -170,7 +173,7 @@ public class IBuildActionTest
 		File parmFile = new File(buildDirectory.getAbsoluteFile(), IBuildAction.BUILD_PARAM_FILE_NAME);
 		FileUtils.writeStringToFile(parmFile,
 				"{\"containerId\":\"PLAY002455\",\"releaseId\":\"RELEASE666\",\"taskLevel\":\"DEV2\",\"taskIds\":[\"7E3A5D04D0C2\",\"7E3A5D04D3A3\"]}");
-		String expectedOutput = "assignmentId = PLAY002455\nlevel = DEV2\nreleaseId = RELEASE666\ntaskId = 7E3A5D04D0C2,7E3A5D04D3A3\nevents.name=Completed\r\n\nevents.body=Deployed\r\n\n"
+		String expectedOutput = "assignmentId = PLAY002455\nlevel = DEV2\nreleaseId = RELEASE666\ntaskId = 7E3A5D04D0C2,7E3A5D04D3A3\n\nevents.name=Completed\r\n\nevents.body=Deployed\r\n\n"
 				+ "\nevents.httpHeaders=Jenkins-Crumb:no-crumb\r\n\n\n\n\r\n\nevents.credentials=admin:library";
 		
 		String outputRequestBody = buildAction.getRequestBody(inputRequestBody, new FilePath(parmFile), logger);
@@ -191,7 +194,7 @@ public class IBuildActionTest
 		File parmFile = new File(buildDirectory.getAbsoluteFile(), IBuildAction.BUILD_PARAM_FILE_NAME);
 		FileUtils.writeStringToFile(parmFile,
 				"{\"containerId\":\"PLAY002455\",\"releaseId\":\"RELEASE666\",\"taskLevel\":\"DEV2\",\"taskIds\":[\"7E3A5D04D0C2\",\"7E3A5D04D3A3\"]}");
-		String expectedOutput = "assignmentId = PLAY002455\nlevel = DEV2\nreleaseId = RELEASE666\ntaskId = 7E3A5D04D0C2,7E3A5D04D3A3\nevents.name=Completed\r\nevents.body=Deployed\r\n"
+		String expectedOutput = "assignmentId = PLAY002455\nlevel = DEV2\nreleaseId = RELEASE666\ntaskId = 7E3A5D04D0C2,7E3A5D04D3A3\n\nevents.name=Completed\r\nevents.body=Deployed\r\n"
 				+ "events.httpHeaders=Jenkins-Crumb:no-crumb\r\nevents.credentials=admin:library";
 		String outputRequestBody = buildAction.getRequestBody(inputRequestBody, new FilePath(parmFile), logger);
 		assertEquals("Failure of this test indicates a change in behavior", expectedOutput, outputRequestBody);
