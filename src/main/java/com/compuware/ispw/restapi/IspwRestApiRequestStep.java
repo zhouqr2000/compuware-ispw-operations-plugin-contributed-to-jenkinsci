@@ -550,8 +550,17 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 							}
 							else if (Constants.SET_STATE_FAILED.equalsIgnoreCase(setState))
 							{
-								logger.println("ISPW: Set " + setId + " - Failed for action "
-										+ ispwRequestBean.getIspwContextPathBean().getAction());
+								String actionName = ispwRequestBean.getIspwContextPathBean().getAction();
+								if (StringUtils.isBlank(actionName) && action != null)
+								{
+									actionName = action.getClass().getName();
+								}
+
+								if (StringUtils.isNotBlank(actionName))
+								{
+									logger.println(String.format("ISPW: Set " + setId + " - action [%s] failed", actionName));
+								}
+								
 								break;
 							}
 							else if (Constants.SET_STATE_TERMINATED.equalsIgnoreCase(setState)
