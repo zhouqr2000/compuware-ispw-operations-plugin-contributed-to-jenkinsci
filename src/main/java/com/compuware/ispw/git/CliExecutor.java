@@ -174,7 +174,7 @@ public class CliExecutor
 			String sCmd = argClone.toString();
 
 			if (sCmd.length() > COMMAND_LINE_LIMITATION) {
-				logger.println("The calculated list of changed programs is too long. Topaz CLI release 20.04.01 is the minimum release required for this functionality of Git to ISPW integration."); //$NON-NLS-1$
+				logger.println("The calculated list of changed programs is too long. Topaz CLI release 20.04.01 is the minimum release required for supporting a long command line used by Git to ISPW integration."); //$NON-NLS-1$
 				useHashFile = true;	
 			}
 		}
