@@ -76,7 +76,7 @@ public class CliExecutor
 		String host = ArgumentUtils.escapeForScript(connection.getHost());
 		String port = ArgumentUtils.escapeForScript(connection.getPort());
 
-		logger.println(String.format("Using host connection: %s:$s", host, port));
+		logger.println(String.format("Using host connection: %s:%s", host, port));
 		
 		String protocol = connection.getProtocol();
 		String codePage = connection.getCodePage();
