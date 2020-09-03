@@ -38,6 +38,8 @@ public class CliExecutor
 	private String cliScriptFileRemote;
 	private FilePath workDir;
 
+	private static int COMMAND_LINE_LIMITATION = 2048;
+	
 	public CliExecutor(PrintStream logger, Run<?, ?> run, Launcher launcher, EnvVars envVars, String gitLocalPath,
 			String topazCliWorkspace, CpwrGlobalConfiguration globalConfig, String cliScriptFileRemote, FilePath workDir)
 
@@ -74,7 +76,7 @@ public class CliExecutor
 		String host = ArgumentUtils.escapeForScript(connection.getHost());
 		String port = ArgumentUtils.escapeForScript(connection.getPort());
 
-		logger.print(String.format("Using host connection: %s:$s", host, port));
+		logger.println(String.format("Using host connection: %s:%s", host, port));
 		
 		String protocol = connection.getProtocol();
 		String codePage = connection.getCodePage();
@@ -162,17 +164,55 @@ public class CliExecutor
 		args.add(GitToIspwConstants.GIT_REF_PARAM, ref);
 		args.add(GitToIspwConstants.GIT_FROM_HASH_PARAM, fromHash);
 		
-		// If the path doesn't contains space, the argument is not
-		// properly double quoted, we need to fix it here
-		if (!toHash.contains(" "))
-		{
-			toHash = "\"" + toHash + "\"";
-		}
-		args.add(GitToIspwConstants.GIT_HASH_PARAM, toHash);
 		args.add(GitToIspwConstants.GIT_LOCAL_PATH_ARG_PARAM, gitLocalPath);
 
+		boolean useHashFile = false;
+		
+		if ("-1".equals(fromHash)) {					
+			ArgumentListBuilder argClone = args.clone();
+			argClone.add(GitToIspwConstants.GIT_HASH_PARAM, toHash);
+			String sCmd = argClone.toString();
+
+			if (sCmd.length() > COMMAND_LINE_LIMITATION) {
+				logger.println("The calculated list of changed programs is too long. Topaz CLI release 20.04.01 is the minimum release required for supporting a long command line used by Git to ISPW integration."); //$NON-NLS-1$
+				useHashFile = true;	
+			}
+		}
+		
+		FilePath jenkinsWorkSpace = new FilePath(launcher.getChannel(), targetFolder);
+		
+		if (!jenkinsWorkSpace.exists()) {
+			jenkinsWorkSpace.mkdirs();
+		}
+		
+		FilePath toHashTempFile = null;
+		
+		if (useHashFile) 
+		{
+			toHashTempFile = jenkinsWorkSpace.createTempFile("toHash", ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
+			
+			if (toHashTempFile.exists()) 
+			{
+				toHashTempFile.delete();
+			}
+			
+			toHashTempFile = jenkinsWorkSpace.createTextTempFile("toHash", ".txt", toHash); //$NON-NLS-1$ //$NON-NLS-2$
+			args.add(GitToIspwConstants.GIT_HASH_PARAM_FILE, toHashTempFile.getRemote());			
+		}
+		else 
+		{
+			// If the path doesn't contains space, the argument is not
+			// properly double quoted, we need to fix it here
+			if (!toHash.contains(" ")) //$NON-NLS-1$
+			{
+				toHash = "\"" + toHash + "\""; //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			args.add(GitToIspwConstants.GIT_HASH_PARAM, toHash);		
+		}
+		
 		workDir.mkdirs();
 		logger.println("Shell script: " + args.toString());
+
 
 		// invoke the CLI (execute the batch/shell script)
 		int exitValue = launcher.launch().cmds(args).envs(envVars).stdout(logger).pwd(workDir).join();
@@ -180,6 +220,11 @@ public class CliExecutor
 		String osFile = launcher.isUnix()
 				? GitToIspwConstants.SCM_DOWNLOADER_CLI_SH
 				: GitToIspwConstants.SCM_DOWNLOADER_CLI_BAT;
+		
+		if (useHashFile && toHashTempFile != null && toHashTempFile.exists() && !RestApiUtils.isIspwDebugMode())
+		{
+			toHashTempFile.delete();
+		}
 
 		if (exitValue != 0)
 		{
