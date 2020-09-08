@@ -322,9 +322,15 @@ The Compuware site provides a variety of product and support
 information.
 
 # Change Log
+
+## Version 1.0.8
+
+ - In development; To be published
+ 
 ### Version 1.0.7
 
-- TBD
+ - Support intelligent test case execution
+ - Enforce valid level check for Git/ISPW sync 
 
 ### Version 1.0.6
 
