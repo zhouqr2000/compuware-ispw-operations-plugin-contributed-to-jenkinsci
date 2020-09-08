@@ -147,7 +147,7 @@ public class JaxbLifeCycleLoadModule implements Serializable
 	}
 
 	/**
-	 * @param loadLibConcatenation the loadLibConcatenation to remove
+	 * @param loadLib the loadLibConcatenation to remove
 	 */
 	public void removeLoadLibConcatenation(JaxbLevelLoadLib loadLib)
 	{

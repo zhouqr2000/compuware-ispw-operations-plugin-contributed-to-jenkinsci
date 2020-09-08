@@ -171,7 +171,7 @@ public class JaxbProgram implements Serializable
 	/**
 	 * Add a load module to the list.
 	 * 
-	 * @param loadModule
+	 * @param loadModule the load module
 	 */
 	public void addLifeCycleLoadModule(JaxbLifeCycleLoadModule loadModule)
 	{
@@ -186,7 +186,7 @@ public class JaxbProgram implements Serializable
 	/**
 	 * Remove a load module from the list
 	 * 
-	 * @param loadModule
+	 * @param loadModule the load module
 	 */
 	public void removeLifeCycleLoadModule(JaxbLifeCycleLoadModule loadModule)
 	{
@@ -204,7 +204,7 @@ public class JaxbProgram implements Serializable
 	/**
 	 * Returns the list of deploy target load libraries. Changing the returned list will change the original.
 	 * 
-	 * @return
+	 * @return deploy target modules
 	 */
 	public List<JaxbDeployTargetLoadModule> getDeployTargetLoadModules()
 	{
@@ -214,7 +214,7 @@ public class JaxbProgram implements Serializable
 	/**
 	 * Adds the given deploy target load library name to the list
 	 * 
-	 * @param deployTargetLoadModule
+	 * @param deployTargetLoadModule deploy target load module
 	 */
 	public void addDeployTargetLoadModule(JaxbDeployTargetLoadModule deployTargetLoadModule)
 	{
@@ -229,7 +229,7 @@ public class JaxbProgram implements Serializable
 	/**
 	 * Removes the given deploy target load library name from the list
 	 * 
-	 * @param deployTargetLoadModule
+	 * @param deployTargetLoadModule the deploy target load module
 	 */
 	public void removeDeployTargetLoadModule(JaxbDeployTargetLoadModule deployTargetLoadModule)
 	{

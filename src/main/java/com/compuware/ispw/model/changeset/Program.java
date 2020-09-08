@@ -167,7 +167,7 @@ public class Program implements Serializable
 	/**
 	 * Add a load module to the list.
 	 * 
-	 * @param loadModule
+	 * @param loadModule the load module
 	 */
 	public void addLifeCycleLoadModule(LifeCycleLoadModule loadModule)
 	{
@@ -182,7 +182,7 @@ public class Program implements Serializable
 	/**
 	 * Remove a load module from the list
 	 * 
-	 * @param loadModule
+	 * @param loadModule the load module
 	 */
 	public void removeLifeCycleLoadModule(LifeCycleLoadModule loadModule)
 	{
@@ -200,7 +200,7 @@ public class Program implements Serializable
 	/**
 	 * Returns the list of deploy target load libraries. Changing the returned list will change the original.
 	 * 
-	 * @return
+	 * @return deploy target load modules
 	 */
 	public List<DeployTargetLoadModule> getDeployTargetLoadModules()
 	{
@@ -210,7 +210,7 @@ public class Program implements Serializable
 	/**
 	 * Adds the given deploy target load library name to the list
 	 * 
-	 * @param deployTargetLoadModule
+	 * @param deployTargetLoadModule deploy target load module
 	 */
 	public void addDeployTargetLoadModule(DeployTargetLoadModule deployTargetLoadModule)
 	{
@@ -225,7 +225,7 @@ public class Program implements Serializable
 	/**
 	 * Removes the given deploy target load library name from the list
 	 * 
-	 * @param deployTargetLoadModule
+	 * @param deployTargetLoadModule deploy target load module
 	 */
 	public void removeDeployTargetLoadModule(DeployTargetLoadModule deployTargetLoadModule)
 	{

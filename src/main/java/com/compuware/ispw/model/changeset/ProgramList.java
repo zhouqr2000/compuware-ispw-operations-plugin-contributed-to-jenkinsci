@@ -49,7 +49,7 @@ public class ProgramList implements Serializable
 	/**
 	 * Adds a program to the list
 	 * 
-	 * @param program
+	 * @param program the program
 	 */
 	public void addProgram(Program program)
 	{
@@ -64,7 +64,7 @@ public class ProgramList implements Serializable
 	/**
 	 * Removes a program from the list
 	 * 
-	 * @param program
+	 * @param program the program
 	 */
 	public void removeProgram(Program program)
 	{
