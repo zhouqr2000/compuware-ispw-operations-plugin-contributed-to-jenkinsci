@@ -45,6 +45,9 @@ public class JaxbLevelLoadLib implements Serializable
 
 	/**
 	 * Constructor
+	 * 
+	 * @param level the level
+	 * @param loadLib the load library
 	 */
 	public JaxbLevelLoadLib(String level, String loadLib)
 	{

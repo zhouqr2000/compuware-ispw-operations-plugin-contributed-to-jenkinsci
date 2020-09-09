@@ -143,7 +143,7 @@ public class LifeCycleLoadModule implements Serializable
 	}
 
 	/**
-	 * @param loadLibConcatenation the loadLibConcatenation to remove
+	 * @param loadLib the load library to remove
 	 */
 	public void removeLoadLibConcatenation(LevelLoadLib loadLib)
 	{

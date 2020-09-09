@@ -42,6 +42,8 @@ public class LevelLoadLib implements Serializable
 
 	/**
 	 * Constructor
+	 * @param level the level
+	 * @param loadLib the load lib
 	 */
 	public LevelLoadLib(String level, String loadLib)
 	{
