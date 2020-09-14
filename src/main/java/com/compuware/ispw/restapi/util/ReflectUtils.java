@@ -133,22 +133,28 @@ public class ReflectUtils {
 	public static IAction createAction(String command, PrintStream log) {
 		IAction action = null;
 		Class<?> clazz = getCommandClass(command);
+		String clazzName = "[No match class]";
+		String actionName = "[No match action]";
 
 		if (clazz != null) {
+			clazzName = clazz.getName();
 			try {
 				action = (IAction) ConstructorUtils.invokeConstructor(clazz, log);
+				if (action != null) {
+					actionName = action.toString();
+				}
 			} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException
 					| InstantiationException e) {
 				String message = String.format("Failed to instantiate command: %s from action class: %s", command,
-						clazz.getName());
+						clazzName);
 				log.println(message);
 
 				logger.error(message, e);
 			}
 		}
 
-		String message = String.format("Reflect to instantiate command %s -> Class %s -> instance %s", command,
-				clazz.getName(), action.toString());
+		String message = String.format("Reflect to instantiate command %s -> Class %s -> instance %s", command, clazzName,
+				actionName);
 		logger.info(message);
 
 		return action;
