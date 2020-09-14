@@ -562,7 +562,7 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 							else if (Constants.SET_STATE_FAILED.equalsIgnoreCase(setState))
 							{
 								String actionName = ispwRequestBean.getIspwContextPathBean().getAction();
-								if (StringUtils.isBlank(actionName) && action != null)
+								if (StringUtils.isBlank(actionName))
 								{
 									actionName = action.getClass().getName();
 								}
