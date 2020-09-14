@@ -41,8 +41,9 @@ public interface IBuildAction extends IAction
 	 * @param logger
 	 *            the logger.
 	 * @return a String containing the request body that should be used.
+	 * @throws IOException, InterruptedException 
 	 */
-	public default String getRequestBody(String ispwRequestBody, FilePath buildParmPath, PrintStream logger)
+	public default String getRequestBody(String ispwRequestBody, FilePath buildParmPath, PrintStream logger) throws IOException, InterruptedException
 	{
 		String buildAutomaticallyRegex = "(?i)(?m)(^(?!#)(.+)?buildautomatically.+true(.+)?$)"; //$NON-NLS-1$
 		Pattern buildAutomaticallyPattern = Pattern.compile(buildAutomaticallyRegex,
@@ -94,6 +95,7 @@ public interface IBuildAction extends IAction
 						
 						e.printStackTrace();
 						logger.println("The tasks could not be built automatically because the following error occurred: " + e.getMessage());
+						throw e;
 					}
 					
 				}
@@ -114,7 +116,7 @@ public interface IBuildAction extends IAction
 	}
 
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody, WebhookToken webhookToken,
-			FilePath buildParmPath);
+			FilePath buildParmPath) throws IOException, InterruptedException;
 	
 	default String getRequestBodyUsingBuildParms(String inputRequestBody, BuildParms buildParms)
 	{

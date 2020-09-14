@@ -3,7 +3,6 @@ package com.compuware.ispw.restapi;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -20,7 +19,6 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
-import org.parboiled.common.FileUtils;
 import com.compuware.ispw.git.GitToIspwUtils;
 import com.compuware.ispw.model.changeset.ProgramList;
 import com.compuware.ispw.model.rest.BuildResponse;
@@ -394,9 +392,21 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			if (action instanceof IBuildAction)
 			{
 				FilePath buildParmPath = GitToIspwUtils.getFilePathInVirtualWorkspace(envVars, IBuildAction.BUILD_PARAM_FILE_NAME);
-				
-				ispwRequestBean = ((IBuildAction) action).getIspwRequestBean(cesIspwHost, step.ispwRequestBody, webhookToken,
-						buildParmPath);
+				try 
+				{
+					ispwRequestBean = ((IBuildAction) action).getIspwRequestBean(cesIspwHost, step.ispwRequestBody,
+							webhookToken, buildParmPath);
+
+					if (ispwRequestBean == null) 
+					{
+						logger.println("The build operation is skipped since the build parameters cannot be captured."); 
+						return null;
+					}
+				} 
+				catch (IOException | InterruptedException e) 
+				{
+					throw e;
+				}
 			}
 			else
 			{
@@ -449,6 +459,7 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 				logger.println(errorMsg);
 				throw new IllegalStateException(new Exception(errorMsg));
 			}
+			
 			String responseJson = supplier.getContent();
 			if (RestApiUtils.isIspwDebugMode())
 				logger.println("responseJson=" + responseJson);

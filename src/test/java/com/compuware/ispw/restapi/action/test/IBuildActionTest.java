@@ -67,9 +67,10 @@ public class IBuildActionTest
 	/**
 	 * Test method for {@link com.compuware.ispw.restapi.action.IBuildAction#getRequestBody(java.lang.String, java.io.File, java.io.PrintStream)}.
 	 * @throws IOException 
+	 * @throws InterruptedException 
 	 */
 	@Test
-	public void testGetRequestBody_buildAutomaticallyNoAccess() throws IOException
+	public void testGetRequestBody_buildAutomaticallyNoAccess() throws IOException, InterruptedException
 	{
 		File buildDirectory = tempFolder.getRoot();
 		String inputRequestBody = "buildautomatically = true\n###";
@@ -81,9 +82,11 @@ public class IBuildActionTest
 	
 	/**
 	 * Test method for {@link com.compuware.ispw.restapi.action.IBuildAction#getRequestBody(java.lang.String, java.io.File, java.io.PrintStream)}.
+	 * @throws InterruptedException 
+	 * @throws IOException 
 	 */
 	@Test
-	public void testGetRequestBody_buildAutomaticallyNoFile()
+	public void testGetRequestBody_buildAutomaticallyNoFile() throws IOException, InterruptedException
 	{
 		File buildDirectory = tempFolder.getRoot();
 		File parmsFile = new File(buildDirectory, IBuildAction.BUILD_PARAM_FILE_NAME);
@@ -101,10 +104,11 @@ public class IBuildActionTest
 	
 	/**
 	 * Test method for {@link com.compuware.ispw.restapi.action.IBuildAction#getRequestBody(java.lang.String, java.io.File, java.io.PrintStream)}.
+	 * @throws InterruptedException 
 	 */
 	
 	@Test
-	public void testGetRequestBody_buildAutomaticallyHasFile() throws IOException
+	public void testGetRequestBody_buildAutomaticallyHasFile() throws IOException, InterruptedException
 	{
 		File buildDirectory = tempFolder.getRoot();
 		String inputRequestBody = "BuildAutomatically = true";
@@ -129,9 +133,11 @@ public class IBuildActionTest
 	
 	/**
 	 * Test method for {@link com.compuware.ispw.restapi.action.IBuildAction#getRequestBody(java.lang.String, java.io.File, java.io.PrintStream)}.
+	 * @throws InterruptedException 
+	 * @throws IOException 
 	 */
 	@Test
-	public void testGetRequestBody_notBuildAutomatically()
+	public void testGetRequestBody_notBuildAutomatically() throws IOException, InterruptedException
 	{
 		File buildDirectory = tempFolder.getRoot();
 		File parmFile = new File(buildDirectory.getAbsoluteFile(), IBuildAction.BUILD_PARAM_FILE_NAME);
@@ -161,9 +167,10 @@ public class IBuildActionTest
 	
 	/**
 	 * Test method for {@link com.compuware.ispw.restapi.action.IBuildAction#getRequestBody(java.lang.String, java.io.File, java.io.PrintStream)}.
+	 * @throws InterruptedException 
 	 */
 	@Test
-	public void testGetRequestBody_replacingGivenParms() throws IOException
+	public void testGetRequestBody_replacingGivenParms() throws IOException, InterruptedException
 	{
 		File buildDirectory = tempFolder.getRoot();
 		String inputRequestBody = "buildAutomatically=true\nevents.name=Completed\r\napplication = x\nevents.body=Deployed\r\n  assignmentID = y\n releaseid = z\n"
@@ -182,9 +189,10 @@ public class IBuildActionTest
 
 	/**
 	 * Test method for {@link com.compuware.ispw.restapi.action.IBuildAction#getRequestBody(java.lang.String, java.io.File, java.io.PrintStream)}.
+	 * @throws InterruptedException 
 	 */
 	@Test
-	public void testGetRequestBody_containsEventData() throws IOException
+	public void testGetRequestBody_containsEventData() throws IOException, InterruptedException
 	{
 		File buildDirectory = tempFolder.getRoot();
 		String inputRequestBody = "buildAutomatically=true\nevents.name=Completed\r\nevents.body=Deployed\r\n"

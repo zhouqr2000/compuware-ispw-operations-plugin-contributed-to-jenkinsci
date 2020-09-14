@@ -11,6 +11,7 @@
  */
 package com.compuware.ispw.restapi.action;
 
+import java.io.IOException;
 import java.io.PrintStream;
 
 import org.apache.commons.lang3.StringUtils;
@@ -81,7 +82,7 @@ public class BuildReleaseAction extends SetInfoPostAction implements IBuildActio
 	 */
 	@Override
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody, WebhookToken webhookToken,
-			FilePath buildParmPath)
+			FilePath buildParmPath) throws IOException, InterruptedException
 	{
 		ispwRequestBody = getRequestBody(ispwRequestBody, buildParmPath, this.getLogger());
 		
