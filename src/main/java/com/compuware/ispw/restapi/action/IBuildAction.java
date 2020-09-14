@@ -15,6 +15,7 @@ import java.io.PrintStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import com.compuware.ispw.restapi.BuildParms;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
@@ -26,6 +27,7 @@ import hudson.FilePath;
  */
 public interface IBuildAction extends IAction
 {
+	public static Logger classLogger = Logger.getLogger(IBuildAction.class);
 	public static String BUILD_PARAM_FILE_NAME = "automaticBuildParams.txt"; //$NON-NLS-1$
 
 	/**
@@ -103,8 +105,7 @@ public interface IBuildAction extends IAction
 				{
 					//do NOT auto build if file doesn't exist
 					ispwRequestBody = StringUtils.EMPTY;
-					
-					logger.println("The tasks could not be built automatically because the automaticBuildParams.txt file does not exist.");
+					classLogger.debug("The tasks could not be built automatically because the automaticBuildParams.txt file does not exist.");
 				}
 			}
 		}
