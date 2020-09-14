@@ -43,7 +43,8 @@ public interface IBuildAction extends IAction
 	 * @param logger
 	 *            the logger.
 	 * @return a String containing the request body that should be used.
-	 * @throws IOException, InterruptedException 
+	 * @throws IOException IO exception
+	 * @throws InterruptedException interrupted exception
 	 */
 	public default String getRequestBody(String ispwRequestBody, FilePath buildParmPath, PrintStream logger) throws IOException, InterruptedException
 	{
