@@ -15,6 +15,7 @@ import java.io.PrintStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import com.compuware.ispw.restapi.BuildParms;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.WebhookToken;
@@ -26,6 +27,7 @@ import hudson.FilePath;
  */
 public interface IBuildAction extends IAction
 {
+	public static Logger classLogger = Logger.getLogger(IBuildAction.class);
 	public static String BUILD_PARAM_FILE_NAME = "automaticBuildParams.txt"; //$NON-NLS-1$
 
 	/**
@@ -41,8 +43,9 @@ public interface IBuildAction extends IAction
 	 * @param logger
 	 *            the logger.
 	 * @return a String containing the request body that should be used.
+	 * @throws IOException, InterruptedException 
 	 */
-	public default String getRequestBody(String ispwRequestBody, FilePath buildParmPath, PrintStream logger)
+	public default String getRequestBody(String ispwRequestBody, FilePath buildParmPath, PrintStream logger) throws IOException, InterruptedException
 	{
 		String buildAutomaticallyRegex = "(?i)(?m)(^(?!#)(.+)?buildautomatically.+true(.+)?$)"; //$NON-NLS-1$
 		Pattern buildAutomaticallyPattern = Pattern.compile(buildAutomaticallyRegex,
@@ -94,6 +97,7 @@ public interface IBuildAction extends IAction
 						
 						e.printStackTrace();
 						logger.println("The tasks could not be built automatically because the following error occurred: " + e.getMessage());
+						throw e;
 					}
 					
 				}
@@ -101,8 +105,7 @@ public interface IBuildAction extends IAction
 				{
 					//do NOT auto build if file doesn't exist
 					ispwRequestBody = StringUtils.EMPTY;
-					
-					logger.println("The tasks could not be built automatically because the automaticBuildParams.txt file does not exist.");
+					classLogger.debug("The tasks could not be built automatically because the automaticBuildParams.txt file does not exist.");
 				}
 			}
 		}
@@ -114,7 +117,7 @@ public interface IBuildAction extends IAction
 	}
 
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody, WebhookToken webhookToken,
-			FilePath buildParmPath);
+			FilePath buildParmPath) throws IOException, InterruptedException;
 	
 	default String getRequestBodyUsingBuildParms(String inputRequestBody, BuildParms buildParms)
 	{

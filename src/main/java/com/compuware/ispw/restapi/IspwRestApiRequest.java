@@ -366,12 +366,20 @@ public class IspwRestApiRequest extends Builder {
 		{
 			FilePath buildParmPath = GitToIspwUtils.getFilePathInVirtualWorkspace(envVars, IBuildAction.BUILD_PARAM_FILE_NAME);
 			
-			ispwRequestBean = ((IBuildAction) action).getIspwRequestBean(cesIspwHost, ispwRequestBody, webhookToken,
-					buildParmPath);
-			
-			if (ispwRequestBean == null) // in case of NO auto build
+			try 
 			{
-				return true;
+				ispwRequestBean = ((IBuildAction) action).getIspwRequestBean(cesIspwHost, ispwRequestBody, webhookToken,
+						buildParmPath);
+
+				if (ispwRequestBean == null) // in case of NO auto build
+				{
+					logger.println("The build operation is skipped since the build parameters cannot be captured.");
+					return true;
+				}
+			} 
+			catch (IOException | InterruptedException e)
+			{
+				throw e;
 			}
 		}
 		else
