@@ -256,7 +256,7 @@ public class GitToIspwUtils
 				"refMap is null. Failed to mapping refId: %s to refMap. Please refine your branch mapping to match the branch name or ID in order to find correct refId.",
 				refId);
 		
-		logger.println("Mapping refId: " + refId + " to refMap=" + refMap.toString());
+		logger.println("Matched on the following mapping: " + refMap.toString());
 		
 		Properties remoteProperties = vChannel.call(new RemoteSystemProperties());
 		String remoteFileSeparator = remoteProperties.getProperty(CommonConstants.FILE_SEPARATOR_PROPERTY_KEY);

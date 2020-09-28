@@ -193,7 +193,10 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
 			}
 	
 			Map<String, RefMap> map = GitToIspwUtils.parse(step.branchMapping);
-			logger.println("map=" + map);
+			if (RestApiUtils.isIspwDebugMode())
+			{
+				logger.println("map=" + map);
+			}
 			
 			String refId = envVars.get(GitToIspwConstants.VAR_REF_ID, null);
 			
