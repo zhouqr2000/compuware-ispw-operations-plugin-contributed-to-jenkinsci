@@ -19,6 +19,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 
+/**
+ * JSON marshaller and unmarshaller
+ * 
+ * @author Sam Zhou
+ */
 public class JsonProcessor {
 
 	private static Logger logger = Logger.getLogger(JsonProcessor.class);
