@@ -448,8 +448,8 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 		{
 			if (RestApiUtils.logMessageIfAny(logger(), response, true))
 			{
-				logger().println(x.getMessage());
 				response.setAbortStatus(true);
+				response.setAbortMessage(x.getMessage());
 			}
 			else
 			{

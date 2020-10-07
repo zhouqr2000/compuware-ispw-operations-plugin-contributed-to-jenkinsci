@@ -441,6 +441,10 @@ public class IspwRestApiRequest extends Builder {
 		
 		if (supplier.getAbortStatus())
 		{
+			if (!supplier.getAbortMessage().isEmpty())
+			{
+				logger.println(supplier.getAbortMessage());
+			}
 			return false;
 		}
 		
@@ -475,6 +479,7 @@ public class IspwRestApiRequest extends Builder {
 
 				int i = 0;
 				boolean isSetHeld = false;
+				String setState = "Unknown";
 				for (; i < 60; i++) {
 					Thread.sleep(Constants.POLLING_INTERVAL);
 					HttpRequestExecution poller =
@@ -487,7 +492,7 @@ public class IspwRestApiRequest extends Builder {
 					JsonProcessor jsonProcessor = new JsonProcessor();
 					SetInfoResponse setInfoResp =
 							jsonProcessor.parse(pollingJson, SetInfoResponse.class);
-					String setState = StringUtils.trimToEmpty(setInfoResp.getState());
+					setState = StringUtils.trimToEmpty(setInfoResp.getState());
 					if (!set.contains(setState))
 					{
 						logger.println("ISPW: Set " + setInfoResp.getSetid() + " status - " + setState);
@@ -509,7 +514,10 @@ public class IspwRestApiRequest extends Builder {
 								JsonProcessor jsonProcessor1 = new JsonProcessor();
 								SetInfoResponse setInfoResp1 = jsonProcessor1.parse(pollingJson1,
 										SetInfoResponse.class);
-								logger.println("tasks=" + setInfoResp1.getTasks());
+								if (setInfoResp1 != null)
+								{
+									logger.println("tasks=" + setInfoResp1.getTasks());
+								}
 
 								ProgramList programList = RestApiUtils.convertSetInfoResp(setInfoResp1);
 
@@ -581,7 +589,7 @@ public class IspwRestApiRequest extends Builder {
 				// Follow with post set execution logging for the tasks within the BuildResponse model
 				if (respObject instanceof BuildResponse && !isSetHeld)
 				{
-					return buildActionTaskInfoLogger(setId, launcher, envVars, build, listener, logger, respObject);
+					return buildActionTaskInfoLogger(setId, setState, launcher, envVars, build, listener, logger, respObject);
 				}
 			}
 		}
@@ -589,7 +597,7 @@ public class IspwRestApiRequest extends Builder {
 		return true;
 	}
 
-	private boolean buildActionTaskInfoLogger(String setId, Launcher launcher, EnvVars envVars, AbstractBuild<?, ?> build,
+	private boolean buildActionTaskInfoLogger(String setId, String setState, Launcher launcher, EnvVars envVars, AbstractBuild<?, ?> build,
 			BuildListener listener, PrintStream logger, Object respObject) throws InterruptedException, IOException
 	{
 		Thread.sleep(Constants.POLLING_INTERVAL);
@@ -625,9 +633,11 @@ public class IspwRestApiRequest extends Builder {
 
 			for (TaskInfo task : tasksInSet)
 			{
-				if (task.getOperation().equals("G")) //$NON-NLS-1$
+				//take GP and G into consideration - new tasks without PGM=Y is GP.
+				//New tasks without PGM=Y, if generate fails remains in the set so this code doesn't work
+				if (task.getOperation().startsWith("G")) //$NON-NLS-1$
 				{
-					logger.println("ISPW: " + task.getModuleName() + " compiled successfully");
+					logger.println("ISPW: " + task.getModuleName() + " generated successfully");
 				}
 				// Remove all successfully built tasks
 				uniqueTasksInSet.add(task.getTaskId());
@@ -636,25 +646,32 @@ public class IspwRestApiRequest extends Builder {
 
 			for (TaskInfo task : tasksNotBuilt)
 			{
-				logger.println("ISPW: " + task.getModuleName() + " did not compile successfully");
+				logger.println("ISPW: " + task.getModuleName() + " did not generate successfully");
 			}
 			
 			StringBuilder sb = new StringBuilder();
 			sb.append("ISPW: " + uniqueTasksInSet.size() + " of " + numTasksToBeBuilt + " generated successfully. " + tasksNotBuilt.size()
 					+ " of " + numTasksToBeBuilt + " generated with errors.\n");
 			
-			if (!tasksNotBuilt.isEmpty())
+			if (setState.equals(Constants.SET_STATE_CLOSED) || setState.equals(Constants.SET_STATE_COMPLETE)
+						|| setState.equals(Constants.SET_STATE_WAITING_APPROVAL))
 			{
-				isSuccessful = false;
-				sb.append("ISPW: The build process completed with errors. ");
+				if (!tasksNotBuilt.isEmpty())
+				{
+					logger.println(sb);
+					logger.println("ISPW: The build process completed with generate errors.");
+				}
+				else
+				{
+					logger.println(sb);
+					logger.println("ISPW: The build process completed.");
+				}
 			}
 			else
 			{
-				isSuccessful = true;
-				sb.append("ISPW: The build process was successfully completed. ");
+				logger.println(sb);
+				throw new AbortException("ISPW: Set processing has not completed successfully. Set status is " + setState + "."); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			
-			logger.println(sb);
 		}
 		return isSuccessful;
 	}

@@ -526,65 +526,68 @@ public class RestApiUtils {
 	{
 		ProgramList programList = new ProgramList();
 
-		List<TaskInfo> taskInfos = setInfoResp.getTasks();
-		if (taskInfos != null && !taskInfos.isEmpty())
+		if (setInfoResp != null)
 		{
-			for (TaskInfo taskInfo : taskInfos)
+			List<TaskInfo> taskInfos = setInfoResp.getTasks();
+			if (taskInfos != null && !taskInfos.isEmpty())
 			{
-				JaxbProgram jaxbProgram = taskInfo.getJaxbProgram();
-
-				if (jaxbProgram != null)
+				for (TaskInfo taskInfo : taskInfos)
 				{
-					Program program = new Program();
-					program.setStream(jaxbProgram.getStream());
-					program.setApplication(jaxbProgram.getApplication());
-					program.setIsImpact(jaxbProgram.getIsImpact());
-					program.setLevel(jaxbProgram.getLevel());
-					program.setProgramLanguage(jaxbProgram.getProgramLanguage());
-					program.setProgramName(jaxbProgram.getProgramName());
-					programList.addProgram(program);
+					JaxbProgram jaxbProgram = taskInfo.getJaxbProgram();
 
-					List<JaxbLifeCycleLoadModule> jaxbLifeCycleLoads = jaxbProgram.getLifeCycleLoadModules();
-					if (jaxbLifeCycleLoads != null && !jaxbLifeCycleLoads.isEmpty())
+					if (jaxbProgram != null)
 					{
-						for (JaxbLifeCycleLoadModule jaxbLifeCycleLoad : jaxbLifeCycleLoads)
+						Program program = new Program();
+						program.setStream(jaxbProgram.getStream());
+						program.setApplication(jaxbProgram.getApplication());
+						program.setIsImpact(jaxbProgram.getIsImpact());
+						program.setLevel(jaxbProgram.getLevel());
+						program.setProgramLanguage(jaxbProgram.getProgramLanguage());
+						program.setProgramName(jaxbProgram.getProgramName());
+						programList.addProgram(program);
+
+						List<JaxbLifeCycleLoadModule> jaxbLifeCycleLoads = jaxbProgram.getLifeCycleLoadModules();
+						if (jaxbLifeCycleLoads != null && !jaxbLifeCycleLoads.isEmpty())
 						{
-							LifeCycleLoadModule lclm = new LifeCycleLoadModule();
-							program.addLifeCycleLoadModule(lclm);
-
-							lclm.setComponentClass(jaxbLifeCycleLoad.getComponentClass());
-							lclm.setComponentType(jaxbLifeCycleLoad.getComponentType());
-							lclm.setLoadLibName(jaxbLifeCycleLoad.getLoadLibName());
-							lclm.setLoadModName(jaxbLifeCycleLoad.getLoadModName());
-
-							List<JaxbLevelLoadLib> jaxbLevelLoads = jaxbLifeCycleLoad.getLoadLibConcatenation();
-							for (JaxbLevelLoadLib jaxbLevelLoad : jaxbLevelLoads)
+							for (JaxbLifeCycleLoadModule jaxbLifeCycleLoad : jaxbLifeCycleLoads)
 							{
-								LevelLoadLib levelLoadLib = new LevelLoadLib();
-								lclm.addLoadLibConcatenation(levelLoadLib);
+								LifeCycleLoadModule lclm = new LifeCycleLoadModule();
+								program.addLifeCycleLoadModule(lclm);
 
-								levelLoadLib.setLevel(jaxbLevelLoad.getLevel());
-								levelLoadLib.setLoadLib(jaxbLevelLoad.getLoadLib());
+								lclm.setComponentClass(jaxbLifeCycleLoad.getComponentClass());
+								lclm.setComponentType(jaxbLifeCycleLoad.getComponentType());
+								lclm.setLoadLibName(jaxbLifeCycleLoad.getLoadLibName());
+								lclm.setLoadModName(jaxbLifeCycleLoad.getLoadModName());
+
+								List<JaxbLevelLoadLib> jaxbLevelLoads = jaxbLifeCycleLoad.getLoadLibConcatenation();
+								for (JaxbLevelLoadLib jaxbLevelLoad : jaxbLevelLoads)
+								{
+									LevelLoadLib levelLoadLib = new LevelLoadLib();
+									lclm.addLoadLibConcatenation(levelLoadLib);
+
+									levelLoadLib.setLevel(jaxbLevelLoad.getLevel());
+									levelLoadLib.setLoadLib(jaxbLevelLoad.getLoadLib());
+								}
 							}
 						}
-					}
 
-					List<JaxbDeployTargetLoadModule> jaxbDeployLoads = jaxbProgram.getDeployTargetLoadModules();
-					if (jaxbDeployLoads != null && !jaxbDeployLoads.isEmpty())
-					{
-						for (JaxbDeployTargetLoadModule jaxbDeployLoad : jaxbDeployLoads)
+						List<JaxbDeployTargetLoadModule> jaxbDeployLoads = jaxbProgram.getDeployTargetLoadModules();
+						if (jaxbDeployLoads != null && !jaxbDeployLoads.isEmpty())
 						{
-							DeployTargetLoadModule dtlm = new DeployTargetLoadModule();
-							program.addDeployTargetLoadModule(dtlm);
+							for (JaxbDeployTargetLoadModule jaxbDeployLoad : jaxbDeployLoads)
+							{
+								DeployTargetLoadModule dtlm = new DeployTargetLoadModule();
+								program.addDeployTargetLoadModule(dtlm);
 
-							dtlm.setComponentClass(jaxbDeployLoad.getComponentClass());
-							dtlm.setComponentType(jaxbDeployLoad.getComponentType());
-							dtlm.setDeployEnvironment(jaxbDeployLoad.getDeployEnvironment());
-							dtlm.setDeployType(jaxbDeployLoad.getDeployType());
-							dtlm.setLoadLibName(jaxbDeployLoad.getLoadLibName());
-							dtlm.setLoadModName(jaxbDeployLoad.getLoadModName());
-							dtlm.setSubenvironment(jaxbDeployLoad.getSubenvironment());
-							dtlm.setSystem(jaxbDeployLoad.getSystem());
+								dtlm.setComponentClass(jaxbDeployLoad.getComponentClass());
+								dtlm.setComponentType(jaxbDeployLoad.getComponentType());
+								dtlm.setDeployEnvironment(jaxbDeployLoad.getDeployEnvironment());
+								dtlm.setDeployType(jaxbDeployLoad.getDeployType());
+								dtlm.setLoadLibName(jaxbDeployLoad.getLoadLibName());
+								dtlm.setLoadModName(jaxbDeployLoad.getLoadModName());
+								dtlm.setSubenvironment(jaxbDeployLoad.getSubenvironment());
+								dtlm.setSystem(jaxbDeployLoad.getSystem());
+							}
 						}
 					}
 				}
