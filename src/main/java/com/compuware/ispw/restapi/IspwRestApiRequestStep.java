@@ -36,6 +36,7 @@ import com.compuware.ispw.restapi.action.SetOperationAction;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
 import com.compuware.ispw.restapi.util.ReflectUtils;
 import com.compuware.ispw.restapi.util.RestApiUtils;
+import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
@@ -463,6 +464,10 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 				logger.println(errorMsg);
 				throw new IllegalStateException(new Exception(errorMsg));
 			}
+			else if (supplier.getAbortStatus() && !supplier.getAbortMessage().isEmpty())
+			{
+				throw new AbortException(supplier.getAbortMessage());
+			}
 			
 			String responseJson = supplier.getContent();
 			if (RestApiUtils.isIspwDebugMode())
@@ -531,6 +536,7 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 
 					int i = 0;
 					boolean isSetHeld = false;
+					String setState = "Unknown";
 					for (; i < 60; i++) {
 						Thread.sleep(Constants.POLLING_INTERVAL);
 						HttpRequestExecution poller = HttpRequestExecution
@@ -547,7 +553,7 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 						JsonProcessor jsonProcessor = new JsonProcessor();
 						SetInfoResponse setInfoResp =
 								jsonProcessor.parse(pollingJson, SetInfoResponse.class);
-						String setState = StringUtils.trimToEmpty(setInfoResp.getState());
+						setState = StringUtils.trimToEmpty(setInfoResp.getState());
 						if (!set.contains(setState))
 						{
 							logger.println("Set " + setInfoResp.getSetid() + " status - "
@@ -576,7 +582,10 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 									JsonProcessor jsonProcessor1 = new JsonProcessor();
 									SetInfoResponse setInfoResp1 = jsonProcessor1.parse(pollingJson1,
 											SetInfoResponse.class);
-									logger.println("tasks="+setInfoResp1.getTasks());
+									if (setInfoResp1 != null)
+									{
+										logger.println("tasks="+ setInfoResp1.getTasks());
+									}
 									
 									saveTttChangeSet(logger, envVars, setInfoResp1);
 								}
@@ -636,7 +645,7 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 					// Follow with post set execution logging for the task within the BuildResponse model
 					if (respObject instanceof BuildResponse && !isSetHeld)
 					{
-						buildActionTaskInfoLogger(setId, logger, respObject);
+						buildActionTaskInfoLogger(setId, setState, logger, respObject);
 					}
 				}
 			}
@@ -683,7 +692,7 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			}
 		}
 		
-		private void buildActionTaskInfoLogger(String setId, PrintStream logger, Object respObject)
+		private void buildActionTaskInfoLogger(String setId, String setState, PrintStream logger, Object respObject)
 				throws InterruptedException, IOException, RuntimeException
 		{
 			Thread.sleep(Constants.POLLING_INTERVAL);
@@ -715,9 +724,11 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 
 			for (TaskInfo task : tasksInSet)
 			{
-				if (task.getOperation().equals("G")) //$NON-NLS-1$
+				//take GP and G into consideration - new tasks without PGM=Y is GP.
+				//New tasks without PGM=Y, if generate fails remains in the set so this code doesn't work
+				if (task.getOperation().startsWith("G")) //$NON-NLS-1$
 				{
-					logger.println("ISPW: Set " + setId + " - " + task.getModuleName() + " compiled successfully");
+					logger.println("ISPW: Set " + setId + " - " + task.getModuleName() + " generated successfully");
 				}
 				// Remove all successfully built tasks
 				uniqueTasksInSet.add(task.getTaskId());
@@ -726,21 +737,31 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 
 			for (TaskInfo task : tasksNotBuilt)
 			{
-				logger.println("ISPW: Set " + setId + " - " + task.getModuleName() + " did not compile successfully");
+				logger.println("ISPW: Set " + setId + " - " + task.getModuleName() + " did not generate successfully");
 			}
 
 			StringBuilder sb = new StringBuilder();
 			sb.append("ISPW: " + uniqueTasksInSet.size() + " of " + numTasksToBeBuilt + " generated successfully. " + tasksNotBuilt.size()
 					+ " of " + numTasksToBeBuilt + " generated with errors.\n");
-			if (!tasksNotBuilt.isEmpty())
+			
+			if (setState.equals(Constants.SET_STATE_CLOSED) || setState.equals(Constants.SET_STATE_COMPLETE)
+						|| setState.equals(Constants.SET_STATE_WAITING_APPROVAL))
 			{
-				logger.println(sb);
-				throw new RuntimeException("ISPW: The build process completed with errors.");
+				if (!tasksNotBuilt.isEmpty())
+				{
+					logger.println(sb);
+					logger.println("ISPW: The build process completed with generate errors.");
+				}
+				else
+				{
+					logger.println(sb);
+					logger.println("ISPW: The build process completed.");
+				}
 			}
 			else
 			{
-				sb.append("ISPW: The build process was successfully completed. ");
 				logger.println(sb);
+				throw new AbortException("ISPW: Set processing has not completed successfully. Set status is " + setState + "."); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 
