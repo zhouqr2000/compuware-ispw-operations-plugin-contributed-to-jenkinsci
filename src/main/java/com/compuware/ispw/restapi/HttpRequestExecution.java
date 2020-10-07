@@ -17,12 +17,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
-
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedTrustManager;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -34,39 +32,38 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
-
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
 import com.compuware.ispw.restapi.IspwRestApiRequest.DescriptorImpl;
 import com.compuware.ispw.restapi.IspwRestApiRequestStep.Execution;
-import com.compuware.ispw.restapi.action.GetSetInfoAction;
 import com.compuware.ispw.restapi.action.IAction;
 import com.compuware.ispw.restapi.action.IspwCommand;
 import com.compuware.ispw.restapi.auth.Authenticator;
 import com.compuware.ispw.restapi.auth.CredentialBasicAuthentication;
 import com.compuware.ispw.restapi.util.HttpClientUtil;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
+import com.compuware.ispw.restapi.util.ReflectUtils;
 import com.compuware.ispw.restapi.util.RequestAction;
 import com.compuware.ispw.restapi.util.RestApiUtils;
-import com.compuware.jenkins.common.configuration.HostConnection;
 import com.google.common.collect.Range;
 import com.google.common.io.ByteStreams;
-
 import hudson.AbortException;
 import hudson.CloseProofOutputStream;
 import hudson.EnvVars;
 import hudson.FilePath;
+import hudson.model.AbstractBuild;
+import hudson.model.BuildListener;
 import hudson.model.Item;
 import hudson.model.TaskListener;
-import hudson.model.AbstractBuild;
 import hudson.remoting.RemoteOutputStream;
 import hudson.security.ACL;
 import jenkins.security.MasterToSlaveCallable;
 
 /**
  * @author Janario Oliveira
+ * @author Sam Zhou
  */
 public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentSupplier, RuntimeException> {
 
@@ -91,33 +88,44 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 	private final OutputStream remoteLogger;
 	private transient PrintStream localLogger;
 
+	
+	// create poller for rest api request
+	static HttpRequestExecution createPoller(String setId,
+			IspwRestApiRequest http, EnvVars envVars,
+			AbstractBuild<?, ?> build, TaskListener taskListener) throws AbortException {
+		return createPoller(setId, null, http, envVars, build, taskListener);
+	}
+	
+	static HttpRequestExecution createPoller(String setId, String level,
+			IspwRestApiRequest http, EnvVars envVars,
+			AbstractBuild<?, ?> build, TaskListener taskListener) throws AbortException {
+		return createPoller(setId, level, null, http, envVars, build, taskListener);
+	}
+	
 	//create poller for rest api request
-	static HttpRequestExecution createPoller(String setId, WebhookToken webhookToken, IspwRestApiRequest http, EnvVars envVars,
-			AbstractBuild<?, ?> build, TaskListener taskListener) {
+	static HttpRequestExecution createPoller(String setId, String level, WebhookToken webhookToken, IspwRestApiRequest http, EnvVars envVars,
+			AbstractBuild<?, ?> build, TaskListener taskListener) throws AbortException {
 
 		PrintStream logger = taskListener.getLogger();
-		IAction action = RestApiUtils.createAction(IspwCommand.GetSetInfoAction, logger);
+		IAction action = ReflectUtils.createAction(IspwCommand.GetSetInfo, logger);
 
-		String cesUrl = StringUtils.EMPTY;
-		String cesIspwHost = StringUtils.EMPTY;
+		String cesUrl = RestApiUtils.getCesUrl(http.getConnectionId());
+		String cesIspwHost = RestApiUtils.getIspwHostLabel(http.getConnectionId());
 
-		HostConnection hostConnection = RestApiUtils.getCesUrl(http.getConnectionId());
-		if (hostConnection != null) {
-			cesUrl = StringUtils.trimToEmpty(hostConnection.getCesUrl());
-
-			String host = StringUtils.trimToEmpty(hostConnection.getHost());
-			String port = StringUtils.trimToEmpty(hostConnection.getPort());
-			cesIspwHost = host + "-" + port;
-		}
-
-		String cesIspwToken = RestApiUtils.getCesToken(http.getCredentialsId());
+		String cesIspwToken = RestApiUtils.getCesToken(http.getCredentialsId(), build.getParent());
 		if (RestApiUtils.isIspwDebugMode())
 			logger.println("...ces.url=" + cesUrl + ", ces.ispw.host=" + cesIspwHost
 					+ ", ces.ispw.token=" + cesIspwToken);
 
+		String reqBody = "setId=" + setId;
+		if (StringUtils.isNotBlank(level))
+		{
+			reqBody += System.lineSeparator() + "level=" + level;
+		}
+		
 		// no webhook, polling set status
 		IspwRequestBean ispwRequestBean =
-				action.getIspwRequestBean(cesIspwHost, "setId=" + setId, webhookToken);
+				action.getIspwRequestBean(cesIspwHost, reqBody, webhookToken);
 
 		String url = cesUrl + ispwRequestBean.getContextPath(); // CES URL
 		String body = ispwRequestBean.getJsonRequest();
@@ -136,31 +144,41 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 	}
 	
 	//create poller for rest api request step
-	static HttpRequestExecution createPoller(String setId, WebhookToken webhookToken, IspwRestApiRequestStep step, TaskListener taskListener, Execution execution) {
+	static HttpRequestExecution createPoller(String setId,
+			IspwRestApiRequestStep step, TaskListener taskListener,
+			Execution execution) throws AbortException {
+		return createPoller(setId, null, null, step, taskListener, execution);
+	}
+	
+	static HttpRequestExecution createPoller(String setId, String level, 
+			IspwRestApiRequestStep step, TaskListener taskListener,
+			Execution execution) throws AbortException {
+		return createPoller(setId, level, null, step, taskListener, execution);
+	}
+	
+	//create poller for rest api request step
+	static HttpRequestExecution createPoller(String setId, String level, WebhookToken webhookToken, IspwRestApiRequestStep step, TaskListener taskListener, Execution execution) throws AbortException {
 		
 		PrintStream logger = taskListener.getLogger();
-		IAction action = RestApiUtils.createAction(IspwCommand.GetSetInfoAction, logger);
+		IAction action = ReflectUtils.createAction(IspwCommand.GetSetInfo, logger);
 
-		String cesUrl = StringUtils.EMPTY;
-		String cesIspwHost = StringUtils.EMPTY;
+		String cesUrl = RestApiUtils.getCesUrl(step.getConnectionId());
+		String cesIspwHost = RestApiUtils.getIspwHostLabel(step.getConnectionId());
 
-		HostConnection hostConnection = RestApiUtils.getCesUrl(step.getConnectionId());
-		if (hostConnection != null) {
-			cesUrl = StringUtils.trimToEmpty(hostConnection.getCesUrl());
-
-			String host = StringUtils.trimToEmpty(hostConnection.getHost());
-			String port = StringUtils.trimToEmpty(hostConnection.getPort());
-			cesIspwHost = host + "-" + port;
-		}
-
-		String cesIspwToken = RestApiUtils.getCesToken(step.getCredentialsId());
+		String cesIspwToken = RestApiUtils.getCesToken(step.getCredentialsId(), execution.getProject());
 		if (RestApiUtils.isIspwDebugMode())
 			logger.println("...ces.url=" + cesUrl + ", ces.ispw.host=" + cesIspwHost
 					+ ", ces.ispw.token=" + cesIspwToken);
 
+		String reqBody = "setId=" + setId;
+		if (StringUtils.isNotBlank(level))
+		{
+			reqBody += System.lineSeparator() + "level=" + level;
+		}
+		
 		// no webhook, polling set status
 		IspwRequestBean ispwRequestBean =
-				action.getIspwRequestBean(cesIspwHost, "setId=" + setId, webhookToken);
+				action.getIspwRequestBean(cesIspwHost, reqBody, webhookToken);
 
 		String url = cesUrl + ispwRequestBean.getContextPath(); // CES URL
 		String body = ispwRequestBean.getJsonRequest();
@@ -424,11 +442,20 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 					throw new AbortException("Fail: Response doesn't contain expected content '"
 							+ validResponseContent + "'");
 				}
+			}		
+		}
+		catch (AbortException x)
+		{
+			if (RestApiUtils.logMessageIfAny(logger(), response, true))
+			{
+				response.setAbortStatus(true);
+				response.setAbortMessage(x.getMessage());
 			}
-		} catch (AbortException x) {
-			RestApiUtils.logMessageIfAny(logger(), response, true);
-
-			throw x;
+			else
+			{
+				logger().println(x.getMessage());
+				throw x;
+			}
 		}
 
 		//save file
@@ -490,5 +517,69 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 		public void checkServerTrusted(X509Certificate[] chain, String authType, SSLEngine engine)
 				throws CertificateException {
 		}
+	}
+
+	public static HttpRequestExecution createTaskInfoPoller(String setId, IspwRestApiRequest http, EnvVars envVars,
+			AbstractBuild<?, ?> build, BuildListener taskListener) throws AbortException
+	{
+		PrintStream logger = taskListener.getLogger();
+		IAction action = ReflectUtils.createAction(IspwCommand.GetSetTaskList, logger);
+
+		String cesUrl = RestApiUtils.getCesUrl(http.getConnectionId());
+		String cesIspwHost = RestApiUtils.getIspwHostLabel(http.getConnectionId());
+
+		String cesIspwToken = RestApiUtils.getCesToken(http.getCredentialsId(), build.getParent());
+		if (RestApiUtils.isIspwDebugMode())
+			logger.println("...ces.url=" + cesUrl + ", ces.ispw.host=" + cesIspwHost + ", ces.ispw.token=" + cesIspwToken);
+
+		// no webhook, polling set status
+		IspwRequestBean ispwRequestBean = action.getIspwRequestBean(cesIspwHost, "setId=" + setId, null);
+
+		String url = cesUrl + ispwRequestBean.getContextPath(); // CES URL
+		String body = ispwRequestBean.getJsonRequest();
+		List<HttpRequestNameValuePair> headers = http.resolveHeaders(envVars);
+
+		FilePath outputFile = http.resolveOutputFile(envVars, build);
+		Item project = build.getProject();
+
+		return new HttpRequestExecution(url, HttpMode.GET, http.getIgnoreSslErrors(), http.getHttpProxy(), body, headers,
+				http.getTimeout(), http.getAuthentication(), http.getValidResponseCodes(), http.getValidResponseContent(),
+				http.getConsoleLogResponseBody(), outputFile, ResponseHandle.STRING,
+
+				project, taskListener.getLogger());
+	}
+
+	// create poller for rest api request step
+	public static HttpRequestExecution createTaskInfoPoller(String setId, IspwRestApiRequestStep step,
+			TaskListener taskListener, Execution execution) throws AbortException
+	{
+
+		PrintStream logger = taskListener.getLogger();
+		IAction action = ReflectUtils.createAction(IspwCommand.GetSetTaskList, logger);
+
+		String cesUrl = RestApiUtils.getCesUrl(step.getConnectionId());
+		String cesIspwHost = RestApiUtils.getIspwHostLabel(step.getConnectionId());
+
+		String cesIspwToken = RestApiUtils.getCesToken(step.getCredentialsId(), execution.getProject());
+		if (RestApiUtils.isIspwDebugMode())
+		{
+			logger.println("...ces.url=" + cesUrl + ", ces.ispw.host=" + cesIspwHost + ", ces.ispw.token=" + cesIspwToken);
+		}
+
+		// no webhook, polling set status
+		IspwRequestBean ispwRequestBean = action.getIspwRequestBean(cesIspwHost, "setId=" + setId, null);
+
+		String url = cesUrl + ispwRequestBean.getContextPath(); // CES URL
+		String body = ispwRequestBean.getJsonRequest();
+
+		List<HttpRequestNameValuePair> headers = step.resolveHeaders();
+		FilePath outputFile = execution.resolveOutputFile();
+		Item project = execution.getProject();
+
+		return new HttpRequestExecution(url, HttpMode.GET, step.isIgnoreSslErrors(), step.getHttpProxy(), body, headers,
+				step.getTimeout(), step.getAuthentication(),
+
+				step.getValidResponseCodes(), step.getValidResponseContent(), step.getConsoleLogResponseBody(), outputFile,
+				step.getResponseHandle(), project, taskListener.getLogger());
 	}
 }

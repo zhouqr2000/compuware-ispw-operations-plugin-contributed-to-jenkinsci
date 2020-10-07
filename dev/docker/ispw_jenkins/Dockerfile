@@ -1,4 +1,4 @@
-FROM jenkins/jenkins:lts
+FROM jenkins/jenkins
 LABEL author="Sam Zhou <sam.zhou@compuware.com>"
 
 USER root

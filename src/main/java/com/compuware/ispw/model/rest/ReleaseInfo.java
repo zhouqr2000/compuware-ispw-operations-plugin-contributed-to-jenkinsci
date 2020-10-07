@@ -20,7 +20,7 @@ public class ReleaseInfo
 	@XmlElement(name = "releaseId")
 	private String releaseId;
 	@XmlElement(name = "releasePrefix")
-	private String releasePreference;
+	private String releasePrefix;
 	@XmlElement(name = "referenceNumber")
 	private String workRefNumber;
 	@XmlElement(name = "userTag")
@@ -78,14 +78,14 @@ public class ReleaseInfo
 		this.releaseId = releaseId;
 	}
 
-	public String getReleasePreference()
+	public String getReleasePrefix()
 	{
-		return releasePreference;
+		return releasePrefix;
 	}
 
-	public void setReleasePreference(String releasePreference)
+	public void setReleasePrefix(String releasePrefix)
 	{
-		this.releasePreference = releasePreference;
+		this.releasePrefix = releasePrefix;
 	}
 
 	public String getWorkRefNumber()

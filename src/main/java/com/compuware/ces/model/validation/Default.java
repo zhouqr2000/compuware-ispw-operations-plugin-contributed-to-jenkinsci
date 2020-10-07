@@ -6,7 +6,7 @@
  * All Compuware products listed within the materials are trademarks of Compuware Corporation. All other company or product
  * names are trademarks of their respective owners.
  * 
- * Copyright (c) 2016 Compuware Corporation. All rights reserved.
+ * Copyright (c) 2016-2019 Compuware Corporation. All rights reserved.
  ******************************************************************************/
 
 package com.compuware.ces.model.validation;

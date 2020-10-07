@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -36,6 +36,8 @@ public class ResponseContentSupplier implements Serializable, AutoCloseable {
 	private int status;
 	private Map<String, List<String>> headers = new HashMap<>();
 	private String charset;
+	private boolean isAbort = false;
+	private String abortMessage = StringUtils.EMPTY;
 
 	private ResponseHandle responseHandle;
 	private String content;
@@ -157,5 +159,25 @@ public class ResponseContentSupplier implements Serializable, AutoCloseable {
 
 	void setHttpClient(CloseableHttpClient httpclient) {
 		this.httpclient = httpclient;
+	}
+	
+	public void setAbortStatus(boolean isAbort)
+	{
+		this.isAbort = isAbort;
+	}
+	
+	public boolean getAbortStatus()
+	{
+		return isAbort;
+	}
+	
+	public void setAbortMessage(String abortMessage)
+	{
+		this.abortMessage = abortMessage;
+	}
+	
+	public String getAbortMessage()
+	{
+		return abortMessage;
 	}
 }
