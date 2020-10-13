@@ -656,6 +656,7 @@ public class IspwRestApiRequest extends Builder {
 			if (setState.equals(Constants.SET_STATE_CLOSED) || setState.equals(Constants.SET_STATE_COMPLETE)
 						|| setState.equals(Constants.SET_STATE_WAITING_APPROVAL))
 			{
+				isSuccessful = true;
 				if (!tasksNotBuilt.isEmpty())
 				{
 					logger.println(sb);
