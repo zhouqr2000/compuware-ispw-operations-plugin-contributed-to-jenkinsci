@@ -384,7 +384,7 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			if(RestApiUtils.isIspwDebugMode())
 				logger.println("ispwAction=" + step.ispwAction + ", httpMode=" + step.httpMode);
 
-			String cesUrl = RestApiUtils.getCesUrl(step.connectionId);
+			String cesUrl = RestApiUtils.getCesUrl(step.connectionId, logger);
 			String cesIspwHost = RestApiUtils.getIspwHostLabel(step.connectionId);
 
 			String cesIspwToken = RestApiUtils.getCesToken(step.credentialsId, run.getParent());
