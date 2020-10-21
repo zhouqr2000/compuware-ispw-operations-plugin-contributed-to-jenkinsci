@@ -352,7 +352,7 @@ public class IspwRestApiRequest extends Builder {
 		if (RestApiUtils.isIspwDebugMode())
 			logger.println("...ispwAction=" + ispwAction + ", httpMode=" + httpMode);
 
-		String cesUrl = RestApiUtils.getCesUrl(connectionId);
+		String cesUrl = RestApiUtils.getCesUrl(connectionId, logger);
 		String cesIspwHost = RestApiUtils.getIspwHostLabel(connectionId);
 
 		String cesIspwToken = RestApiUtils.getCesToken(credentialsId, build.getParent());

@@ -109,7 +109,7 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 		PrintStream logger = taskListener.getLogger();
 		IAction action = ReflectUtils.createAction(IspwCommand.GetSetInfo, logger);
 
-		String cesUrl = RestApiUtils.getCesUrl(http.getConnectionId());
+		String cesUrl = RestApiUtils.getCesUrl(http.getConnectionId(), logger);
 		String cesIspwHost = RestApiUtils.getIspwHostLabel(http.getConnectionId());
 
 		String cesIspwToken = RestApiUtils.getCesToken(http.getCredentialsId(), build.getParent());
@@ -162,7 +162,7 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 		PrintStream logger = taskListener.getLogger();
 		IAction action = ReflectUtils.createAction(IspwCommand.GetSetInfo, logger);
 
-		String cesUrl = RestApiUtils.getCesUrl(step.getConnectionId());
+		String cesUrl = RestApiUtils.getCesUrl(step.getConnectionId(), logger);
 		String cesIspwHost = RestApiUtils.getIspwHostLabel(step.getConnectionId());
 
 		String cesIspwToken = RestApiUtils.getCesToken(step.getCredentialsId(), execution.getProject());
@@ -525,7 +525,7 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 		PrintStream logger = taskListener.getLogger();
 		IAction action = ReflectUtils.createAction(IspwCommand.GetSetTaskList, logger);
 
-		String cesUrl = RestApiUtils.getCesUrl(http.getConnectionId());
+		String cesUrl = RestApiUtils.getCesUrl(http.getConnectionId(), logger);
 		String cesIspwHost = RestApiUtils.getIspwHostLabel(http.getConnectionId());
 
 		String cesIspwToken = RestApiUtils.getCesToken(http.getCredentialsId(), build.getParent());
@@ -557,7 +557,7 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 		PrintStream logger = taskListener.getLogger();
 		IAction action = ReflectUtils.createAction(IspwCommand.GetSetTaskList, logger);
 
-		String cesUrl = RestApiUtils.getCesUrl(step.getConnectionId());
+		String cesUrl = RestApiUtils.getCesUrl(step.getConnectionId(), logger);
 		String cesIspwHost = RestApiUtils.getIspwHostLabel(step.getConnectionId());
 
 		String cesIspwToken = RestApiUtils.getCesToken(step.getCredentialsId(), execution.getProject());

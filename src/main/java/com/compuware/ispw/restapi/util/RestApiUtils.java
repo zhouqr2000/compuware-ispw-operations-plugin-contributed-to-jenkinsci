@@ -186,15 +186,20 @@ public class RestApiUtils {
 		return model;
 	}
 	
+	/**
+	 * Get the host connection 
+	 * @param connectionId
+	 * @return  The host connection or a null object
+	 */
 	public static HostConnection getHostConnection(String connectionId) {
 		CpwrGlobalConfiguration globalConfig = CpwrGlobalConfiguration.get();
 		HostConnection hostConnection = globalConfig.getHostConnection(connectionId);
 		return hostConnection;
 	}
 	
-	public static String getCesUrl(String connectionId) throws AbortException {
-		
+	public static String getCesUrl(String connectionId, PrintStream logger) throws AbortException {
 		HostConnection hostConnection = getHostConnection(connectionId);
+		RestApiUtils.assertNotNull(logger, hostConnection, "Unable to connect to host connection for connectionId: %s", connectionId);
 
 		String cesUrl = StringUtils.trimToEmpty(hostConnection.getCesUrl());
 
