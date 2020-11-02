@@ -430,6 +430,7 @@ information.
  - Support webhook to produce intelligent test case change set for Build, Generate, Promote, Deploy and Regress
  - Fixed a bug affecting some Bitbucket repository URLs not being saved correctly during a Git to ISPW synchronization
  - Assure CES connection not null while performing any ISPW actions
+ - Added support to automatically generate and deploy components synchronized through the Git to ISPW integration
  
 ### Version 1.0.7
 
