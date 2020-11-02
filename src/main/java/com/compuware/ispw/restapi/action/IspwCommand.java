@@ -21,7 +21,10 @@ public class IspwCommand {
 	
 	@IspwAction(clazz = GenerateTasksInAssignmentAction.class)
 	public static final String GenerateTasksInAssignment = "GenerateTasksInAssignment"; // POST
-	
+
+	@IspwAction(clazz = GenerateTaskAction.class)
+	public static final String GenerateTask = "GenerateTask"; // POST
+
 	@IspwAction(clazz = PromoteAssignmentAction.class)
 	public static final String PromoteAssignment = "PromoteAssignment"; // POST
 	

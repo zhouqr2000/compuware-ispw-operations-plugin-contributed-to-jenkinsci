@@ -44,8 +44,11 @@ public class DeployReleaseAction extends SetInfoPostAction {
 	@Override
 	public void startLog(PrintStream logger, IspwContextPathBean ispwContextPathBean, Object jsonObject)
 	{
-		logger.println("ISPW: Deploying tasks in Release " + ispwContextPathBean.getReleaseId()
-		+ " at level " + ispwContextPathBean.getLevel());
+		if (ispwContextPathBean.getReleaseId() != null)
+		{
+			logger.println("ISPW: The deploy process has started for release " + ispwContextPathBean.getReleaseId()
+					+ " at level " + ispwContextPathBean.getLevel());
+		}
 	}
 
 	@Override
