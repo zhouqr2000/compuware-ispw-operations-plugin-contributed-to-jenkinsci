@@ -106,8 +106,10 @@ The following are required to use this plugin:
     -   CreateRelease
     -   DeployAssignment
     -   DeployRelease
+    -	DeployTask
     -   FallbackAssignment
     -   FallbackRelease
+    -	GenerateTask
     -   GenerateTasksInAssignment
     -   GenerateTasksInRelease
     -   GetAssignmentInfo
