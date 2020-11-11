@@ -6,7 +6,6 @@ public class GitToIspwConstants
 	public static final String VAR_REF = "ref"; //$NON-NLS-1$
 	public static final String VAR_TO_HASH = "toHash"; //$NON-NLS-1$
 	public static final String VAR_FROM_HASH = "fromHash"; //$NON-NLS-1$
-	public static final String BUILD_PARMS_FILE_NAME = "automaticBuildParams.txt"; //$NON-NLS-1$
 	public static final String CONTAINER_PREF_PER_COMMIT = "per-commit"; //$NON-NLS-1$
 	public static final String CONTAINER_PREF_PER_BRANCH = "per-branch"; //$NON-NLS-1$
 	public static final String CONTAINER_PREF_CUSTOM = "custom"; //$NON-NLS-1$

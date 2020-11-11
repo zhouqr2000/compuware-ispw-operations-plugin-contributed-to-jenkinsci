@@ -116,6 +116,10 @@
             <td>default to only add, if true, also checkout the task<br>
             </td>
           </tr>
+          <tr>
+            <td valign="top">generateAutomatically<br></td>
+            <td valing="top">The request parameters for the generate will come from a file written to the Jenkins build directory. This option is only valid when used in combination with a Git to ISPW Integration step<br></td>
+          </tr>
         </tbody>
       </table>
       Example:
@@ -796,6 +800,75 @@
         </tbody>
       </table>
       <br>
+      <strong>
+        GenerateTask action (Ignore 'events' properties if no webhook callback):</strong> <br>
+      Required:
+      <table border="1">
+        <tbody>
+          <tr>
+            <td>runtimeConfiguration</td>
+            <td>see ISPW administrator for valid values</td>
+          </tr>
+          <tr>
+            <td>assignmentId</td>
+            <td>The container for which you intend to generate tasks.</td>
+          </tr>
+          <tr>
+            <td>level</td>
+            <td>The level that the tasks exist at in the assignment</td>
+          </tr>
+          <tr>
+            <td>taskId</td>
+            <td>The comma-separated list of task IDs for the tasks that need to be generated</td>
+          </tr>
+        </tbody>
+      </table>
+      Optional:
+      <table border="1">
+        <tbody>
+         <tr>
+            <td>generateAutomatically</td>
+            <td>The request parameters for the generate will come from a file written to the Jenkins build directory. This option is only valid when used in combination with a Git to ISPW Integration step</td>
+          </tr>
+          <tr>
+            <td>changeType</td>
+            <td>S for standard, I for incidental, or E for emergency.
+              Default value of S</td>
+          </tr>
+          <tr>
+            <td>executionStatus</td>
+            <td>I for immediate execution or at start date/time, H to
+              create request in hold</td>
+          </tr>
+          <tr>
+            <td>autoDeploy</td>
+            <td>generates can be set up to automatically Deploy as well
+              by an option set up by the ISPW. The default is to not use
+              Auto Deploy. If the Auto Deploy option is set-up through ISPW, 
+              then you may use this option to automatically deploy instead of using
+              the deployAutomatically option within the DeployTask/DeployAssignment/DeployRelease actions</td>
+          </tr>
+        </tbody>
+      </table>
+      Example:
+      <table border="1">
+        <tbody>
+          <tr>
+            <td>GenerateTask</td>
+            <td> <br>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <pre>runtimeConfiguration=TPZP<br>assignmentId=PLAY000313<br>level=QA<br>taskId=7E489457622C,7E4A2CAC742C<br>#optional if use webhook callback in pipeline<br>events.name=Completed<br>events.body=Deployed<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
+            </td>
+            <td>
+              <pre>runtimeConfiguration=TPZP<br>#optional if using a Git to ISPW Integration step<br>generateautomatically=true<br>autoDeploy=true<br>#optional if use webhook callback in pipeline<br>events.name=Completed<br>events.body=Deployed<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
       <strong>GenerateTasksInAssignment / GenerateTasksInRelease actions
         (Ignore 'events' properties if no webhook callback):</strong> <br>
       Required:
@@ -832,9 +905,11 @@
           </tr>
           <tr>
             <td>autoDeploy</td>
-            <td>promotes can be set up to automatically Deploy as well
+            <td>generates can be set up to automatically Deploy as well
               by an option set up by the ISPW. The default is to not use
-              Auto Deploy</td>
+              Auto Deploy. If the Auto Deploy option is set-up through ISPW, 
+              then you may use this option to automatically deploy instead of using
+              the deployAutomatically option within the DeployTask/DeployAssignment/DeployRelease actions</td>
           </tr>
         </tbody>
       </table>
@@ -850,7 +925,7 @@
               <pre>runtimeConfiguration=TPZP<br>assignmentId=PLAY000313<br>level=DEV2<br>#optional<br>mname=TPROG08<br>mtype=COB<br>#optional if use webhook callback in pipeline<br>events.name=Completed<br>events.body=Generated<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
             </td>
             <td>
-              <pre>runtimeConfiguration=TPZP<br>releaseId=JKGENRELID<br>level=DEV2<br>#optional<br>mname=TPROG08<br>mtype=COB<br>#optional if use webhook callback in pipeline<br>events.name=Completed<br>events.body=Generated<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
+              <pre>runtimeConfiguration=TPZP<br>releaseId=JKGENRELID<br>level=DEV2<br>#optional<br>mname=TPROG08<br>mtype=COB<br>generateAutomatically=true<br>autoDeploy=true<br>#optional if use webhook callback in pipeline<br>events.name=Completed<br>events.body=Generated<br>events.httpHeaders=Jenkins-Crumb:no-crumb<br>events.credentials=admin:library</pre>
             </td>
           </tr>
         </tbody>
