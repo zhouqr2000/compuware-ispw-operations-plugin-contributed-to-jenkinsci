@@ -1,3 +1,6 @@
+/**
+* (c) Copyright 2020 BMC Software, Inc.
+*/
 package com.compuware.ispw.restapi;
 
 import java.io.File;
@@ -31,7 +34,6 @@ import com.compuware.ispw.model.rest.TaskListResponse;
 import com.compuware.ispw.model.rest.TaskResponse;
 import com.compuware.ispw.restapi.action.GetSetInfoAction;
 import com.compuware.ispw.restapi.action.IAction;
-import com.compuware.ispw.restapi.action.IBuildAction;
 import com.compuware.ispw.restapi.action.SetInfoPostAction;
 import com.compuware.ispw.restapi.action.SetOperationAction;
 import com.compuware.ispw.restapi.util.HttpRequestNameValuePair;
@@ -398,28 +400,12 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			IspwRequestBean ispwRequestBean = null;
 			FilePath buildParmPath = GitToIspwUtils.getFilePathInVirtualWorkspace(envVars, Constants.BUILD_PARAM_FILE_NAME);
 
-			if (action instanceof IBuildAction)
+			String realIspwRequestBody = action.preprocess(step.ispwRequestBody, buildParmPath, logger);
+			ispwRequestBean = action.getIspwRequestBean(cesIspwHost, realIspwRequestBody, webhookToken);
+			if (ispwRequestBean == null)
 			{
-				try 
-				{
-					ispwRequestBean = ((IBuildAction) action).getIspwRequestBean(cesIspwHost, step.ispwRequestBody,
-							webhookToken, buildParmPath);
-
-					if (ispwRequestBean == null) 
-					{
-						logger.println("The build operation is skipped since the build parameters cannot be captured."); 
-						return null;
-					}
-				} 
-				catch (IOException | InterruptedException e) 
-				{
-					throw e;
-				}
-			}
-			else
-			{
-				String realIspwRequestBody = action.preprocess(step.ispwRequestBody, buildParmPath, logger);
-				ispwRequestBean = action.getIspwRequestBean(cesIspwHost, realIspwRequestBody, webhookToken);
+				logger.println("The " + step.ispwAction + " operation is skipped since the build parameters cannot be captured.");
+				return null;
 			}
 
 			if (RestApiUtils.isIspwDebugMode())

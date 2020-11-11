@@ -1,11 +1,4 @@
 /**
- * These materials contain confidential information and trade secrets of Compuware Corporation. You shall maintain the materials
- * as confidential and shall not disclose its contents to any third party except as may be required by law or regulation. Use,
- * disclosure, or reproduction is prohibited without the prior express written permission of Compuware Corporation.
- * 
- * All Compuware products listed within the materials are trademarks of Compuware Corporation. All other company or product
- * names are trademarks of their respective owners.
- * 
  * Copyright (c) 2020 Compuware Corporation. All rights reserved.
  * (c) Copyright 2020 BMC Software, Inc.
  */
@@ -14,21 +7,20 @@ package com.compuware.ispw.restapi.action;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.compuware.ispw.model.rest.BuildResponse;
 import com.compuware.ispw.restapi.Constants;
 import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
 import com.compuware.ispw.restapi.JsonProcessor;
 import com.compuware.ispw.restapi.WebhookToken;
+import com.compuware.ispw.restapi.util.Operation;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 import hudson.FilePath;
 
 /**
  * 
  */
-public class BuildTaskAction extends SetInfoPostAction implements IBuildAction
+public class BuildTaskAction extends SetInfoPostAction
 {
 	private static final String[] defaultProps = new String[]{taskId, runtimeConfiguration};
 
@@ -50,9 +42,9 @@ public class BuildTaskAction extends SetInfoPostAction implements IBuildAction
 	{
 		IspwRequestBean bean = getIspwRequestBean(srid, ispwRequestBody, webhookToken, contextPath);
 
-		String contextPath = bean.getContextPath();
-		contextPath = contextPath.replaceAll(",", "&taskId=");
-		bean.setContextPath(contextPath);
+		String tempContextPath = bean.getContextPath();
+		tempContextPath = tempContextPath.replaceAll(",", "&taskId=");
+		bean.setContextPath(tempContextPath);
 
 		return bean;
 	}
@@ -88,22 +80,17 @@ public class BuildTaskAction extends SetInfoPostAction implements IBuildAction
 		return buildResp;
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.compuware.ispw.restapi.action.IBuildAction#getIspwRequestBean(java.lang.String, java.lang.String, com.compuware.ispw.restapi.WebhookToken, java.io.File)
-	 */
 	@Override
-	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody, WebhookToken webhookToken,
-			FilePath buildParmPath) throws IOException, InterruptedException
+	public String preprocess(String ispwRequestBody, FilePath pathToParmFile, PrintStream logger) throws IOException, InterruptedException
 	{
-		ispwRequestBody = getRequestBody(ispwRequestBody, buildParmPath, this.getLogger());
-		
-		if (StringUtils.isNotBlank(ispwRequestBody))
-		{
-			return getIspwRequestBean(srid, ispwRequestBody, webhookToken);
-		}
-		else
-		{
-			return null;
-		}
+		String automaticRegex = "(?i)(?m)(^(?!#)(.+)?buildautomatically.+true(.+)?$)";
+		return super.preprocess(automaticRegex, ispwRequestBody, pathToParmFile, logger, getIspwOperation().getDescription(),
+				getIspwOperation().getPastTenseDescription());
+	}
+
+	@Override
+	public Operation getIspwOperation()
+	{
+		return Operation.GENERATE;
 	}
 }

@@ -1,6 +1,6 @@
 /**
- * (c) Copyright 2020 BMC Software, Inc.
- */
+* (c) Copyright 2020 BMC Software, Inc.
+*/
 package com.compuware.ispw.restapi.action;
 
 import java.io.IOException;
