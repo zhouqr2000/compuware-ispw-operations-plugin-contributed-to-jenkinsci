@@ -31,6 +31,9 @@ import com.compuware.ispw.model.rest.SetInfoResponse;
 import com.compuware.ispw.model.rest.TaskInfo;
 import com.compuware.ispw.model.rest.TaskListResponse;
 import com.compuware.ispw.model.rest.TaskResponse;
+import com.compuware.ispw.restapi.action.GenerateTaskAction;
+import com.compuware.ispw.restapi.action.GenerateTasksInAssignmentAction;
+import com.compuware.ispw.restapi.action.GenerateTasksInReleaseAction;
 import com.compuware.ispw.restapi.action.IAction;
 import com.compuware.ispw.restapi.action.SetInfoPostAction;
 import com.compuware.ispw.restapi.action.SetOperationAction;
@@ -711,25 +714,47 @@ public class IspwRestApiRequest extends Builder {
 	{
 		if (action instanceof SetInfoPostAction)
 		{
+			String setState = StringUtils.trimToEmpty(finalSetInfoResp.getState());
 			SetInfoPostAction setAction = (SetInfoPostAction) action;
 			Operation operation  = setAction.getIspwOperation();
 			List<TaskInfo> tasksInSet = finalSetInfoResp.getTasks();
+			
+			boolean bGenerateAction = (action instanceof GenerateTaskAction || action instanceof GenerateTasksInAssignmentAction
+					|| action instanceof GenerateTasksInReleaseAction);
+			
+			boolean showActionSuccessfulMsg = true;
+			
+			if (bGenerateAction 
+					&& !(setState.equals(Constants.SET_STATE_CLOSED)
+							|| setState.equals(Constants.SET_STATE_COMPLETE))) 
+			{
+				showActionSuccessfulMsg = false;
+			}
+			
 			if (tasksInSet != null)
 			{
 				for (TaskInfo task : tasksInSet)
 				{
-					if (task.getOperation().startsWith(operation.getCode()))
+					if (task.getOperation().startsWith(operation.getCode()) && showActionSuccessfulMsg)
 					{
-						logger.println("ISPW: " + task.getModuleName() + " " + operation.getPastTenseDescription() + " successfully");
+						logger.println("ISPW: " + task.getModuleName() + " " + operation.getPastTenseDescription() + " successfully."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					}
 				}
 			}
 			
-			String setState = StringUtils.trimToEmpty(finalSetInfoResp.getState());
+			
 			if (setState.equals(Constants.SET_STATE_CLOSED) || setState.equals(Constants.SET_STATE_COMPLETE)
 					|| setState.equals(Constants.SET_STATE_WAITING_APPROVAL))
 			{
-				logger.println("ISPW: The " + ispwAction + " process completed.");
+				if (!bGenerateAction || (bGenerateAction && (setState.equals(Constants.SET_STATE_CLOSED)
+							|| setState.equals(Constants.SET_STATE_COMPLETE))))
+				{
+					logger.println("ISPW: The " + ispwAction + " process completed."); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+				else 
+				{
+					logger.println("ISPW: The " + ispwAction + " process waits for an approval."); //$NON-NLS-1$ //$NON-NLS-2$
+				}
 			}
 			else
 			{
