@@ -694,73 +694,91 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 		private void buildActionTaskInfoLogger(String setId, String setState, PrintStream logger, Object respObject)
 				throws InterruptedException, IOException, RuntimeException
 		{
-			Thread.sleep(Constants.POLLING_INTERVAL);
-			HttpRequestExecution poller = HttpRequestExecution.createTaskInfoPoller(setId, step, listener, this);
-
-			ResponseContentSupplier pollerSupplier = runExec(poller);
-			String pollingJson = pollerSupplier.getContent();
-
-			JsonProcessor jsonProcessor = new JsonProcessor();
-			TaskListResponse taskListResp = jsonProcessor.parse(pollingJson, TaskListResponse.class);
-			BuildResponse buildResponse = (BuildResponse) respObject;
-
-			if (buildResponse.getTasksBuilt().size() == 1)
+			if (setState.equals(Constants.SET_STATE_CLOSED) || setState.equals(Constants.SET_STATE_COMPLETE)) 
 			{
-				logger.println("ISPW: Set " + setId + " - " + buildResponse.getTasksBuilt().size() + " task will be built");
-			}
-			else
-			{
-				logger.println("ISPW: Set " + setId + " - " + buildResponse.getTasksBuilt().size() + " tasks will be built");
-			}
+				
+				Thread.sleep(Constants.POLLING_INTERVAL);
+				HttpRequestExecution poller = HttpRequestExecution.createTaskInfoPoller(setId, step, listener, this);
 
-			List<TaskInfo> tasksBuilt = buildResponse.getTasksBuilt();
-			// Used to hold the difference between tasks built and tasks within a closed set
-			List<TaskInfo> tasksNotBuilt = tasksBuilt;
-			// Get the tasks that were successfully generated (anything leftover in a set is successful)
-			List<TaskInfo> tasksInSet = taskListResp.getTasks();
-			int numTasksToBeBuilt = tasksBuilt.size();
-			Set<String> uniqueTasksInSet = new HashSet<>();
+				ResponseContentSupplier pollerSupplier = runExec(poller);
+				String pollingJson = pollerSupplier.getContent();
 
-			for (TaskInfo task : tasksInSet)
-			{
-				//take GP and G into consideration - new tasks without PGM=Y is GP.
-				//New tasks without PGM=Y, if generate fails remains in the set so this code doesn't work
-				if (task.getOperation().startsWith("G")) //$NON-NLS-1$
+				JsonProcessor jsonProcessor = new JsonProcessor();
+				TaskListResponse taskListResp = jsonProcessor.parse(pollingJson, TaskListResponse.class);
+				BuildResponse buildResponse = (BuildResponse) respObject;
+
+				if (buildResponse.getTasksBuilt().size() == 1) 
 				{
-					logger.println("ISPW: Set " + setId + " - " + task.getModuleName() + " generated successfully");
-				}
-				// Remove all successfully built tasks
-				uniqueTasksInSet.add(task.getTaskId());
-				tasksNotBuilt.removeIf(x -> x.getTaskId().equals(task.getTaskId())); // remove all successfully built
-			}
-
-			for (TaskInfo task : tasksNotBuilt)
-			{
-				logger.println("ISPW: Set " + setId + " - " + task.getModuleName() + " did not generate successfully");
-			}
-
-			StringBuilder sb = new StringBuilder();
-			sb.append("ISPW: " + uniqueTasksInSet.size() + " of " + numTasksToBeBuilt + " generated successfully. " + tasksNotBuilt.size()
-					+ " of " + numTasksToBeBuilt + " generated with errors.\n");
-			
-			if (setState.equals(Constants.SET_STATE_CLOSED) || setState.equals(Constants.SET_STATE_COMPLETE)
-						|| setState.equals(Constants.SET_STATE_WAITING_APPROVAL))
-			{
-				if (!tasksNotBuilt.isEmpty())
+					logger.println("ISPW: Set " + setId + " - " + buildResponse.getTasksBuilt().size()  //$NON-NLS-1$ //$NON-NLS-2$
+							+ " task will be built"); //$NON-NLS-1$ 
+				} 
+				else 
 				{
-					logger.println(sb);
-					logger.println("ISPW: The build process completed with generate errors.");
+					logger.println("ISPW: Set " + setId + " - " + buildResponse.getTasksBuilt().size()  //$NON-NLS-1$ //$NON-NLS-2$
+							+ " tasks will be built"); //$NON-NLS-1$ 
 				}
-				else
+
+				List<TaskInfo> tasksBuilt = buildResponse.getTasksBuilt();
+				// Used to hold the difference between tasks built and tasks within a closed set
+				List<TaskInfo> tasksNotBuilt = tasksBuilt;
+				// Get the tasks that were successfully generated (anything leftover in a set is
+				// successful)
+				List<TaskInfo> tasksInSet = taskListResp.getTasks();
+				int numTasksToBeBuilt = tasksBuilt.size();
+				Set<String> uniqueTasksInSet = new HashSet<>();
+
+				if (!tasksInSet.isEmpty()) 
 				{
-					logger.println(sb);
-					logger.println("ISPW: The build process completed.");
-				}
-			}
-			else
+					
+					// audit trail is available
+					for (TaskInfo task : tasksInSet) 
+					{
+						// take GP and G into consideration - new tasks without PGM=Y is GP.
+						// New tasks without PGM=Y, if generate fails remains in the set so this code
+						// doesn't work
+						if (task.getOperation().startsWith("G")) //$NON-NLS-1$
+						{
+							logger.println(
+									"ISPW: Set " + setId + " - " + task.getModuleName() + " generated successfully"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						}
+						// Remove all successfully built tasks
+						uniqueTasksInSet.add(task.getTaskId());
+						tasksNotBuilt.removeIf(x -> x.getTaskId().equals(task.getTaskId())); // remove all successfully
+																								// built
+					}
+
+					for (TaskInfo task : tasksNotBuilt) 
+					{
+						logger.println(
+								"ISPW: Set " + setId + " - " + task.getModuleName() + " did not generate successfully"); //$NON-NLS-1$ //$NON-NLS-2$ 
+					}
+
+					StringBuilder sb = new StringBuilder();
+					sb.append("ISPW: " + uniqueTasksInSet.size() + " of " + numTasksToBeBuilt    //$NON-NLS-1$ //$NON-NLS-2$ 
+							+ " generated successfully. " + tasksNotBuilt.size() + " of " + numTasksToBeBuilt  //$NON-NLS-1$ //$NON-NLS-2$ 
+							+ " generated with errors.\n"); //$NON-NLS-1$ 
+
+					if (!tasksNotBuilt.isEmpty()) 
+					{
+						
+						logger.println(sb);
+						logger.println("ISPW: The build process completed with generate errors.");  //$NON-NLS-1$ //$NON-NLS-2$ 
+						throw new AbortException("ISPW: Set processing has not generated successfully.");  //$NON-NLS-1$
+					} 
+					else 
+					{						
+						logger.println(sb);						
+					}
+				} 
+				
+
+				logger.println("ISPW: The build process completed.");	  //$NON-NLS-1$
+
+			} 
+			else 
 			{
-				logger.println(sb);
-				throw new AbortException("ISPW: Set processing has not completed successfully. Set status is " + setState + "."); //$NON-NLS-1$ //$NON-NLS-2$
+				throw new AbortException(
+						"ISPW: Set processing has not completed successfully. Set status is " + setState + "."); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 

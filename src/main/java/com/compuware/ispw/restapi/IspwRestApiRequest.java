@@ -31,6 +31,9 @@ import com.compuware.ispw.model.rest.SetInfoResponse;
 import com.compuware.ispw.model.rest.TaskInfo;
 import com.compuware.ispw.model.rest.TaskListResponse;
 import com.compuware.ispw.model.rest.TaskResponse;
+import com.compuware.ispw.restapi.action.GenerateTaskAction;
+import com.compuware.ispw.restapi.action.GenerateTasksInAssignmentAction;
+import com.compuware.ispw.restapi.action.GenerateTasksInReleaseAction;
 import com.compuware.ispw.restapi.action.IAction;
 import com.compuware.ispw.restapi.action.SetInfoPostAction;
 import com.compuware.ispw.restapi.action.SetOperationAction;
@@ -539,6 +542,8 @@ public class IspwRestApiRequest extends Builder {
 							{
 								logger.println(String.format("ISPW: Set " + setId + " - action [%s] failed", actionName));
 							}
+							// fail the build if the set status is failed
+							break;
 						}
 						else if (Constants.SET_STATE_TERMINATED.equalsIgnoreCase(setState)
 								&& SetOperationAction.SET_ACTION_TERMINATE.equalsIgnoreCase(ispwRequestBean.getIspwContextPathBean().getAction()))
@@ -596,80 +601,98 @@ public class IspwRestApiRequest extends Builder {
 	private boolean buildActionTaskInfoLogger(String setId, String setState, Launcher launcher, EnvVars envVars, AbstractBuild<?, ?> build,
 			BuildListener listener, PrintStream logger, Object respObject) throws InterruptedException, IOException
 	{
-		Thread.sleep(Constants.POLLING_INTERVAL);
-		HttpRequestExecution poller = HttpRequestExecution.createTaskInfoPoller(setId, this, envVars, build, listener);
+
 		boolean isSuccessful = false;
-		
-		VirtualChannel channel = launcher.getChannel();
-		if (channel != null)
+
+		if (setState.equals(Constants.SET_STATE_CLOSED) || setState.equals(Constants.SET_STATE_COMPLETE)) 
 		{
-			ResponseContentSupplier pollerSupplier = channel.call(poller);
-			String pollingJson = pollerSupplier.getContent();
-
-			JsonProcessor jsonProcessor = new JsonProcessor();
-			TaskListResponse taskListResp = jsonProcessor.parse(pollingJson, TaskListResponse.class);
-			BuildResponse buildResponse = (BuildResponse) respObject;
-
-			if (buildResponse.getTasksBuilt().size() == 1)
-			{
-				logger.println("ISPW: Set " + setId + " - " + buildResponse.getTasksBuilt().size() + " task will be built");
-			}
-			else
-			{
-				logger.println("ISPW: Set " + setId + " - " + buildResponse.getTasksBuilt().size() + " tasks will be built");
-			}
-
-			List<TaskInfo> tasksBuilt = buildResponse.getTasksBuilt();
-			// Used to hold the difference between tasks built and tasks within a closed set
-			List<TaskInfo> tasksNotBuilt = tasksBuilt;
-			// Get the tasks that were successfully generated (anything leftover in a set is successful)
-			List<TaskInfo> tasksInSet = taskListResp.getTasks();
-			int numTasksToBeBuilt = tasksBuilt.size();
-			Set<String> uniqueTasksInSet = new HashSet<>();
-
-			for (TaskInfo task : tasksInSet)
-			{
-				//take GP and G into consideration - new tasks without PGM=Y is GP.
-				//New tasks without PGM=Y, if generate fails remains in the set so this code doesn't work
-				if (task.getOperation().startsWith("G")) //$NON-NLS-1$
-				{
-					logger.println("ISPW: " + task.getModuleName() + " generated successfully");
-				}
-				// Remove all successfully built tasks
-				uniqueTasksInSet.add(task.getTaskId());
-				tasksNotBuilt.removeIf(x -> x.getTaskId().equals(task.getTaskId()));
-			}
-
-			for (TaskInfo task : tasksNotBuilt)
-			{
-				logger.println("ISPW: " + task.getModuleName() + " did not generate successfully");
-			}
+			isSuccessful = true;
 			
-			StringBuilder sb = new StringBuilder();
-			sb.append("ISPW: " + uniqueTasksInSet.size() + " of " + numTasksToBeBuilt + " generated successfully. " + tasksNotBuilt.size()
-					+ " of " + numTasksToBeBuilt + " generated with errors.\n");
+			Thread.sleep(Constants.POLLING_INTERVAL);
+			HttpRequestExecution poller = HttpRequestExecution.createTaskInfoPoller(setId, this, envVars, build,
+					listener);
+			VirtualChannel channel = launcher.getChannel();
 			
-			if (setState.equals(Constants.SET_STATE_CLOSED) || setState.equals(Constants.SET_STATE_COMPLETE)
-						|| setState.equals(Constants.SET_STATE_WAITING_APPROVAL))
+			if (channel != null) 
 			{
-				isSuccessful = true;
-				if (!tasksNotBuilt.isEmpty())
+				ResponseContentSupplier pollerSupplier = channel.call(poller);
+				String pollingJson = pollerSupplier.getContent();
+
+				JsonProcessor jsonProcessor = new JsonProcessor();
+				TaskListResponse taskListResp = jsonProcessor.parse(pollingJson, TaskListResponse.class);
+				BuildResponse buildResponse = (BuildResponse) respObject;
+
+				if (buildResponse.getTasksBuilt().size() == 1) 
 				{
-					logger.println(sb);
-					logger.println("ISPW: The build process completed with generate errors.");
-				}
-				else
+					logger.println("ISPW: Set " + setId + " - " + buildResponse.getTasksBuilt().size() //$NON-NLS-1$ //$NON-NLS-2$
+							+ " task will be built"); //$NON-NLS-1$ 
+				} 
+				else 
 				{
-					logger.println(sb);
-					logger.println("ISPW: The build process completed.");
+					logger.println("ISPW: Set " + setId + " - " + buildResponse.getTasksBuilt().size() //$NON-NLS-1$ //$NON-NLS-2$
+							+ " tasks will be built"); //$NON-NLS-1$ 
 				}
-			}
-			else
-			{
-				logger.println(sb);
-				throw new AbortException("ISPW: Set processing has not completed successfully. Set status is " + setState + "."); //$NON-NLS-1$ //$NON-NLS-2$
-			}
+
+				List<TaskInfo> tasksBuilt = buildResponse.getTasksBuilt();
+				// Used to hold the difference between tasks built and tasks within a closed set
+				List<TaskInfo> tasksNotBuilt = tasksBuilt;
+				// Get the tasks that were successfully generated (anything leftover in a set is
+				// successful)
+				List<TaskInfo> tasksInSet = taskListResp.getTasks();
+				int numTasksToBeBuilt = tasksBuilt.size();
+				Set<String> uniqueTasksInSet = new HashSet<>();
+
+				if (!tasksInSet.isEmpty()) 
+				{
+					for (TaskInfo task : tasksInSet)
+					{
+						// take GP and G into consideration - new tasks without PGM=Y is GP.
+						// New tasks without PGM=Y, if generate fails remains in the set so this code
+						// doesn't work
+						if (task.getOperation().startsWith("G")) //$NON-NLS-1$
+						{
+							logger.println("ISPW: " + task.getModuleName() + " generated successfully"); //$NON-NLS-1$ //$NON-NLS-2$
+						}
+						// Remove all successfully built tasks
+						uniqueTasksInSet.add(task.getTaskId());
+						tasksNotBuilt.removeIf(x -> x.getTaskId().equals(task.getTaskId()));
+					}
+
+					for (TaskInfo task : tasksNotBuilt) 
+					{
+						logger.println("ISPW: " + task.getModuleName() + " did not generate successfully"); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+
+					StringBuilder sb = new StringBuilder();
+					sb.append("ISPW: " + uniqueTasksInSet.size() + " of " + numTasksToBeBuilt //$NON-NLS-1$ //$NON-NLS-2$
+							+ " generated successfully. " + tasksNotBuilt.size() + " of " + numTasksToBeBuilt //$NON-NLS-1$ //$NON-NLS-2$
+							+ " generated with errors.\n"); //$NON-NLS-1$ 
+
+
+					if (!tasksNotBuilt.isEmpty()) 
+					{
+						// some tasks with generate errors, fail the build
+						isSuccessful = false;
+						logger.println(sb);
+						logger.println("ISPW: The build process completed with generate errors."); //$NON-NLS-1$ 
+						throw new AbortException("ISPW: Set processing has not generated successfully."); //$NON-NLS-1$ 
+					} 
+					else 
+					{
+						logger.println(sb);						
+					}
+				} 
+				
+			}			
+
+			logger.println("ISPW: The build process completed."); //$NON-NLS-1$ 		
+		} 
+		else 
+		{
+			throw new AbortException(
+					"ISPW: Set processing has not completed successfully. Set status is " + setState + "."); //$NON-NLS-1$ //$NON-NLS-2$
 		}
+		
 		return isSuccessful;
 	}
 	
@@ -691,25 +714,49 @@ public class IspwRestApiRequest extends Builder {
 	{
 		if (action instanceof SetInfoPostAction)
 		{
+			String setState = StringUtils.trimToEmpty(finalSetInfoResp.getState());
 			SetInfoPostAction setAction = (SetInfoPostAction) action;
 			Operation operation  = setAction.getIspwOperation();
 			List<TaskInfo> tasksInSet = finalSetInfoResp.getTasks();
+
+			boolean bGenerateAction = (action instanceof GenerateTaskAction || action instanceof GenerateTasksInAssignmentAction
+					|| action instanceof GenerateTasksInReleaseAction);
+
+			boolean showActionSuccessfulMsg = true;
+
+			// There may be cases where this method is called for sets that are waiting for approvals. We should not show
+			// messages for tasks when the set is in that state
+			if (bGenerateAction
+					&& !(setState.equals(Constants.SET_STATE_CLOSED) || setState.equals(Constants.SET_STATE_COMPLETE)))
+			{
+				showActionSuccessfulMsg = false;
+			}
+
 			if (tasksInSet != null)
 			{
 				for (TaskInfo task : tasksInSet)
 				{
-					if (task.getOperation().startsWith(operation.getCode()))
+					if (task.getOperation().startsWith(operation.getCode()) && showActionSuccessfulMsg)
 					{
-						logger.println("ISPW: " + task.getModuleName() + " " + operation.getPastTenseDescription() + " successfully");
+						logger.println(
+								"ISPW: " + task.getModuleName() + " " + operation.getPastTenseDescription() + " successfully."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					}
 				}
 			}
 			
-			String setState = StringUtils.trimToEmpty(finalSetInfoResp.getState());
+			
 			if (setState.equals(Constants.SET_STATE_CLOSED) || setState.equals(Constants.SET_STATE_COMPLETE)
 					|| setState.equals(Constants.SET_STATE_WAITING_APPROVAL))
 			{
-				logger.println("ISPW: The " + ispwAction + " process completed.");
+				if (!bGenerateAction || (bGenerateAction && (setState.equals(Constants.SET_STATE_CLOSED)
+							|| setState.equals(Constants.SET_STATE_COMPLETE))))
+				{
+					logger.println("ISPW: The " + ispwAction + " process completed."); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+				else 
+				{
+					logger.println("ISPW: The " + ispwAction + " process waits for an approval."); //$NON-NLS-1$ //$NON-NLS-2$
+				}
 			}
 			else
 			{
