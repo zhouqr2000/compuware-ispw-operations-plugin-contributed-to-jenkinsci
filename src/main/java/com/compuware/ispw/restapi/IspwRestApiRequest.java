@@ -718,26 +718,28 @@ public class IspwRestApiRequest extends Builder {
 			SetInfoPostAction setAction = (SetInfoPostAction) action;
 			Operation operation  = setAction.getIspwOperation();
 			List<TaskInfo> tasksInSet = finalSetInfoResp.getTasks();
-			
+
 			boolean bGenerateAction = (action instanceof GenerateTaskAction || action instanceof GenerateTasksInAssignmentAction
 					|| action instanceof GenerateTasksInReleaseAction);
-			
+
 			boolean showActionSuccessfulMsg = true;
-			
-			if (bGenerateAction 
-					&& !(setState.equals(Constants.SET_STATE_CLOSED)
-							|| setState.equals(Constants.SET_STATE_COMPLETE))) 
+
+			// There may be cases where this method is called for sets that are waiting for approvals. We should not show
+			// messages for tasks when the set is in that state
+			if (bGenerateAction
+					&& !(setState.equals(Constants.SET_STATE_CLOSED) || setState.equals(Constants.SET_STATE_COMPLETE)))
 			{
 				showActionSuccessfulMsg = false;
 			}
-			
+
 			if (tasksInSet != null)
 			{
 				for (TaskInfo task : tasksInSet)
 				{
 					if (task.getOperation().startsWith(operation.getCode()) && showActionSuccessfulMsg)
 					{
-						logger.println("ISPW: " + task.getModuleName() + " " + operation.getPastTenseDescription() + " successfully."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						logger.println(
+								"ISPW: " + task.getModuleName() + " " + operation.getPastTenseDescription() + " successfully."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					}
 				}
 			}
