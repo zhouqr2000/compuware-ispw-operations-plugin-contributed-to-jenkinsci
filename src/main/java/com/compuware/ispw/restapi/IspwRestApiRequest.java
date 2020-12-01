@@ -369,11 +369,14 @@ public class IspwRestApiRequest extends Builder {
 		IspwRequestBean ispwRequestBean = null;
 		FilePath buildParmPath = GitToIspwUtils.getFilePathInVirtualWorkspace(envVars, Constants.BUILD_PARAM_FILE_NAME);
 		ispwRequestBody = action.preprocess(ispwRequestBody, buildParmPath, logger);
-		ispwRequestBean = action.getIspwRequestBean(cesIspwHost, ispwRequestBody, webhookToken);
-		if (ispwRequestBean == null)
+		if (ispwRequestBody == null || ispwRequestBody.isEmpty())
 		{
 			logger.println("The " + ispwAction + " operation is skipped since the build parameters cannot be captured.");
 			return true;
+		}
+		else
+		{
+			ispwRequestBean = action.getIspwRequestBean(cesIspwHost, ispwRequestBody, webhookToken);
 		}
 		
 		if (RestApiUtils.isIspwDebugMode())
