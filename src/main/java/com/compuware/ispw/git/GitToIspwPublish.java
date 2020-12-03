@@ -12,10 +12,12 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
+import com.compuware.ispw.restapi.Constants;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.Launcher;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
@@ -94,6 +96,13 @@ public class GitToIspwPublish extends Builder implements IGitToIspwPublish
 
 		EnvVars envVars = build.getEnvironment(listener);
 		GitToIspwUtils.trimEnvironmentVariables(envVars);
+
+		FilePath buildParmPath = GitToIspwUtils.getFilePathInVirtualWorkspace(envVars, Constants.BUILD_PARAM_FILE_NAME);
+    	
+		if (buildParmPath.exists()) {
+    		logger.println("Remove the old build parm files." + buildParmPath.getName()); //$NON-NLS-1$
+    		buildParmPath.delete();
+    	}
 
 		Map<String, RefMap> map = GitToIspwUtils.parse(branchMapping);
 		logger.println("branch mapping = " + map);
