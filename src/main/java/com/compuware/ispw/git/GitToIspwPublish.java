@@ -106,7 +106,7 @@ public class GitToIspwPublish extends Builder implements IGitToIspwPublish
 		RestApiUtils.assertNotNull(logger, refMap,
 				"Cannot find a branch pattern that matches the branch %s. Please adjust your branch mapping.", refId);
 
-		if (build instanceof AbstractBuild)
+		if (build instanceof AbstractBuild) //NOSONAR
 		{
 			//Test to determine if there was a from hash which may not be the case for a new branch first build.
 			//If "from hash" is all zeros and "to hash" is good, then do the special case of setting fromHash to -2 which
