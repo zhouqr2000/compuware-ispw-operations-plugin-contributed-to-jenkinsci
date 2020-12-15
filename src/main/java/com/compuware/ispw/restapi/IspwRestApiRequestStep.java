@@ -489,7 +489,14 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 							{
 								logger.println("Deleting the old changed program list at " //$NON-NLS-1$
 										+ tttChangeSet.getCanonicalPath());
-								tttChangeSet.delete(); //NOSONAR
+								boolean deleteSuccess = tttChangeSet.delete(); //NOSONAR
+								
+								if(deleteSuccess)
+								{
+									logger.println("delete successfully");
+								} else {
+									logger.println("failed to delete");
+								}
 							}
 
 							logger.println("Saving the changed program list to " + tttChangeSet.getCanonicalPath()); //$NON-NLS-1$
@@ -507,7 +514,7 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			}
 			
 			// polling status if no webhook
-			if (webhookToken == null && !step.skipWaitingForSet) { //NOSONAR
+			if (webhookToken == null && step!=null && !step.skipWaitingForSet) {
 				String setId = StringUtils.EMPTY;
 				if (respObject instanceof TaskResponse)
 				{
