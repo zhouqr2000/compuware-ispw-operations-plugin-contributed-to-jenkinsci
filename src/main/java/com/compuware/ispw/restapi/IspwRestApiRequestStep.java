@@ -513,8 +513,8 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 				logger.println("Skip waiting for the completion of the set for this job...");
 			}
 			
-			// polling status if no webhook
-			if (webhookToken == null && step!=null && !step.skipWaitingForSet) {
+			// polling status if no webhook, we know webhookToken == null at this point
+			if (!step.skipWaitingForSet) {
 				String setId = StringUtils.EMPTY;
 				if (respObject instanceof TaskResponse)
 				{
