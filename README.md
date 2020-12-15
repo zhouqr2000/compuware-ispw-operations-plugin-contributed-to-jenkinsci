@@ -426,9 +426,12 @@ information.
 
 # Change Log
 
-## Version 1.0.8
+## Version 1.0.9
 
  - In development; To be published
+
+## Version 1.0.8
+
  - Support webhook to produce intelligent test case change set for Build, Generate, Promote, Deploy and Regress
  - Fixed a bug affecting some Bitbucket repository URLs not being saved correctly during a Git to ISPW synchronization
  - Assure CES connection not null while performing any ISPW actions
