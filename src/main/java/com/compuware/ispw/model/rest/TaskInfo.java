@@ -145,6 +145,19 @@ public class TaskInfo
 	
 	@XmlElement(name = "jaxbProgram")
 	private JaxbProgram jaxbProgram = null;
+	
+	@XmlElement(name = "assignmentId")
+	private String assignmentId;
+
+	public String getAssignmentId()
+	{
+		return assignmentId;
+	}
+	
+	public void setAssignmentId(String assignmentId)
+	{
+		this.assignmentId = assignmentId;
+	}
 
 	public String getApplication()
 	{
