@@ -195,7 +195,7 @@ public interface IAction {
 
 						e.printStackTrace();
 						logger.println(
-								"The tasks could not be " + pastTenseOp + " automatically because the following error occurred: "
+								"The tasks could not be " + StringUtils.lowerCase(pastTenseOp) + " automatically because the following error occurred: "
 										+ e.getMessage());
 						throw e;
 					}
@@ -204,7 +204,7 @@ public interface IAction {
 					// do NOT auto build if file doesn't exist
 					ispwRequestBody = StringUtils.EMPTY;
 					logger.println(
-							"The tasks could not be " + pastTenseOp + " automatically because the automaticBuildParams.txt file does not exist.");
+							"The tasks could not be " + StringUtils.lowerCase(pastTenseOp) + " automatically because the automaticBuildParams.txt file does not exist.");
 				}
 			}
 		}

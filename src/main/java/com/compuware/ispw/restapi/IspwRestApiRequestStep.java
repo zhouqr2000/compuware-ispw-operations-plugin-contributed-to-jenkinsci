@@ -401,11 +401,14 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			FilePath buildParmPath = GitToIspwUtils.getFilePathInVirtualWorkspace(envVars, Constants.BUILD_PARAM_FILE_NAME);
 
 			String realIspwRequestBody = action.preprocess(step.ispwRequestBody, buildParmPath, logger);
-			ispwRequestBean = action.getIspwRequestBean(cesIspwHost, realIspwRequestBody, webhookToken);
-			if (ispwRequestBean == null)
+			if (realIspwRequestBody == null || realIspwRequestBody.isEmpty())
 			{
 				logger.println("The " + step.ispwAction + " operation is skipped since the build parameters cannot be captured.");
 				return null;
+			}
+			else
+			{
+				ispwRequestBean = action.getIspwRequestBean(cesIspwHost, realIspwRequestBody, webhookToken);
 			}
 
 			if (RestApiUtils.isIspwDebugMode())
