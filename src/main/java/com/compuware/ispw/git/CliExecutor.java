@@ -117,7 +117,7 @@ public class CliExecutor
 
 		StandardCredentials gitCredentials = globalConfig.getLoginCredentials(run.getParent(),
 				gitCredentialsId);
-		if (gitCredentials != null && gitCredentials instanceof StandardUsernamePasswordCredentials)
+		if (gitCredentials instanceof StandardUsernamePasswordCredentials)
 		{
 			gitUserId = ArgumentUtils.escapeForScript(globalConfig.getCredentialsUser(gitCredentials));
 			StandardUsernamePasswordCredentials standardUsernamePasswordCredentials = (StandardUsernamePasswordCredentials) gitCredentials;
