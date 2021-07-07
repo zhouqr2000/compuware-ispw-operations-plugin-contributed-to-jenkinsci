@@ -119,9 +119,9 @@ public class CliExecutor
 				gitCredentialsId);
 		if (gitCredentials != null && gitCredentials instanceof StandardUsernamePasswordCredentials)
 		{
-			gitUserId = ArgumentUtils.escapeForScript(globalConfig.getCredentialsUser(credentials));
-			StandardUsernamePasswordCredentials standardUsernamePasswordCredentials = (StandardUsernamePasswordCredentials) credentials;
-			password = ArgumentUtils.escapeForScript(standardUsernamePasswordCredentials.getPassword().getPlainText());
+			gitUserId = ArgumentUtils.escapeForScript(globalConfig.getCredentialsUser(gitCredentials));
+			StandardUsernamePasswordCredentials standardUsernamePasswordCredentials = (StandardUsernamePasswordCredentials) gitCredentials;
+			gitPassword = ArgumentUtils.escapeForScript(standardUsernamePasswordCredentials.getPassword().getPlainText());
 			if (RestApiUtils.isIspwDebugMode())
 			{
 				logger.println("gitRepoUrl=" + gitRepoUrl + ", gitUserId=" + gitUserId + ", gitPassword=" + gitPassword);
