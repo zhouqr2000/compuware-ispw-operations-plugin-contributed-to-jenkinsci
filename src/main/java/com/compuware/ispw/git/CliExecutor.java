@@ -6,7 +6,7 @@
 * ALL BMC SOFTWARE PRODUCTS LISTED WITHIN THE MATERIALS ARE TRADEMARKS OF BMC SOFTWARE, INC. ALL OTHER COMPANY PRODUCT NAMES
 * ARE TRADEMARKS OF THEIR RESPECTIVE OWNERS.
 *
-* (c) Copyright 2020 BMC Software, Inc.
+* (c) Copyright 2020-21 BMC Software, Inc.
 */
 
 package com.compuware.ispw.git;
@@ -14,6 +14,7 @@ package com.compuware.ispw.git;
 import java.io.IOException;
 import java.io.PrintStream;
 import org.apache.commons.lang.StringUtils;
+import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.compuware.ispw.restapi.util.RestApiUtils;
 import com.compuware.jenkins.common.configuration.CpwrGlobalConfiguration;
@@ -93,10 +94,20 @@ public class CliExecutor
 		String codePage = connection.getCodePage();
 		String timeout = ArgumentUtils.escapeForScript(connection.getTimeout());
 
-		StandardUsernamePasswordCredentials credentials = globalConfig.getLoginInformation(run.getParent(), credentialsId);
+		StandardCredentials credentials = globalConfig.getLoginCredentials(run.getParent(), credentialsId);
 		RestApiUtils.assertNotNull(logger,  credentials, "The host credentials were not able to be obtained.");
-		userId = ArgumentUtils.escapeForScript(credentials.getUsername());
-		password = ArgumentUtils.escapeForScript(credentials.getPassword().getPlainText());
+		userId = ArgumentUtils.escapeForScript(globalConfig.getCredentialsUser(credentials));
+
+		if (credentials instanceof StandardUsernamePasswordCredentials)
+		{
+			StandardUsernamePasswordCredentials standardUsernamePasswordCredentials = (StandardUsernamePasswordCredentials) credentials;
+			password = ArgumentUtils.escapeForScript(standardUsernamePasswordCredentials.getPassword().getPlainText());
+		}
+		else
+		{
+			throw new AbortException("The host credentials were not able to be obtained. Only the standard username and password host credentials is supported.");
+		}
+		
 		if (RestApiUtils.isIspwDebugMode())
 		{
 			logger.println("host=" + host + ", port=" + port + ", protocol=" + protocol + ", codePage=" + codePage
@@ -104,12 +115,13 @@ public class CliExecutor
 					+ containerPref + ", containerDesc=" + containerDesc);
 		}
 
-		StandardUsernamePasswordCredentials gitCredentials = globalConfig.getLoginInformation(run.getParent(),
+		StandardCredentials gitCredentials = globalConfig.getLoginCredentials(run.getParent(),
 				gitCredentialsId);
-		if (gitCredentials != null)
+		if (gitCredentials instanceof StandardUsernamePasswordCredentials)
 		{
-			gitUserId = ArgumentUtils.escapeForScript(gitCredentials.getUsername());
-			gitPassword = ArgumentUtils.escapeForScript(gitCredentials.getPassword().getPlainText());
+			gitUserId = ArgumentUtils.escapeForScript(globalConfig.getCredentialsUser(gitCredentials));
+			StandardUsernamePasswordCredentials standardUsernamePasswordCredentials = (StandardUsernamePasswordCredentials) gitCredentials;
+			gitPassword = ArgumentUtils.escapeForScript(standardUsernamePasswordCredentials.getPassword().getPlainText());
 			if (RestApiUtils.isIspwDebugMode())
 			{
 				logger.println("gitRepoUrl=" + gitRepoUrl + ", gitUserId=" + gitUserId + ", gitPassword=" + gitPassword);
@@ -117,7 +129,7 @@ public class CliExecutor
 		}
 		else
 		{
-			logger.println("The git credentials were not able to be obtained.");
+			logger.println("The git credentials were not able to be obtained.  Only the standard username and password Git credentials is supported.");
 		}
 
 		ArgumentListBuilder args = new ArgumentListBuilder();

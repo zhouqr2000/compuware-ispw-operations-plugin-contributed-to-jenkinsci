@@ -379,9 +379,16 @@
 		<dependency>
 			<groupId>com.compuware.jenkins</groupId>
 			<artifactId>compuware-common-configuration</artifactId>
-			<version>1.0.9</version>
+			<version>1.0.12-SNAPSHOT</version>
 	    </dependency>
 
+		<!--
+		<dependency>
+		    <groupId>org.jenkins-ci.plugins</groupId>
+		    <artifactId>skip-certificate-check</artifactId>
+		    <version>1.0</version>
+		</dependency>
+		-->
 		<!-- dependency from Stash Notifier -->
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
