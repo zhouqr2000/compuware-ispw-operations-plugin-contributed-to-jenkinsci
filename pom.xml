@@ -382,6 +382,13 @@
 			<version>1.0.12-SNAPSHOT</version>
 	    </dependency>
 
+		<!--
+		<dependency>
+		    <groupId>org.jenkins-ci.plugins</groupId>
+		    <artifactId>skip-certificate-check</artifactId>
+		    <version>1.0</version>
+		</dependency>
+		-->
 		<!-- dependency from Stash Notifier -->
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
