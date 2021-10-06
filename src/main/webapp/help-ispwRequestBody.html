@@ -137,7 +137,7 @@
       </table>
       <br>
       <strong>BuildAssignment Action:</strong>
-	  <br /> Required:
+	  <br /> Required (unless buildAutomatically property is specified):
 	  <table border="1">
 	    <tbody>
 	      <tr>
@@ -168,7 +168,7 @@
         </tr>
         <tr>
 	        <td valign="top">buildAutomatically</td>
-	        <td valign="top">The request parameters for the build will come from a file written to the Jenkins build directory. This option is only valid when used in combination with a Git to ISPW Integration step</td>
+	        <td valign="top">Set to true if the request parameters for the build will come from a file written to the Jenkins build directory. This option is only valid when used in combination with a Git to ISPW Integration step and is mutually exclusive with any other properties. If other properties are specified, the properties will be overridden.</td>
         </tr>
 	    </tbody>
 	  </table>
@@ -190,7 +190,7 @@
 	    </tbody>
     </table>
 	  <br /><strong>BuildRelease Action:</strong>
-	  <br /> Required:
+	  <br /> Required (unless buildAutomatically property is specified):
 	  <table border="1">
 	    <tbody>
 	      <tr>
@@ -225,7 +225,7 @@
         </tr>
         <tr>
 	        <td valign="top">buildAutomatically</td>
-	        <td valign="top">The request parameters for the build will come from a file written to the Jenkins build directory. This option is only valid when used in combination with a Git to ISPW Integration step</td>
+	        <td valign="top">Set to true if the request parameters for the build will come from a file written to the Jenkins build directory. This option is only valid when used in combination with a Git to ISPW Integration step and is mutually exclusive with any other properties. If other properties are specified, the properties will be overridden.</td>
         </tr>
 	    </tbody>
 	  </table>
@@ -247,7 +247,7 @@
 	    </tbody>
     </table>
 	  <br /><strong>BuildTask Action:</strong>
-	  <br /> Required:
+	  <br /> Required (unless buildAutomatically property is specified):
 	  <table border="1">
 	    <tbody>
 	      <tr>
@@ -286,7 +286,7 @@
         </tr>
         <tr>
 	        <td valign="top">buildAutomatically</td>
-	        <td valign="top">The request parameters for the build will come from a file written to the Jenkins build directory. This option is only valid when used in combination with a Git to ISPW Integration step</td>
+	        <td valign="top">Set to true if the request parameters for the build will come from a file written to the Jenkins build directory. This option is only valid when used in combination with a Git to ISPW Integration step and is mutually exclusive with any other properties. If other properties are specified, the properties will be overridden.</td>
         </tr>
 	    </tbody>
 	  </table>
