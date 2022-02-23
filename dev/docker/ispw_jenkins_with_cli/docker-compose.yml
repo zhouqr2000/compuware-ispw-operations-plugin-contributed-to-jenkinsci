@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  jenkins:
+    image: sam/jenkins
+    container_name: sam_jenkins_1
+    volumes:
+     - jenkins_home:/var/jenkins_home
+    restart: always
+    ports:
+     - 8080:8080
+     - 50000:50000
+    environment:
+     - "JAVA_OPTS=-Dces.url=http://10.211.55.12:48080 -Dces.tokens=cw09-47623:3837ae52-de34-4068-9c2a-3e2ddc7e9fed;cw09-27623:8971c96a-35fb-45ba-8cff-b9ba631ae0ba"
+    
+volumes:
+  jenkins_home:
+  

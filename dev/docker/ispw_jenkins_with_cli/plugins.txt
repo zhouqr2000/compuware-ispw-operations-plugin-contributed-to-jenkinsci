@@ -1,0 +1,9 @@
+workflow-step-api
+compuware-common-configuration
+compuware-scm-downloader
+compuware-topaz-for-total-test
+compuware-topaz-utilities
+compuware-ispw-operations
+compuware-xpediter-code-coverage
+compuware-strobe-measurement
+compuware-zadviser-api

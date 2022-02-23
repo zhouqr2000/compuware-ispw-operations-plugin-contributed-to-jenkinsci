@@ -1,0 +1,2 @@
+Expecting TopazCLI-linux.gtk.x86_64.zip in this folder
+but will not release to public domain, such as GitHub.
