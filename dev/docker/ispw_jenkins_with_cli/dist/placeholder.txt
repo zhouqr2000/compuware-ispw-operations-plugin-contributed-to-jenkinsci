@@ -1,2 +1,5 @@
 Expecting TopazCLI-linux.gtk.x86_64.zip in this folder
 but will not release to public domain, such as GitHub.
+
+
+PLEASE DONT COMMIT TopazCLI-linux.gtk.x86_64.zip in this folder due to legal concerns!!!
