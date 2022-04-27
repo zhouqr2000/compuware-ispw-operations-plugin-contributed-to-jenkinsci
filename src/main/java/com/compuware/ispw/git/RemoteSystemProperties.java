@@ -1,7 +1,8 @@
 /**
  * The MIT License (MIT)
  * 
- * Copyright (c) 2015-2019 Compuware Corporation
+ * Copyright (c) 2015 Compuware Corporation. All rights reserved.
+ * Copyright (c) 2015,2021-2022 Compuware Corporation
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,
@@ -16,15 +17,15 @@
  */
 package com.compuware.ispw.git;
 
-import hudson.remoting.Callable;
 import java.util.Properties;
-import org.jenkinsci.remoting.RoleChecker;
+
+import jenkins.security.MasterToSlaveCallable;
 
 /**
  * Get remote system properties
  */
-public class RemoteSystemProperties implements Callable<Properties, RuntimeException>
-{
+public class RemoteSystemProperties extends MasterToSlaveCallable<Properties, RuntimeException> {
+
 	private static final long serialVersionUID = -8859580651709239685L;
 
 	public Properties call()
@@ -32,12 +33,5 @@ public class RemoteSystemProperties implements Callable<Properties, RuntimeExcep
 		return System.getProperties();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.jenkinsci.remoting.RoleSensitive#checkRoles(org.jenkinsci.remoting.RoleChecker)
-	 */
-	@Override
-	public void checkRoles(RoleChecker checker)
-	{
-		// Implementation required by interface, but not using
-	}
+	
 }
