@@ -428,7 +428,10 @@ information.
 
 ## Version 1.0.9
 
- - In development; To be published
+ 🚀 New features and improvements
+- Support for built-in node names and labels as part of the Jenkins terminology cleanup work.
+- Added the ability to pass a certificate to the Topaz Workbench CLI.
+- Fixed security vulnerabilities.
 
 ## Version 1.0.8
 
