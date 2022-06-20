@@ -28,6 +28,7 @@ public class DeploymentPackageItem
 	private String name;
 	private String deploymentType;
 	private String application;
+	private String subAppl;
 	private String type;
 	private String clazz;
 	private String action;
@@ -143,5 +144,15 @@ public class DeploymentPackageItem
 	public void setStorage(String storage)
 	{
 		this.storage = storage;
+	}
+
+	public String getSubAppl()
+	{
+		return subAppl;
+	}
+
+	public void setSubAppl(String subAppl)
+	{
+		this.subAppl = subAppl;
 	}
 }

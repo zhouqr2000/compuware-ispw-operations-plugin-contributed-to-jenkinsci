@@ -19,6 +19,8 @@ public class Assignment
 	private String release;
 	private String tag;
 	private String projectNumber;
+	private String subAppl;
+	
 
 	public String getOwner()
 	{
@@ -119,5 +121,16 @@ public class Assignment
 	{
 		this.projectNumber = projectNumber;
 	}
+
+	public String getSubAppl()
+	{
+		return subAppl;
+	}
+
+	public void setSubAppl(String subAppl)
+	{
+		this.subAppl = subAppl;
+	}
+	
 
 }

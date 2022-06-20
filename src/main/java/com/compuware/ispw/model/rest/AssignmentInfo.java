@@ -12,6 +12,7 @@ public class AssignmentInfo
 {
 	private String stream;
 	private String application;
+	private String subAppl;
 	private String defaultPath;
 	private String description;
 	private String owner;
@@ -145,5 +146,15 @@ public class AssignmentInfo
 	public void setProjectNumber(String projectNumber)
 	{
 		this.projectNumber = projectNumber;
+	}
+
+	public String getSubAppl()
+	{
+		return subAppl;
+	}
+
+	public void setSubAppl(String subAppl)
+	{
+		this.subAppl = subAppl;
 	}
 }
