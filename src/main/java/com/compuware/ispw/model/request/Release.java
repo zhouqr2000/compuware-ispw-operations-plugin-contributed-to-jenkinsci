@@ -118,5 +118,17 @@ public class Release
 	{
 		this.userTag = userTag;
 	}
+
+	public String getSubAppl()
+	{
+		return subAppl;
+	}
+
+	public void setSubAppl(String subAppl)
+	{
+		this.subAppl = subAppl;
+	}
+	
+	
 	
 }

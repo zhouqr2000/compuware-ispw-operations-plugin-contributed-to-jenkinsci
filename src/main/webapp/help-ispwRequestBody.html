@@ -120,6 +120,10 @@
             <td valign="top">generateAutomatically<br></td>
             <td valing="top">The request parameters for the generate will come from a file written to the Jenkins build directory. This option is only valid when used in combination with a Git to ISPW Integration step<br></td>
           </tr>
+          <tr>
+            <td valign="top">subAppl<br></td>
+            <td valing="top">The Sub Application Name<br></td>
+          </tr>
         </tbody>
       </table>
       Example:
@@ -130,7 +134,7 @@
           </tr>
           <tr>
             <td>
-              <pre>runtimeConfiguration=TPZP<br>assignmentId=PLAY001386<br>taskName=TREXX23<br>stream=PLAY<br>application=PLAY<br>type=CLST<br>path=DEV1<br>owner=Foobar<br>checkoutFromLevel=PRD<br>releaseId=R1<br></pre>
+              <pre>runtimeConfiguration=TPZP<br>assignmentId=PLAY001386<br>taskName=TREXX23<br>stream=PLAY<br>application=PLAY<br>subAppl=PLAY<br>type=CLST<br>path=DEV1<br>owner=Foobar<br>checkoutFromLevel=PRD<br>releaseId=R1<br></pre>
             </td>
           </tr>
         </tbody>
@@ -288,6 +292,10 @@
 	        <td valign="top">buildAutomatically</td>
 	        <td valign="top">Set to true if the request parameters for the build will come from a file written to the Jenkins build directory. This option is only valid when used in combination with a Git to ISPW Integration step and is mutually exclusive with any other properties. If other properties are specified, the properties will be overridden.</td>
         </tr>
+        <tr>
+	        <td valign="top">subAppl</td>
+	        <td valign="top">A task with this sub application will be built</td>
+	      </tr>
 	    </tbody>
 	  </table>
 	  Example:
@@ -400,7 +408,7 @@
           </tr>
           <tr>
             <td>
-              <pre>runtimeConfiguration=TPZP<br>assignmentId=PLAY001386<br>stream=PLAY<br>application=PLAY<br>moduleName=TREXX23<br>moduleType=CLST<br>currentLevel=DEV1<br>startingLevel=DEV1<br>userId=Foobar<br></pre>
+              <pre>runtimeConfiguration=TPZP<br>assignmentId=PLAY001386<br>stream=PLAY<br>application=PLAY<br>subAppl=PLAY<br>moduleName=TREXX23<br>moduleType=CLST<br>currentLevel=DEV1<br>startingLevel=DEV1<br>userId=Foobar<br></pre>
             </td>
           </tr>
         </tbody>
@@ -577,6 +585,10 @@
                     <td>userTag</td>
                     <td>user tag</td>
                   </tr>
+                  <tr>
+                    <td>subAppl</td>
+                    <td>ISPW sub application name</td>
+                  </tr>
                 </tbody>
               </table>
               Example:
@@ -587,7 +599,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <pre>stream=PLAY<br>application=PLAY<br>defaultPath=DEV2<br>description=MyA01<br>assignmentPrefix=PLAY</pre>
+                      <pre>stream=PLAY<br>application=PLAY<br>subAppl=PLAY<br>defaultPath=DEV2<br>description=MyA01<br>assignmentPrefix=PLAY</pre>
                     </td>
                   </tr>
                 </tbody>
@@ -627,6 +639,10 @@
                     <td>referenceNumber</td>
                     <td>reference number</td>
                   </tr>
+                  <tr>
+                    <td>subAppl</td>
+                    <td>The sub Application name</td>
+                  </tr>
                 </tbody>
               </table>
               Example:
@@ -637,7 +653,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <pre>stream=PLAY<br>application=PLAY<br>releaseId=MyR01<br>description=MyR01<br><br>	</pre>
+                      <pre>stream=PLAY<br>application=PLAY<br>subAppl=PLAY<br>releaseId=MyR01<br>description=MyR01<br><br>	</pre>
                     </td>
                   </tr>
                 </tbody>
@@ -978,6 +994,13 @@
             </td>
           </tr>
           <tr>
+            <td valign="top">subAppl<br>
+            </td>
+            <td valign="top">The sub application.&nbsp; Trailing
+              wildcards are supported, i.e. FOO*<br>
+            </td>
+          </tr>
+          <tr>
             <td valign="top">containerId<br>
             </td>
             <td valign="top">The container ID (Assignment ID, Release ID
@@ -1066,7 +1089,7 @@
           </tr>
           <tr>
             <td>
-              <pre>application=PLAY<br>containerId=PLAY001386<br>containerType=A<br>description=myContainer<br>includeClosedContainers=false<br>owner=myUserId<br>path=DEV1<br>refNumber=JIRA1234<br>releaseId=R00001234<br>stream=PLAY<br>tag=ABCD<br>userId=myUserId<br></pre>
+              <pre>application=PLAY<br>containerId=PLAY001386<br>containerType=A<br>description=myContainer<br>includeClosedContainers=false<br>owner=myUserId<br>path=DEV1<br>refNumber=JIRA1234<br>releaseId=R00001234<br>stream=PLAY<br>subAppl=PLAY<br>tag=ABCD<br>userId=myUserId<br></pre>
             </td>
           </tr>
         </tbody>
@@ -1474,6 +1497,13 @@
             </td>
           </tr>
           <tr>
+            <td valign="top">sub application</td>
+            <td valign="top">Container's primary sub application code.
+              Containers may include components from multiple
+              applications. Trailing wildcards are supported, i.e. FOO*
+            </td>
+          </tr>
+          <tr>
             <td valign="top">environment<br>
             </td>
             <td valign="top">ISPW environment for this version (such as
@@ -1560,7 +1590,7 @@
           </tr>
           <tr>
             <td>
-              <pre>inProgress=true<br>production=true<br>historical=true<br>startDate=2019-01-01<br>endDate=2019-03-31<br>application=PLAY<br>environment=TEST<br>group=GRP1<br>lastUpdatedBy=FOOUSER<br>level=DEV1<br>name=TPROG01<br>operation=Promote<br>owner=FOOUSER<br>refNumber=JIRA1234<br>releaseId=RLS001<br>stream=PLAY<br>type=COB<br></pre>
+              <pre>inProgress=true<br>production=true<br>historical=true<br>startDate=2019-01-01<br>endDate=2019-03-31<br>application=PLAY<br>subAppl=PLAY<br>environment=TEST<br>group=GRP1<br>lastUpdatedBy=FOOUSER<br>level=DEV1<br>name=TPROG01<br>operation=Promote<br>owner=FOOUSER<br>refNumber=JIRA1234<br>releaseId=RLS001<br>stream=PLAY<br>type=COB<br></pre>
             </td>
           </tr>
         </tbody>

@@ -44,6 +44,9 @@ public class JaxbProgram implements Serializable
 	@XmlElement(name = "application")
 	private String application;
 	
+	@XmlElement(name = "subAppl")
+	private String subAppl;
+	
 	@XmlElement(name = "stream")
 	private String stream;
 	
@@ -122,6 +125,16 @@ public class JaxbProgram implements Serializable
 	public void setApplication(String application)
 	{
 		this.application = application;
+	}
+
+	public String getSubAppl()
+	{
+		return subAppl;
+	}
+
+	public void setSubAppl(String subAppl)
+	{
+		this.subAppl = subAppl;
 	}
 
 	/**
