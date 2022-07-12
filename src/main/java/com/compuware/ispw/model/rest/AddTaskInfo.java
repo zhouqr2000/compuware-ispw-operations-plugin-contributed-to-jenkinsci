@@ -21,8 +21,10 @@ public class AddTaskInfo
 	@XmlElement(name="application")
 	@Required
 	private String application;
-	@XmlElement(name="application")
+	
+	@XmlElement(name="subAppl")
 	private String subAppl;
+	
 	@XmlElement(name="type")
 	@Required
 	private String type;

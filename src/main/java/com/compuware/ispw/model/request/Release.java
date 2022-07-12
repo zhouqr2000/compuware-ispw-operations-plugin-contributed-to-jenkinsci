@@ -17,6 +17,7 @@ public class Release
 	private String workRefNumber;
 	private String releasePrefix;
 	private String userTag;
+	private String subAppl;
 
 	public String getReleaseId()
 	{
