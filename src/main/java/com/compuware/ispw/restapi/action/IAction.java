@@ -30,6 +30,7 @@ import hudson.FilePath;
 public interface IAction {
 
 	public static final String application = "application";
+	public static final String subAppl = "subAppl";
 	public static final String assignmentId = "assignmentId";
 	public static final String assignmentPrefix = "assignmentPrefix";
 	public static final String autoDeploy = "autoDeploy";

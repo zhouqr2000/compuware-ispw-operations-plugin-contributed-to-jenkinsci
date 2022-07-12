@@ -20,8 +20,8 @@ public class GetWorkListAction extends AbstractGetAction
 {
 
 	private static final String[] defaultProps = new String[]{inProgress, production, historical, startDate, endDate, type,
-			name, operation, level, environment, application, stream, lastUpdatedBy, owner, releaseId, refNumber, group};
-	private static final String contextPath = "/ispw/{srid}/worklist?inProgress={inProgress}&production={production}&historical={historical}&startDate={startDate}&endDate={endDate}&type={type}&name={name}&operation={operation}&level={level}&environment={environment}&application={application}&stream={stream}&lastUpdatedBy={lastUpdatedBy}&owner={owner}&releaseId={releaseId}&refNumber={refNumber}&group={group}"; //$NON-NLS-1$
+			name, operation, level, environment, application, subAppl, stream, lastUpdatedBy, owner, releaseId, refNumber, group};
+	private static final String contextPath = "/ispw/{srid}/worklist?inProgress={inProgress}&production={production}&historical={historical}&startDate={startDate}&endDate={endDate}&type={type}&name={name}&operation={operation}&level={level}&environment={environment}&application={application}&subAppl={subAppl}&stream={stream}&lastUpdatedBy={lastUpdatedBy}&owner={owner}&releaseId={releaseId}&refNumber={refNumber}&group={group}"; //$NON-NLS-1$
 
 	public GetWorkListAction(PrintStream logger)
 	{
@@ -75,6 +75,7 @@ public class GetWorkListAction extends AbstractGetAction
 				logger.println("Action: " + workListInfo.getAction()); //$NON-NLS-1$
 				logger.println("Alternate Name: " + workListInfo.getAlternateName()); //$NON-NLS-1$
 				logger.println("Application: " + workListInfo.getApplication()); //$NON-NLS-1$
+				logger.println("SubAppl: " + workListInfo.getSubAppl()); //$NON-NLS-1$
 				logger.println("Assignment ID: " + workListInfo.getAssignmentId()); //$NON-NLS-1$
 				logger.println("Clazz: " + workListInfo.getClazz()); //$NON-NLS-1$
 				logger.println("Date/Time: " + workListInfo.getDateTime()); //$NON-NLS-1$

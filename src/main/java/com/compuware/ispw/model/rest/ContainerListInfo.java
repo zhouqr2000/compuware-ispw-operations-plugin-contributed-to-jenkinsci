@@ -11,6 +11,8 @@ public class ContainerListInfo
 {
 	@XmlElement(name = "application")
 	private String application;
+	@XmlElement(name = "subAppl")
+	private String subAppl;
 	@XmlElement(name = "containerId")
 	private String containerId;
 	@XmlElement(name = "containerType")
@@ -46,6 +48,11 @@ public class ContainerListInfo
 		this.application = application;
 	}
 	
+	public void setSubAppl(String subAppl)
+	{
+		this.subAppl = subAppl;
+	}
+
 	public String getContainerId()
 	{
 		return containerId;
@@ -155,6 +162,9 @@ public class ContainerListInfo
 	{
 		this.message = message;
 	}
-	
-	
+
+	public String getSubAppl()
+	{
+		return subAppl;
+	}
 }

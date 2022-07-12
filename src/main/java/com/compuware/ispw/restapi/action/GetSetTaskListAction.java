@@ -45,12 +45,12 @@ public class GetSetTaskListAction extends AbstractGetAction {
 		String fixedResponseJson = RestApiUtils.fixCesTaskListResponseJson(responseJson);
 		TaskListResponse listResponse = new JsonProcessor().parse(fixedResponseJson, TaskListResponse.class);
 		
-		logger.println("TaskId, Module, Type, UserId, Version, Status, Application/Stream/Level, Release");
+		logger.println("TaskId, Module, Type, UserId, Version, Status, Application/SubAppl/Stream/Level, Release");
 		for(TaskInfo taskInfo: listResponse.getTasks()) {
 			logger.println(" " + taskInfo.getTaskId() + ", " + taskInfo.getModuleName() + ", "
 					+ taskInfo.getModuleType() + ", " + taskInfo.getUserId() + ", "
 					+ taskInfo.getVersion() + ", " + taskInfo.getStatus() + ", "
-					+ taskInfo.getApplication() + "/" + taskInfo.getStream() + "/"
+					+ taskInfo.getApplication() + "/" + taskInfo.getSubAppl() + "/"  + taskInfo.getStream() + "/"
 					+ taskInfo.getLevel() + ", " + taskInfo.getRelease());
 		}
 		
