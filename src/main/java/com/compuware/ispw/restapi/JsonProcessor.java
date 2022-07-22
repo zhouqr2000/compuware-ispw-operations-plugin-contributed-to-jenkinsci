@@ -3,11 +3,9 @@ package com.compuware.ispw.restapi;
 import java.io.StringWriter;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.log4j.Logger;
-
 import com.compuware.ces.communications.service.data.EventCallback;
 import com.compuware.ces.model.BasicAuthentication;
 import com.compuware.ces.model.HttpHeader;
@@ -15,6 +13,7 @@ import com.compuware.ispw.model.rest.AssignmentInfo;
 import com.compuware.ispw.model.rest.SetInfo;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
@@ -56,7 +55,7 @@ public class JsonProcessor {
 
 		try {
 			ObjectMapper mapper = new ObjectMapper();
-
+			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			mapper.writerWithDefaultPrettyPrinter();
 			mapper.setSerializationInclusion(Include.NON_NULL);
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
