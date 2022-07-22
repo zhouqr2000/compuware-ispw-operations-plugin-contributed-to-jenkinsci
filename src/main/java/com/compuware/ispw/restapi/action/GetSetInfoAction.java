@@ -41,9 +41,9 @@ public class GetSetInfoAction extends AbstractGetAction {
 	public Object endLog(PrintStream logger, IspwRequestBean ispwRequestBean, String responseJson)
 	{
 		SetInfoResponse setInfoResp = new JsonProcessor().parse(responseJson, SetInfoResponse.class);
-		logger.println("SetId, State, Owner, Application/Stream, Start Date/Start Time");
+		logger.println("SetId, State, Owner, Application/subAppl/Stream, Start Date/Start Time");
 		logger.println(" " + setInfoResp.getSetid() + ", " + setInfoResp.getState() + ", "
-				+ setInfoResp.getOwner() + ", " + setInfoResp.getApplicationId() + "/"
+				+ setInfoResp.getOwner() + ", " + setInfoResp.getApplicationId()+"/"+ setInfoResp.getSubAppl() + "/"
 				+ setInfoResp.getStreamName() + ", " + setInfoResp.getStartDate() + "/"
 				+ setInfoResp.getStartTime());
 		
