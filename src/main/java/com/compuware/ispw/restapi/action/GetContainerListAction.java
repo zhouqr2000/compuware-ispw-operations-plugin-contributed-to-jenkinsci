@@ -76,7 +76,7 @@ public class GetContainerListAction extends AbstractGetAction {
 			{
 				logger.println(" "); //$NON-NLS-1$
 				logger.println("Application: " + containerListInfo.getApplication()); //$NON-NLS-1$
-				logger.println("Sub Appl: " + containerListInfo.getSubAppl()); //$NON-NLS-1$
+				logger.println("SubAppl: " + containerListInfo.getSubAppl()); //$NON-NLS-1$
 				logger.println("Container ID: " + containerListInfo.getContainerId()); //$NON-NLS-1$
 				logger.println("Container type: " + containerListInfo.getContainerType()); //$NON-NLS-1$
 				logger.println("Description: " + containerListInfo.getDescription()); //$NON-NLS-1$

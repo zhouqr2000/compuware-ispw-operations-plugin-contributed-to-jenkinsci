@@ -42,7 +42,7 @@ public class GetAssignmentInfoAction extends AbstractGetAction {
 	public Object endLog(PrintStream logger, IspwRequestBean ispwRequestBean, String responseJson)
 	{
 		AssignmentInfo assignment = new JsonProcessor().parse(responseJson, AssignmentInfo.class);
-		logger.println("Stream/Application/Sub Application/Default path: " + assignment.getStream() + "/"
+		logger.println("Stream/Application/SubAppl/Default path: " + assignment.getStream() + "/"
 				+ assignment.getApplication() + "/" + assignment.getSubAppl() + "/" + assignment.getDefaultPath());
 		logger.println("Assignment: " + assignment.getProjectNumber() + " - "
 				+ assignment.getDescription());
