@@ -3,6 +3,7 @@ package com.compuware.ispw.restapi.action;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import com.compuware.ispw.model.rest.TaskInfo;
 import com.compuware.ispw.model.rest.TaskListResponse;
 import com.compuware.ispw.restapi.IspwContextPathBean;
@@ -45,15 +46,30 @@ public class GetAssignmentTaskListAction extends AbstractGetAction {
 	{
 		String fixedResponseJson = RestApiUtils.fixCesTaskListResponseJson(responseJson);
 		TaskListResponse listResponse = new JsonProcessor().parse(fixedResponseJson, TaskListResponse.class);
-		
-		logger.println("TaskId, Module, Type, UserId, Version, Status, Application/SubAppl/Stream/Level, Release");
-		for(TaskInfo taskInfo: listResponse.getTasks()) {
-			logger.println(" " + taskInfo.getTaskId() + ", " + taskInfo.getModuleName() + ", "
-					+ taskInfo.getModuleType() + ", " + taskInfo.getUserId() + ", "
-					+ taskInfo.getVersion() + ", " + taskInfo.getStatus() + ", "
-					+ taskInfo.getApplication() + "/"+ taskInfo.getSubAppl() + "/" + taskInfo.getStream() + "/"
-					+ taskInfo.getLevel() + ", " + taskInfo.getRelease());
+		if (!listResponse.getTasks().isEmpty() && StringUtils.isNotEmpty(listResponse.getTasks().get(0).getSubAppl()))
+		{
+			logger.println("TaskId, Module, Type, UserId, Version, Status, Application/SubAppl/Stream/Level, Release");
+			for (TaskInfo taskInfo : listResponse.getTasks())
+			{
+				logger.println(" " + taskInfo.getTaskId() + ", " + taskInfo.getModuleName() + ", " + taskInfo.getModuleType()
+						+ ", " + taskInfo.getUserId() + ", " + taskInfo.getVersion() + ", " + taskInfo.getStatus() + ", "
+						+ taskInfo.getApplication() + "/" + taskInfo.getSubAppl() + "/" + taskInfo.getStream() + "/"
+						+ taskInfo.getLevel() + ", " + taskInfo.getRelease());
+			}
 		}
+		else
+		{
+			logger.println("TaskId, Module, Type, UserId, Version, Status, Application/Stream/Level, Release");
+			for (TaskInfo taskInfo : listResponse.getTasks())
+			{
+				logger.println(" " + taskInfo.getTaskId() + ", " + taskInfo.getModuleName() + ", " + taskInfo.getModuleType()
+						+ ", " + taskInfo.getUserId() + ", " + taskInfo.getVersion() + ", " + taskInfo.getStatus() + ", "
+						+ taskInfo.getApplication() + "/" + taskInfo.getStream() + "/" + taskInfo.getLevel() + ", "
+						+ taskInfo.getRelease());
+			}
+		
+		}
+		
 		
 		return listResponse;
 	}

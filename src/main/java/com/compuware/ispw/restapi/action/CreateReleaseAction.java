@@ -40,19 +40,18 @@ public class CreateReleaseAction extends AbstractPostAction {
 	public void startLog(PrintStream logger, IspwContextPathBean ispwContextPathBean, Object jsonObject)
 	{
 		ReleaseInfo releaseInfo = (ReleaseInfo) jsonObject;
-
 		String releaseMsg = StringUtils.trimToEmpty(
 				StringUtils.isBlank(releaseInfo.getReleaseId()) ? "releasePrefix:" + releaseInfo.getReleasePrefix()
 						: "releaseId:" + releaseInfo.getReleaseId());
-		if (releaseInfo.getSubAppl() != null)
+		if (StringUtils.isNotBlank(releaseInfo.getSubAppl()))
 		{
 			logger.println("Creating Release on " + releaseInfo.getStream() + "/" + releaseInfo.getApplication() + " as "
 					+ releaseMsg + " - " + releaseInfo.getDescription());
 		}
 		else
 		{
-			logger.println("Creating Release on " + releaseInfo.getStream() + "/" + releaseInfo.getApplication() + "/" + releaseInfo.getSubAppl()+ " as "
-					+ releaseMsg + " - " + releaseInfo.getDescription());
+			logger.println("Creating Release on " + releaseInfo.getStream() + "/" + releaseInfo.getApplication() + "/"
+					+ releaseInfo.getSubAppl() + " as " + releaseMsg + " - " + releaseInfo.getDescription());
 		}
 	}
 

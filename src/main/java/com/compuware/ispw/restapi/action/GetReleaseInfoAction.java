@@ -3,6 +3,7 @@ package com.compuware.ispw.restapi.action;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import com.compuware.ispw.model.rest.ReleaseInfo;
 import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
@@ -42,8 +43,15 @@ public class GetReleaseInfoAction extends AbstractGetAction {
 	public Object endLog(PrintStream logger, IspwRequestBean ispwRequestBean, String responseJson)
 	{
 		ReleaseInfo releaseInfo = new JsonProcessor().parse(responseJson, ReleaseInfo.class);
-		logger.println("Stream/Application/SubAppl: " + releaseInfo.getStream() + "/"
-				+ releaseInfo.getApplication()+ "/"+ releaseInfo.getSubAppl());
+		if (StringUtils.isNotBlank(releaseInfo.getSubAppl()))
+		{
+			logger.println("Stream/Application/SubAppl: " + releaseInfo.getStream() + "/" + releaseInfo.getApplication() + "/"
+					+ releaseInfo.getSubAppl());
+		}
+		else
+		{
+			logger.println("Stream/Application: " + releaseInfo.getStream() + "/" + releaseInfo.getApplication());
+		}
 		logger.println("Release: " + releaseInfo.getReleaseId() + " - "
 				+ releaseInfo.getDescription());
 		logger.println("Owner: " + releaseInfo.getOwner());

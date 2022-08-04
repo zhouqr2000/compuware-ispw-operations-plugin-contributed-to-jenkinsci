@@ -1,6 +1,7 @@
 package com.compuware.ispw.restapi.action;
 
 import java.io.PrintStream;
+import org.apache.commons.lang3.StringUtils;
 import com.compuware.ispw.git.GitToIspwUtils;
 import com.compuware.ispw.model.rest.AssignmentInfo;
 import com.compuware.ispw.model.rest.AssignmentResponse;
@@ -37,7 +38,7 @@ public class CreateAssignmentAction extends AbstractPostAction {
 	public void startLog(PrintStream logger, IspwContextPathBean ispwContextPathBean, Object jsonObject)
 	{
 		AssignmentInfo assignmentInfo = (AssignmentInfo) jsonObject;
-		if (assignmentInfo.getSubAppl() != null)
+		if (StringUtils.isNoneBlank(assignmentInfo.getSubAppl()))
 		{
 			logger.println("Creating assignment " + assignmentInfo.getStream() + "/" + assignmentInfo.getApplication() + "/"
 					+ "/" + assignmentInfo.getSubAppl() + "/"	+ assignmentInfo.getDefaultPath() + " with description - " + assignmentInfo.getDescription());

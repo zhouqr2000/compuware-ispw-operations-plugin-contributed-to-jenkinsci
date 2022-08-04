@@ -75,6 +75,10 @@ public class GetWorkListAction extends AbstractGetAction
 				logger.println("Action: " + workListInfo.getAction()); //$NON-NLS-1$
 				logger.println("Alternate Name: " + workListInfo.getAlternateName()); //$NON-NLS-1$
 				logger.println("Application: " + workListInfo.getApplication()); //$NON-NLS-1$
+				if (StringUtils.isNotBlank(workListInfo.getSubAppl()))
+				{
+					logger.println("SubAppl: " + workListInfo.getSubAppl()); //$NON-NLS-1$
+				}
 				logger.println("SubAppl: " + workListInfo.getSubAppl()); //$NON-NLS-1$
 				logger.println("Assignment ID: " + workListInfo.getAssignmentId()); //$NON-NLS-1$
 				logger.println("Clazz: " + workListInfo.getClazz()); //$NON-NLS-1$
