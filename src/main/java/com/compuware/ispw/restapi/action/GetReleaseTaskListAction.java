@@ -46,7 +46,7 @@ public class GetReleaseTaskListAction extends AbstractGetAction {
 		
 		String fixedResponseJson = RestApiUtils.fixCesTaskListResponseJson(responseJson);
 		TaskListResponse listResponse = new JsonProcessor().parse(fixedResponseJson, TaskListResponse.class);
-		if (StringUtils.isNotBlank(listResponse.getTasks().get(0).getSubAppl()))
+		if (listResponse.getTasks() !=  null && StringUtils.isNotBlank(listResponse.getTasks().get(0).getSubAppl()))
 		{
 			logger.println("TaskId, Module, Type, UserId, Version, Status, Application/SubAppl/Stream/Level, Release");
 			for (TaskInfo taskInfo : listResponse.getTasks())
