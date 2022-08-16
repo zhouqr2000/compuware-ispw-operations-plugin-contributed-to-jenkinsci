@@ -11,6 +11,8 @@ public class ReleaseInfo
 {
 	@XmlElement(name = "application")
 	private String application;
+	@XmlElement(name = "subAppl")
+	private String subAppl;
 	@XmlElement(name = "stream")
 	private String stream;
 	@XmlElement(name = "description")
@@ -116,5 +118,15 @@ public class ReleaseInfo
 	public void setMessage(String message)
 	{
 		this.message = message;
+	}
+
+	public String getSubAppl()
+	{
+		return subAppl;
+	}
+
+	public void setSubAppl(String subAppl)
+	{
+		this.subAppl = subAppl;
 	}
 }

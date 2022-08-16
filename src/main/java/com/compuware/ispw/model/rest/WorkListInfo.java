@@ -18,6 +18,8 @@ public class WorkListInfo
 	private String alternateName;
 	@XmlElement(name = "application")
 	private String application;
+	@XmlElement(name = "subAppl")
+	private String subAppl;
 	@XmlElement(name = "assignmentId")
 	private String assignmentId;
 	@XmlElement(name = "clazz")
@@ -450,4 +452,13 @@ public class WorkListInfo
 		this.version = version;
 	}
 
+	public String getSubAppl()
+	{
+		return subAppl;
+	}
+
+	public void setSubAppl(String subAppl)
+	{
+		this.subAppl = subAppl;
+	}
 }

@@ -26,6 +26,9 @@ public class SetInfoResponse
 	@XmlElement(name = "applicationId")
 	private String applicationId;
 	
+	@XmlElement(name = "subAppl")
+	private String subAppl;
+	
 	@XmlElement(name = "streamName")
 	private String streamName;
 	
@@ -209,6 +212,18 @@ public class SetInfoResponse
 	{
 		this.tasks = tasks;
 	}
+
+	public String getSubAppl()
+	{
+		return subAppl;
+	}
+
+	public void setSubAppl(String subAppl)
+	{
+		this.subAppl = subAppl;
+	}
+	
+	
 }
 /**
 * THESE MATERIALS CONTAIN CONFIDENTIAL INFORMATION AND TRADE SECRETS OF BMC SOFTWARE, INC. YOU SHALL MAINTAIN THE MATERIALS AS

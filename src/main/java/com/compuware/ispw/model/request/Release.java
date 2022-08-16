@@ -17,6 +17,7 @@ public class Release
 	private String workRefNumber;
 	private String releasePrefix;
 	private String userTag;
+	private String subAppl;
 
 	public String getReleaseId()
 	{
@@ -117,5 +118,17 @@ public class Release
 	{
 		this.userTag = userTag;
 	}
+
+	public String getSubAppl()
+	{
+		return subAppl;
+	}
+
+	public void setSubAppl(String subAppl)
+	{
+		this.subAppl = subAppl;
+	}
+	
+	
 	
 }

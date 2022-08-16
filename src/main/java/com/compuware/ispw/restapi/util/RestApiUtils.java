@@ -547,6 +547,7 @@ public class RestApiUtils {
 						Program program = new Program();
 						program.setStream(jaxbProgram.getStream());
 						program.setApplication(jaxbProgram.getApplication());
+						program.setSubAppl(jaxbProgram.getSubAppl());
 						program.setIsImpact(jaxbProgram.getIsImpact());
 						program.setLevel(jaxbProgram.getLevel());
 						program.setProgramLanguage(jaxbProgram.getProgramLanguage());

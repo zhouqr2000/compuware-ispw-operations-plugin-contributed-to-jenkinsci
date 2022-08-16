@@ -3,6 +3,7 @@ package com.compuware.ispw.restapi.action;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import com.compuware.ispw.model.rest.TaskInfo;
 import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
@@ -43,13 +44,22 @@ public class GetReleaseTaskInfoAction extends AbstractGetAction {
 	public Object endLog(PrintStream logger, IspwRequestBean ispwRequestBean, String responseJson)
 	{
 		TaskInfo taskInfo = new JsonProcessor().parse(responseJson,  TaskInfo.class);
-		logger.println("TaskId, Module, Type, UserId, Version, Status, Application/Stream/Level, Release");
-		logger.println(" " + taskInfo.getTaskId() + ", " + taskInfo.getModuleName() + ", "
-				+ taskInfo.getModuleType() + ", " + taskInfo.getUserId() + ", "
-				+ taskInfo.getVersion() + ", " + taskInfo.getStatus() + ", "
-				+ taskInfo.getApplication() + "/" + taskInfo.getStream() + "/"
-				+ taskInfo.getLevel() + ", " + taskInfo.getRelease());
-		
+		if (StringUtils.isNotBlank(responseJson))
+		{
+			logger.println("TaskId, Module, Type, UserId, Version, Status, Application/SubAppl/Stream/Level, Release");
+			logger.println(" " + taskInfo.getTaskId() + ", " + taskInfo.getModuleName() + ", " + taskInfo.getModuleType() + ", "
+					+ taskInfo.getUserId() + ", " + taskInfo.getVersion() + ", " + taskInfo.getStatus() + ", "
+					+ taskInfo.getApplication() + "/" + taskInfo.getSubAppl() + "/" + taskInfo.getStream() + "/"
+					+ taskInfo.getLevel() + ", " + taskInfo.getRelease());
+		}
+		else
+		{
+			logger.println("TaskId, Module, Type, UserId, Version, Status, Application/Stream/Level, Release");
+			logger.println(" " + taskInfo.getTaskId() + ", " + taskInfo.getModuleName() + ", " + taskInfo.getModuleType() + ", "
+					+ taskInfo.getUserId() + ", " + taskInfo.getVersion() + ", " + taskInfo.getStatus() + ", "
+					+ taskInfo.getApplication() + "/" + taskInfo.getStream() + "/" + taskInfo.getLevel() + ", "
+					+ taskInfo.getRelease());
+		}
 		return taskInfo;
 	}
 

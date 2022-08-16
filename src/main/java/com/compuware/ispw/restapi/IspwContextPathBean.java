@@ -26,6 +26,7 @@ public class IspwContextPathBean {
 	private String action;
 	private String approver;
 	private String checkout = Constants.FALSE;
+	private String sandbox;
 
 	@Override
 	public String toString() {
@@ -126,5 +127,15 @@ public class IspwContextPathBean {
 	public void setApplication(String application)
 	{
 		this.application = application;
+	}
+
+	public String getSandbox()
+	{
+		return sandbox;
+	}
+
+	public void setSandbox(String sandbox)
+	{
+		this.sandbox = sandbox;
 	}
 }

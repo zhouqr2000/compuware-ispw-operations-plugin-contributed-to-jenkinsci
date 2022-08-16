@@ -21,6 +21,10 @@ public class AddTaskInfo
 	@XmlElement(name="application")
 	@Required
 	private String application;
+	
+	@XmlElement(name="subAppl")
+	private String subAppl;
+	
 	@XmlElement(name="type")
 	@Required
 	private String type;
@@ -137,4 +141,13 @@ public class AddTaskInfo
 		this.releaseId = releaseId;
 	}
 
+	public String getSubAppl()
+	{
+		return subAppl;
+	}
+
+	public void setSubAppl(String subAppl)
+	{
+		this.subAppl = subAppl;
+	}
 }

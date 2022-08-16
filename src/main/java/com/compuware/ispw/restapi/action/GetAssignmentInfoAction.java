@@ -3,6 +3,7 @@ package com.compuware.ispw.restapi.action;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import com.compuware.ispw.model.rest.AssignmentInfo;
 import com.compuware.ispw.restapi.IspwContextPathBean;
 import com.compuware.ispw.restapi.IspwRequestBean;
@@ -43,7 +44,11 @@ public class GetAssignmentInfoAction extends AbstractGetAction {
 	{
 		AssignmentInfo assignment = new JsonProcessor().parse(responseJson, AssignmentInfo.class);
 		logger.println("Stream/Application/Default path: " + assignment.getStream() + "/"
-				+ assignment.getApplication() + "/" + assignment.getDefaultPath());
+				+ assignment.getApplication()+ "/" + assignment.getDefaultPath());
+		if (StringUtils.isNotBlank(assignment.getSubAppl()))
+		{
+			logger.println("SubAppl: " + assignment.getSubAppl());
+		}
 		logger.println("Assignment: " + assignment.getProjectNumber() + " - "
 				+ assignment.getDescription());
 		logger.println("Owner: " + assignment.getOwner());

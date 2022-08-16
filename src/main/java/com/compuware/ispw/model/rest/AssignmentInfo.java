@@ -12,10 +12,12 @@ public class AssignmentInfo
 {
 	private String stream;
 	private String application;
+	private String subAppl;
 	private String defaultPath;
 	private String description;
 	private String owner;
 	private String assignmentPrefix;
+	private String sandbox;
 	
 	/* used for response - confirm with CES team
 	@XmlElements({
@@ -145,5 +147,25 @@ public class AssignmentInfo
 	public void setProjectNumber(String projectNumber)
 	{
 		this.projectNumber = projectNumber;
+	}
+
+	public String getSubAppl()
+	{
+		return subAppl;
+	}
+
+	public void setSubAppl(String subAppl)
+	{
+		this.subAppl = subAppl;
+	}
+
+	public String getSandbox()
+	{
+		return sandbox;
+	}
+
+	public void setSandbox(String sandbox)
+	{
+		this.sandbox = sandbox;
 	}
 }

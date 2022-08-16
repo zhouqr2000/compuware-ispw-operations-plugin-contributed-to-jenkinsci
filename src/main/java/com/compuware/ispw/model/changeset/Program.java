@@ -39,6 +39,9 @@ public class Program implements Serializable
 
 	@Expose
 	private String application;
+	
+	@Expose
+	private String subAppl;
 
 	@Expose
 	private String stream;
@@ -152,6 +155,16 @@ public class Program implements Serializable
 	public void setLevel(String level)
 	{
 		this.level = level;
+	}
+	
+	public String getSubAppl()
+	{
+		return subAppl;
+	}
+
+	public void setSubAppl(String subAppl)
+	{
+		this.subAppl = subAppl;
 	}
 
 	/**

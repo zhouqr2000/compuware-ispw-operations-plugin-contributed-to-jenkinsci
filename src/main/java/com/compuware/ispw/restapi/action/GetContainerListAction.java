@@ -18,8 +18,8 @@ import com.compuware.ispw.restapi.util.RestApiUtils;
  */
 public class GetContainerListAction extends AbstractGetAction {
 
-	private static final String[] defaultProps = new String[] { userId, containerId, containerType, application, owner, description, refNumber, releaseId, stream, path, tag, includeClosedContainers };
-	private static final String contextPath = "/ispw/{srid}/containers/list?userId={userId}&containerId={containerId}&containerType={containerType}&application={application}&owner={owner}&description={description}&refNumber={refNumber}&releaseId={releaseId}&stream={stream}&path={path}&tag={tag}&includeClosedContainers={includeClosedContainers}"; //$NON-NLS-1$
+	private static final String[] defaultProps = new String[] { userId, containerId, containerType, application,subAppl, owner, description, refNumber, releaseId, stream, path, tag, includeClosedContainers };
+	private static final String contextPath = "/ispw/{srid}/containers/list?userId={userId}&containerId={containerId}&containerType={containerType}&application={application}&subAppl={subAppl}&owner={owner}&description={description}&refNumber={refNumber}&releaseId={releaseId}&stream={stream}&path={path}&tag={tag}&includeClosedContainers={includeClosedContainers}"; //$NON-NLS-1$
 
 	public GetContainerListAction(PrintStream logger) {
 		super(logger);
@@ -38,6 +38,7 @@ public class GetContainerListAction extends AbstractGetAction {
 		path = path.replace("containerId={containerId}", StringUtils.EMPTY); //$NON-NLS-1$
 		path = path.replace("containerType={containerType}", StringUtils.EMPTY); //$NON-NLS-1$
 		path = path.replace("application={application}", StringUtils.EMPTY); //$NON-NLS-1$
+		path = path.replace("subAppl={subAppl}", StringUtils.EMPTY); //$NON-NLS-1$
 		path = path.replace("owner={owner}", StringUtils.EMPTY); //$NON-NLS-1$
 		path = path.replace("description={description}", StringUtils.EMPTY); //$NON-NLS-1$
 		path = path.replace("refNumber={refNumber}", StringUtils.EMPTY); //$NON-NLS-1$
@@ -75,6 +76,10 @@ public class GetContainerListAction extends AbstractGetAction {
 			{
 				logger.println(" "); //$NON-NLS-1$
 				logger.println("Application: " + containerListInfo.getApplication()); //$NON-NLS-1$
+				if (StringUtils.isNotEmpty(containerListInfo.getSubAppl()))
+				{
+					logger.println("SubAppl: " + containerListInfo.getSubAppl()); //$NON-NLS-1$
+				}
 				logger.println("Container ID: " + containerListInfo.getContainerId()); //$NON-NLS-1$
 				logger.println("Container type: " + containerListInfo.getContainerType()); //$NON-NLS-1$
 				logger.println("Description: " + containerListInfo.getDescription()); //$NON-NLS-1$

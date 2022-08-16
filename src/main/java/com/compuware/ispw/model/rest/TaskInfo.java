@@ -30,6 +30,9 @@ public class TaskInfo
 	@Required
 	@XmlElement(name = "application")
 	private String application;
+
+	@XmlElement(name = "subAppl")
+	private String subAppl;
 	
 	@Required
 	@XmlElement(name = "stream")
@@ -536,5 +539,15 @@ public class TaskInfo
 	public void setJaxbProgram(JaxbProgram jaxbProgram)
 	{
 		this.jaxbProgram = jaxbProgram;
+	}
+
+	public String getSubAppl()
+	{
+		return subAppl;
+	}
+
+	public void setSubAppl(String subAppl)
+	{
+		this.subAppl = subAppl;
 	}
 }
