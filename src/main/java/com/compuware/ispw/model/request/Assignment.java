@@ -20,7 +20,6 @@ public class Assignment
 	private String tag;
 	private String projectNumber;
 	private String subAppl;
-	
 
 	public String getOwner()
 	{
@@ -131,6 +130,4 @@ public class Assignment
 	{
 		this.subAppl = subAppl;
 	}
-	
-
 }
