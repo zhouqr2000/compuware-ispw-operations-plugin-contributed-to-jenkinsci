@@ -1,3 +1,13 @@
+/**
+* THESE MATERIALS CONTAIN CONFIDENTIAL INFORMATION AND TRADE SECRETS OF BMC SOFTWARE, INC. YOU SHALL MAINTAIN THE MATERIALS AS
+* CONFIDENTIAL AND SHALL NOT DISCLOSE ITS CONTENTS TO ANY THIRD PARTY EXCEPT AS MAY BE REQUIRED BY LAW OR REGULATION. USE,
+* DISCLOSURE, OR REPRODUCTION IS PROHIBITED WITHOUT THE PRIOR EXPRESS WRITTEN PERMISSION OF BMC SOFTWARE, INC.
+*
+* ALL BMC SOFTWARE PRODUCTS LISTED WITHIN THE MATERIALS ARE TRADEMARKS OF BMC SOFTWARE, INC. ALL OTHER COMPANY PRODUCT NAMES
+* ARE TRADEMARKS OF THEIR RESPECTIVE OWNERS.
+*
+* (c) Copyright 2023 BMC Software, Inc.
+*/
 package com.compuware.ispw.restapi;
 
 import java.io.IOException;
@@ -9,6 +19,7 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
@@ -68,7 +79,7 @@ import jenkins.security.MasterToSlaveCallable;
 public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentSupplier, RuntimeException> {
 
 	private static final long serialVersionUID = -2066857816168989599L;
-	private final String url;
+	private String url;
 	private final HttpMode httpMode;
 	private final boolean ignoreSslErrors;
 	private final HttpHost httpProxy;
@@ -341,11 +352,25 @@ public class HttpRequestExecution extends MasterToSlaveCallable<ResponseContentS
 			}
 
 			HttpClientUtil clientUtil = new HttpClientUtil();
+			
+			//Supporting Special characters in Query parameters of Regress API's of Assignment/Release
+			if (url.indexOf("/regress")!=-1)
+			{
+				String[] splittedURL=url.split("\\?", 2);
+				if(splittedURL.length == 2)
+				{
+					String baseURL= splittedURL[0];
+					String query=splittedURL[1];
+					url = baseURL + "?"+ URLEncoder.encode( query, "UTF-8") ; 
+				}
+				
+			}
+	 
 			HttpRequestBase httpRequestBase = clientUtil.createRequestBase(new RequestAction(new URL(url), httpMode, body, null, headers));
 			HttpContext context = new BasicHttpContext();
 
 			httpclient = auth(clientBuilder, httpRequestBase, context);
-
+			
 			ResponseContentSupplier response = executeRequest(httpclient, clientUtil, httpRequestBase, context);
 			processResponse(response);
 
