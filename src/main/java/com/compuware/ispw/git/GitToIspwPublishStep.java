@@ -34,6 +34,7 @@ import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.Cause;
 import hudson.model.Item;
+import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.scm.ChangeLogSet;
@@ -107,7 +108,8 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
 				workflowRun = (WorkflowRun) run;
 				previousRun = workflowRun.getPreviousBuild();
 			}
-			if (run instanceof WorkflowRun && (changeSets == null || changeSets.isEmpty()))
+			//If Previous run was not successful we need to recalculate the changelog
+			if (run instanceof WorkflowRun && (changeSets == null || changeSets.isEmpty() || !Result.SUCCESS.equals(previousRun.getResult())))
 			{
 				//If we decide only recalculate based on whether the previous build failed, we need to comment out
 				//the following condition
@@ -266,6 +268,10 @@ public class GitToIspwPublishStep extends AbstractStepImpl implements IGitToIspw
 			Launcher launcher = getContext().get(Launcher.class);
 			if(GitToIspwUtils.callCli(launcher, run, logger, envVars, refMap, step))
 			{
+				logger.println("Successfuly synchronized Repository: " + step.getGitRepoUrl() + ", Branch: "
+						+ envVars.get("BRANCH_NAME") + " to Stream: " + step.getStream() + ", Application: "
+						+ step.getApp() + ", Sub Application: " + step.getSubAppl() + ", Level: "
+						+ refMap.getIspwLevel());
 				return 0;
 			}
 			else
