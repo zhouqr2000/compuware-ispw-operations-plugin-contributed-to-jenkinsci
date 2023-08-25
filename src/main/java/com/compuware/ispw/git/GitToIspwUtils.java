@@ -479,8 +479,11 @@ public class GitToIspwUtils
 			if (scms != null && !scms.isEmpty())
 			{
 				SCM thescm = scms.iterator().next();
-
-				if (thescm instanceof GitSCM && (isSameRevisionUsedbyLastBuild(run, (GitSCM) thescm, listener.getLogger()) || !Result.SUCCESS.equals(run.getPreviousBuild().getResult())))
+				WorkflowRun previousBuild = run.getPreviousBuild();
+				boolean previousBuildIsNotSuccessful = previousBuild != null && !Result.SUCCESS.equals(previousBuild.getResult());
+				if (thescm instanceof GitSCM 
+						&& (isSameRevisionUsedbyLastBuild(run, (GitSCM) thescm, listener.getLogger())
+								|| previousBuildIsNotSuccessful))
 				{
 					return true;
 				}
@@ -532,7 +535,7 @@ public class GitToIspwUtils
 						if (preRun != null)
 						{
 							// if previous run failed, recalculate the changelog starting previous successful run else recalculate changelog from previous build with different revision
-							if (!preRun.getResult().equals(Result.SUCCESS)) 
+							if (preRun.getResult() != null && !Result.SUCCESS.equals(preRun.getResult())) 
 							{
 								WorkflowRun previousSuccessfulBuild = theRun.getPreviousSuccessfulBuild();
 								if (null != previousSuccessfulBuild) {
