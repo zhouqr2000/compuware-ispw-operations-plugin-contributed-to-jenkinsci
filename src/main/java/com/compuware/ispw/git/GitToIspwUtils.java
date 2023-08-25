@@ -50,6 +50,7 @@ import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.model.Computer;
 import hudson.model.Item;
+import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.plugins.git.Branch;
@@ -479,7 +480,7 @@ public class GitToIspwUtils
 			{
 				SCM thescm = scms.iterator().next();
 
-				if (thescm instanceof GitSCM && isSameRevisionUsedbyLastBuild(run, (GitSCM) thescm, listener.getLogger()))
+				if (thescm instanceof GitSCM && (isSameRevisionUsedbyLastBuild(run, (GitSCM) thescm, listener.getLogger()) || !Result.SUCCESS.equals(run.getPreviousBuild().getResult())))
 				{
 					return true;
 				}
@@ -530,19 +531,33 @@ public class GitToIspwUtils
 	
 						if (preRun != null)
 						{
-							preRevision = getRevision(preRun, gitScm);
-	
-							while (isSameRevision(revision, preRevision) && !preRun.isBuilding())
+							// if previous run failed, recalculate the changelog starting previous successful run else recalculate changelog from previous build with different revision
+							if (!preRun.getResult().equals(Result.SUCCESS)) 
 							{
-								theRun = preRun;
-								preRun = theRun.getPreviousBuild();
-								
-								if (preRun != null)
-								{
-									revision = getRevision(theRun, gitScm);
-									preRevision = getRevision(preRun, gitScm);
+								WorkflowRun previousSuccessfulBuild = theRun.getPreviousSuccessfulBuild();
+								if (null != previousSuccessfulBuild) {
+									logger.println("Since the last build failed, changelog will be calculated from last successful build : "+previousSuccessfulBuild);
+									preRevision = getRevision(previousSuccessfulBuild, gitScm);
 								} else {
-									break;
+									//calculate changelog based on first build in case there is no prior successful build
+									logger.println("There is no prior successful build for this job.");
+									preRevision = getRevision(job.getFirstBuild(), gitScm);
+								}
+								revision = getRevision(curRun, gitScm);
+							} else {
+								preRevision = getRevision(preRun, gitScm);
+								while (isSameRevision(revision, preRevision) && !preRun.isBuilding())
+								{
+									theRun = preRun;
+									preRun = theRun.getPreviousBuild();
+									
+									if (preRun != null)
+									{
+										revision = getRevision(theRun, gitScm);
+										preRevision = getRevision(preRun, gitScm);
+									} else {
+										break;
+									}
 								}
 							}
 						}
