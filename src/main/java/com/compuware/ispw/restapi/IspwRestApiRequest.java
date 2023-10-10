@@ -411,7 +411,7 @@ public class IspwRestApiRequest extends Builder {
 		IspwRequestBean ispwRequestBean = null;
 		FilePath buildParmPath = GitToIspwUtils.getFilePathInVirtualWorkspace(envVars, Constants.BUILD_PARAM_FILE_NAME);
 		ispwRequestBody = action.preprocess(ispwRequestBody, buildParmPath, logger);
-		if (ispwRequestBody == null || ispwRequestBody.isEmpty())
+		if (ispwRequestBody == null)
 		{
 			logger.println("The " + ispwAction + " operation is skipped since the build parameters cannot be captured.");
 			return true;

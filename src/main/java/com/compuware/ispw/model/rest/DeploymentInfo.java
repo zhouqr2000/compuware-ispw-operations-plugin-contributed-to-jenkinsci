@@ -17,6 +17,7 @@ public class DeploymentInfo
 	private String status;
 	private String description;
 	private String createDate;
+	private String createDateTime;
 	private List<DeploymentPackageInfo> packages = new ArrayList<DeploymentPackageInfo>();
 	
 	public List<String> getMessage()
@@ -92,6 +93,16 @@ public class DeploymentInfo
 	public void setCreateDate(String createDate)
 	{
 		this.createDate = createDate;
+	}
+	
+	public String getCreateDateTime()
+	{
+		return createDateTime;
+	}
+	
+	public void setCreateDateTime(String createDateTime)
+	{
+		this.createDateTime = createDateTime;
 	}
 
 	public List<DeploymentPackageInfo> getPackages()
