@@ -457,7 +457,7 @@ public final class IspwRestApiRequestStep extends AbstractStepImpl {
 			FilePath buildParmPath = GitToIspwUtils.getFilePathInVirtualWorkspace(envVars, Constants.BUILD_PARAM_FILE_NAME);
 
 			String realIspwRequestBody = action.preprocess(step.ispwRequestBody, buildParmPath, logger);
-			if (realIspwRequestBody == null || realIspwRequestBody.isEmpty())
+			if (realIspwRequestBody == null)
 			{
 				logger.println("The " + step.ispwAction + " operation is skipped since the build parameters cannot be captured.");
 				return null;

@@ -56,6 +56,7 @@ public class JsonProcessor {
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
 			mapper.writerWithDefaultPrettyPrinter();
 			mapper.setSerializationInclusion(Include.NON_NULL);
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);

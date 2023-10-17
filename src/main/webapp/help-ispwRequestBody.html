@@ -1099,6 +1099,74 @@
         </tbody>
       </table>
       <br>
+      <strong>GetDeploymentList action:</strong> <br>
+      Required: none<br>
+      Optional:<br>
+      <table border="1">
+        <tbody>
+          <tr>
+            <td style="width:10%" valign="top">todaysDate<br>
+            </td>
+            <td valign="top">True/False value indicating whether or not to include today's date deployments. This field is not case sensitive.<br>
+            </td
+          <tr>
+          <tr>
+            <td>priorWeek<br>
+            </td>
+            <td valign="top">True/False value indicating whether or not to include prior week deployments. This field is not case sensitive. The default value is true.<br>
+            </td>
+          </tr>
+          <tr>
+            <td>startDate<br>
+            </td>
+            <td>Deployment start date/time in yyyy-mm-dd format when the set will be dispatched for execution.<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">endDate</td>
+            <td valign="top">Deployment end date/time in yyyy-mm-dd format.<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">requestId<br>
+            </td>
+            <td valign="top">A unique numerical id assigned to this deployment request. Wildcard * is not supported.<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">setId</td>
+            <td valign="top">The set ID you want information on. This field is case sensitive. Wildcard * is only supported.<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">environment<br>
+            </td>
+            <td valign="top">The logical execution environment where the components will be deployed for this request. This field is not case sensitive. Wildcard * is only supported.<br>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top">status<br>
+            </td>
+            <td valign="top">The overall current status of the deploy request, which may be Planned, Confirmed, Staged, Implemented, Completed, Failed, or Terminated. This field is not case sensitive. Wildcard * is only supported.<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      Example:
+      <table border="1">
+        <tbody>
+          <tr>
+            <td>GetDeploymentList<br>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <pre>startDate=2023-08-09<br>endDate=2023-08-14<br>status=COMPLETED<br></pre>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
       <strong>GetReleaseTaskInfo / GetReleaseTaskGenerateListing /
         GetReleaseTaskList actions:</strong> <br>
       Required:

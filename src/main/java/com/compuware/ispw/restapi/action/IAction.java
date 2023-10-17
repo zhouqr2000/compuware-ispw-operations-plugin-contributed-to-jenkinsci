@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2019 Compuware Corporation. All rights reserved.
- * (c) Copyright 2020 BMC Software, Inc.
+ * (c) Copyright 2020, 2023 BMC Software, Inc.
  */
 package com.compuware.ispw.restapi.action;
 
@@ -88,6 +88,10 @@ public interface IAction {
 	public static final String taskName = "taskName"; // TODO: need to update to mname/mtype to be consistent on CES
 														// side
 	public static final String type = "type";
+	public static final String todaysDate = "todaysDate";
+	public static final String priorWeek = "priorWeek";
+	public static final String status = "status";
+	
 
 	public IspwRequestBean getIspwRequestBean(String srid, String ispwRequestBody, WebhookToken webhookToken);
 
