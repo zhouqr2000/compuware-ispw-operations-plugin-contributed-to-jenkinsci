@@ -502,6 +502,11 @@ public class RestApiUtils {
 			if(s2.endsWith("&")) {
 				s2 = s2.substring(0, s2.length()-1);
 			}
+			s2 = s2.replace("?&", "?");
+			if(s2.equals("?"))
+			{
+				s2 = StringUtils.EMPTY;
+			}
 
 			resultPath = s1 + s2;
 		}
